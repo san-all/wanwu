@@ -130,7 +130,7 @@
           >
           </el-input>
         </el-form-item>
-        <el-form-item :label="$t('modelAccess.table.publishTime')" prop="publishDate">
+        <!--<el-form-item :label="$t('modelAccess.table.publishTime')" prop="publishDate">
           <el-date-picker
             v-model="createForm.publishDate"
             type="date"
@@ -138,7 +138,7 @@
             :placeholder="$t('common.select.placeholder')"
           >
           </el-date-picker>
-        </el-form-item>
+        </el-form-item>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">{{$t('common.button.cancel')}}</el-button>
@@ -204,7 +204,7 @@ export default {
           key: '',
           path: ''
         },
-        publishDate: '',
+        // publishDate: '',
         functionCalling: DEFAULT_CALLING,
         visionSupport: DEFAULT_SUPPORT
       },
