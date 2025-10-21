@@ -48,14 +48,11 @@
                   class="echo-doc-box"
                   v-if="hasFiles(n)"
                 >
-                 <div v-for="(file,j) in fileDisplayList(n)" :key="`${j}sdsl`">
-                  <div v-if="hasImgs(n)" class="docInfo-img-container">
+                 <div v-for="(file,j) in n.fileList" :key="`${j}sdsl`">
+                  <div v-if="hasImgs(n,file)" class="docInfo-img-container">
                       <img
-                        :src="file.imgUrl || file"
+                        :src="file.fileUrl"
                         class="docIcon imgIcon" />
-                      <p v-if="n.fileList">
-                      {{file.name}} [ {{getFileSizeDisplay(file.size)}} ]
-                      </p>
                   </div>
                   <div v-else class="docInfo-container">
                   <img
@@ -404,24 +401,22 @@ export default {
   },
   methods: {
     hasFiles(n){
-       return (n.fileList && n.fileList.length > 0) ||  (n.filepath && n.filepath.length > 0);
+       return n.fileList && n.fileList.length > 0;
     },
-    hasImgs(n){
-      console.log(n)
-       return (n.fileList && n.fileList.length > 1) ||  (n.filepath && n.filepath.length > 1);
-    },
-    fileDisplayList(n){
-       return n.fileList || n.filepath || [];
+    hasImgs(n,file){
+      if (!n.fileList || n.fileList.length === 0 || !file || !file.name) {
+        return false;
+      }
+      let type = file.name.split('.').pop().toLowerCase();
+      return this.imgConfig.map(t => t.toLowerCase()).includes(type);
     },
     handleCitationClick(e) {
-      // 调用 common.js 中的通用方法
       this.$handleCitationClick(e, {
         sessionStatus: this.sessionStatus,
         sessionData: this.session_data,
         citationSelector: '.citation',
         scrollElementId: 'timeScroll',
         onToggleCollapse: (item, collapse) => {
-          // 使用 Vue.set 确保响应式更新
           this.$set(item, 'collapse', collapse);
         }
       });
@@ -976,17 +971,18 @@ export default {
         }
         .echo-doc-box {
           margin-top: 10px;
-          background: #fff;
           width: auto;
           display: flex;
-          border: 1px solid rgb(235, 236, 238);
-          border-radius: 5px;
+          gap:8px;
           justify-content: space-between;
           align-items: center;
-          padding: 5px 10px 5px 5px;
           .docInfo-container{
             display: flex;
             align-items: center;
+            background: #fff;
+            border: 1px solid rgb(235, 236, 238);
+            padding: 5px 10px 5px 5px;
+            border-radius: 5px;
           }
           .docInfo-img-container{
             p{
@@ -998,11 +994,10 @@ export default {
           .docIcon {
             width: 30px;
             height: 30px;
-            margin-right: 10px;
           }
           .imgIcon {
             width:auto!important;
-            height:60px!important;
+            height:70px!important;
             display:block;
             border-radius:6px;
           }

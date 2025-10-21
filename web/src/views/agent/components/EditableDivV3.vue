@@ -4,7 +4,7 @@
         <div class="editable-box">
             <div  v-if="fileType === 'image/*'" class="echo-img-box">
                 <div v-for="file in fileList" class="echo-img-item">
-                    <el-image class="echo-img" :src="file.imgUrl" @click="showBigImg(file.imgUrl)"  :preview-src-list="[file.imgUrl]"></el-image>
+                    <el-image class="echo-img" :src="file.fileUrl" @click="showBigImg(file.fileUrl)"  :preview-src-list="[file.imgUrl]"></el-image>
                     <i class="el-icon-close echo-close" @click="clearFile"></i>
                 </div>
             </div>

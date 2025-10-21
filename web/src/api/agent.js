@@ -198,6 +198,34 @@ export const enableCustom = (data)=>{
         data
     })
 }
+
+
+// 删除自定义、内置工具
+export const delCustomBuiltIn = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/tool/custom-builtin`,
+        method: 'delete',
+        data
+    })
+}
+// 添加自定义、内置工具
+export const addCustomBuiltIn = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/tool/custom-builtin`,
+        method: 'post',
+        data
+    })
+}
+// 启停自定义、内置工具
+export const switchCustomBuiltIn = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/tool/custom-builtin/switch`,
+        method: 'put',
+        data
+    })
+}
+
+
 //编辑url
 export const editOpenurl = (data)=>{
     return service({

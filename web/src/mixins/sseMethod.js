@@ -368,12 +368,6 @@ export default {
                 responseLoading: true, 
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
                 fileList:this.fileList,
-                // fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
-                // fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                // fileUrl:this.fileList.length > 0 
-                // ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
-                // : '',
-                // fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                 pendingResponse:''
             }
             //正式环境传模型参数
@@ -456,12 +450,6 @@ export default {
                             ...this.sseParams,
                             "query": prompt,
                             "fileList":this.fileList,
-                            // "fileName":this.fileList.length > 0 ? this.fileList[0]['name'] : '',
-                            // "fileSize":this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                            // fileUrl: this.fileList.length > 0 
-                            // ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
-                            // : '',
-                            // fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                             "response": '',
                             "filepath": data.file_url || '',
                             "requestFileUrls": this.queryFilePath?[this.queryFilePath] : data.requestFileUrls,
@@ -575,13 +563,6 @@ export default {
                     // 如果返回有结果，则在结束时不展示“本次回答已终止”
                     this.runResponse = md.render(endStr)
                     this.runDisabled = false
-                    // this.$refs['session-com'].replaceLastData(lastIndex, {
-                    //     ...lastRQ,
-                    //     finish: 1,
-                    //     pending: false,
-                    //     responseLoading: false,
-                    //     response:  md.render(endStr) 
-                    // })
                     this.setStoreSessionStatus(-1)
                 }
             }

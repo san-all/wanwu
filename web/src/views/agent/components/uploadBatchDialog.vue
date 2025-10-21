@@ -170,6 +170,7 @@
                 this.fileType = ''
                 this.fileUrl = ''
                 this.imgUrl = ''
+                this.fileInfo = []
                 this.canScroll = false
             },
             handleClose(){
@@ -218,7 +219,7 @@
                     }
                     const currentFileIndex = this.fileList.length - 1; // 当前文件在列表中的索引
                     if (file.raw) {
-                        this.fileList[currentFileIndex].imgUrl = URL.createObjectURL(file.raw);
+                        this.fileList[currentFileIndex].fileUrl = URL.createObjectURL(file.raw);
                     }
                     this.checkScrollable();
                 } else {
@@ -259,7 +260,8 @@
                 //}
                 this.$emit('setFileId',this.fileInfo)
                 this.$emit('setFile',this.fileList)
-                this.handleClose();
+                this.clearFile()
+                this.handleClose()
             },
             getFileIdList(){
                 return this.fileIdList

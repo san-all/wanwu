@@ -49,10 +49,11 @@ export default {
             mcpList:[],
             workFlowList:[],
             customList:[],
+            builtInInfos:[],
             toolList:[
                 {
                     value:'auto',
-                    name:'自定义'
+                    name:'工具'
                 },
                 {
                     value:'mcp',
@@ -69,6 +70,7 @@ export default {
          contentMap() {
             return {
             auto: this.customInfos,
+            builtIn: this.builtInInfos,
             mcp: this.mcpInfos,
             workflow: this.workFlowInfos
             }
