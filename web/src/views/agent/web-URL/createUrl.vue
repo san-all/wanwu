@@ -13,7 +13,7 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="desc"
+                  prop="description"
                   label="描述"
                 >
                 </el-table-column>
@@ -78,9 +78,9 @@
               <el-input v-model="form.name" placeholder="请输入应用名称"></el-input>
             </el-form-item>
             <el-form-item label="应用描述" 
-              prop="desc"
+              prop="description"
             >
-              <el-input v-model="form.desc" placeholder="请输入应用描述" type="textarea" :rows="2"></el-input>
+              <el-input v-model="form.description" placeholder="请输入应用描述" type="textarea" :rows="2"></el-input>
             </el-form-item>
             <el-form-item label="过期时间" prop="expiredAt">
                <el-date-picker
@@ -179,7 +179,7 @@ export default {
             disclaimerEnable:false,
             expiredAt:'',
             name:'',
-            desc:'',
+            description:'',
             privacyPolicy:'',
             privacyPolicyEnable:false
           },
