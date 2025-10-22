@@ -42,7 +42,9 @@
                                                 <div v-for="(f, idx) in fileList" :key="f.uid || idx" style="margin-bottom: 10px;">
                                                     <img :src="f.fileUrl" />
                                                     <p class="type-img-info">
-                                                        <span>{{f.name}}</span>
+                                                        <el-tooltip class="item" effect="dark" :content="f.name" placement="top-start">
+                                                            <span>{{f.name.length>6?f.name.slice(0,6)+'...':f.name}}</span>
+                                                        </el-tooltip>
                                                         <span>[ {{f.size > 1024 ? (f.size / (1024 * 1024 )).toFixed(2) + ' MB' : f.size + ' bytes' }} ]</span>
                                                     </p>
                                                 </div>
@@ -114,6 +116,7 @@
                 },
                 chunkFileName:'',
                 fileInfo:[],
+                lastFileType:'',
                 imgUrl:''
             }
         },
@@ -242,11 +245,11 @@
                 }
             },
             uploadFile(fileName,oldFileName,fiePath){//文件上传完之后
-                //this.fileInfo = {
-                    //fileName,
-                    //fileSize:this.fileList[0]['size'],
-                    //fileUrl:fiePath,
-                //}
+                if (this.lastFileType && this.lastFileType !== this.fileType) {
+                    this.fileInfo = [];
+                }
+                this.lastFileType = this.fileType;
+
                 this.fileInfo.push({
                     fileName,
                     fileSize:this.fileList[this.fileIndex]['size'],

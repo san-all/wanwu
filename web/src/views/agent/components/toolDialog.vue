@@ -33,7 +33,7 @@
 </template>
 <script>
 import { getList } from '@/api/workflow.js';
-import { addWorkFlowInfo, addMcp,customList,addCustom } from "@/api/agent";
+import { addWorkFlowInfo, addMcp,customList,addCustomBuiltIn } from "@/api/agent";
 import { getExplorationFlowList} from "@/api/workflow";
 export default {
     props:['assistantId'],
@@ -42,7 +42,7 @@ export default {
             toolName:'',
             dialogVisible:false,
             toolIndex:0,
-            activeValue:'auto',
+            activeValue:'tool',
             workFlowInfos:[],
             mcpInfos:[],
             customInfos:[],
@@ -52,7 +52,7 @@ export default {
             builtInInfos:[],
             toolList:[
                 {
-                    value:'auto',
+                    value:'tool',
                     name:'工具'
                 },
                 {
@@ -69,7 +69,7 @@ export default {
     computed:{
          contentMap() {
             return {
-            auto: this.customInfos,
+            tool: this.customInfos,
             builtIn: this.builtInInfos,
             mcp: this.mcpInfos,
             workflow: this.workFlowInfos
@@ -95,7 +95,7 @@ export default {
             })
         },
         goCreate(){
-            if(this.activeValue === 'auto'){
+            if(this.activeValue === 'tool'){
                 this.$router.push({path:'/tool?type=tool&mcp=custom'})
             }else if(this.activeValue === 'mcp'){
                 this.$router.push({path:'/tool?type=mcp&mcp=mcp'})
@@ -104,7 +104,7 @@ export default {
             }
         },
         createText(){
-            if(this.activeValue === 'auto'){
+            if(this.activeValue === 'tool'){
                 return '创建自定义工具'
             }else if(this.activeValue === 'mcp'){
                 return '导入MCP'
@@ -120,11 +120,12 @@ export default {
             }else if(type === 'mcp'){
                 this.addMcpItem(item)
             }else{
-                this.addCustomItem(item)
+                this.addCustomBuiltIn(item)
             }
         },
-        addCustomItem(n){
-            addCustom({assistantId:this.assistantId,customToolId:n.customToolId}).then(res =>{
+        addCustomBuiltIn(n){
+            //添加自定义工具和内置工具
+            addCustomBuiltIn({assistantId:this.assistantId,actionName:n.actionName,toolId:n.toolId,toolType:n.toolType}).then(res =>{
                 if(res.code === 0){
                     n.checked = true;
                     this.$message.success('工具添加成功');
@@ -161,7 +162,7 @@ export default {
             }
         },
         searchTool(){
-            if(this.activeValue === 'auto'){
+            if(this.activeValue === 'tool'){
                 this.getCustomList(this.toolName)
             }else if(this.activeValue === 'mcp'){
                 this.getMcpSelect(this.toolName)
@@ -221,7 +222,7 @@ export default {
         },
         handleClose(){
             this.toolIndex = -1;
-            this.activeValue = 'auto'
+            this.activeValue = 'tool';
             this.dialogVisible = false;
         },
         clickTool(item,i){
