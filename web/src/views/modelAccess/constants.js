@@ -73,7 +73,7 @@ export const TYPE_OBJ = {
         [OLLAMA]: '',
         [QWEN]: 'sk-b************c70d',
         [HUOSHAN]: 'd8008ac0-****-****-****-**************',
-        [INFINI]: ''
+        [INFINI]: 'sk-nw****gzjb6'
     },
     inferUrl: {
         [OCR]: 'https://maas-api.ai-yuanjing.com/openapi/v1',
@@ -84,6 +84,6 @@ export const TYPE_OBJ = {
         [OLLAMA]: 'https://192.168.21.100:11434',
         [QWEN]: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         [HUOSHAN]: 'https://ark.cn-beijing.volces.com/api/v3',
-        [INFINI]: ''
+        [INFINI]: 'https://cloud.infini-ai.com/maas/v1'
     },
 }

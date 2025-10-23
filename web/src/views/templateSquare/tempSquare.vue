@@ -50,7 +50,7 @@
                   <div class="card-bottom">
                     <div class="card-bottom-left">下载量：{{item.downloadNum || '--'}}</div>
                     <div class="card-bottom-right">
-                      <i class="el-icon-copy-document" title="复制" @click.stop="copyTemplate(item)"></i>
+                      <i v-if="isLogin" class="el-icon-copy-document" title="复制" @click.stop="copyTemplate(item)"></i>
                       <i class="el-icon-download" title="下载" @click.stop="downloadTemplate(item)"></i>
                     </div>
                   </div>
@@ -94,6 +94,7 @@ export default {
           "category": "search"
         },
       ],
+      isLogin: false,
       loading:false,
       typeRadio: 'all',
       typeList: [
@@ -107,6 +108,10 @@ export default {
         {name: '搜索', key: 'search'},
       ]
     };
+  },
+  created() {
+    const { token, is2FA } = this.$store.state.user || {}
+    this.isLogin = (token && !is2FA)
   },
   mounted() {
     this.doGetWorkflowTempList()
