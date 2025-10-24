@@ -168,7 +168,7 @@ export default {
   },
   methods: {
     getOrgList(){
-      getOrgList({}).then(res => {
+      getOrgList({knowledgeId:this.knowledgeId}).then(res => {
          if(res.code === 0){
           this.organizationList = res.data.knowOrgInfoList || []
          }
@@ -270,7 +270,6 @@ export default {
       
       const checkedNodes = checkedInfo.checkedNodes || [];
       
-      // 获取当前组织ID和组织名称
       const currentOrg = this.organizationList.find(function(org) {
         return org.orgId === this.selectedOrganization;
       }.bind(this));

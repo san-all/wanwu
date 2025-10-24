@@ -34,7 +34,7 @@
             <el-radio :label="'organization'" v-model="scope">公开发布为应用：组织内可见</el-radio>
           </div>
           <div>
-            <el-radio :label="'public'" v-model="scope">公开发布为应用：组织内可见</el-radio>
+            <el-radio :label="'public'" v-model="scope">公开发布为应用：全局可见</el-radio>
           </div>
           <div class="saveBtn">
             <el-button size="mini" type="primary" @click="savePublish">保 存</el-button>
