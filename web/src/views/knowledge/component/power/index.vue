@@ -12,6 +12,7 @@
         <div class="title-content">
           <i class="el-icon-s-custom title-icon"></i>
           <span class="title-text">{{ dialogTitle }}</span>
+          <span class="title-tip" v-if="currentView === 'transfer'">[ 转移后您的权限将变为'可编辑' ]</span>
         </div>
         <div class="title-subtitle" v-if="knowledgeName">
           <span class="knowledge-name">[ {{ knowledgeName }} ]</span>
@@ -232,6 +233,11 @@ export default {
       font-size: 18px;
       font-weight: 600;
       color: #303133;
+    }
+    .title-tip {
+      margin-left:5px;
+      font-size: 12px;
+      color: #384BF7;
     }
   }
   

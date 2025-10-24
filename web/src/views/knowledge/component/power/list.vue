@@ -157,7 +157,7 @@ export default {
       ]
       editUserPower({knowledgeId:this.knowledgeId,knowledgeUserList:knowledgeUserList}).then(res => {
         if(res.code === 0){
-          this.$message.success('权修改成功')
+          this.$message.success('权限修改成功')
           this.getUserPower()
         }
       }).catch(() => {})

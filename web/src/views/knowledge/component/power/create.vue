@@ -143,6 +143,45 @@ export default {
         label: 'userName'
       },
       treeData: [],
+      // 测试数据（已注释）
+      // treeData: [
+      //     {
+      //       "userId": "15",
+      //       "userName": "wangliang"
+      //     },
+      //     {
+      //       "userId": "11",
+      //       "userName": "zqf"
+      //     },
+      //     {
+      //       "userId": "9",
+      //       "userName": "lih652"
+      //     },
+      //     {
+      //       "userId": "8",
+      //       "userName": "wxm"
+      //     },
+      //     {
+      //       "userId": "7",
+      //       "userName": "daxin"
+      //     },
+      //     {
+      //       "userId": "6",
+      //       "userName": "wuxk26"
+      //     },
+      //     {
+      //       "userId": "4",
+      //       "userName": "stcs"
+      //     },
+      //     {
+      //       "userId": "3",
+      //       "userName": "lwb"
+      //     },
+      //     {
+      //       "userId": "2",
+      //       "userName": "ztq"
+      //     }
+      // ],
       selectedUsers: [],
       isSettingChecked: false
     }
