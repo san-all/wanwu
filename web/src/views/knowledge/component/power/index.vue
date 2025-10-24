@@ -148,11 +148,11 @@ export default {
         ...data,
         permissionId: this.currentTransferUser.permissionId
       }
-      if (data.knowledgeUser.length > 0) {
+      if (data.knowledgeUser && !Array.isArray(data.knowledgeUser)) {
         transferUserPower(params).then(res => {
           if(res.code === 0){
             this.$message.success("转让成功");
-            this.showCreate();
+            this.showList();
             this.refreshList();
           }
         }).catch(() => {})

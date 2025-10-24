@@ -323,7 +323,7 @@ export default {
     getTransferData(){
       return {
         knowledgeId: this.knowledgeId,
-        knowledgeUser: this.selectedUsers
+        knowledgeUser: this.selectedUsers[0] || []
       }
     },
     removeUser(user) {
