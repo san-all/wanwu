@@ -282,9 +282,9 @@ export default {
       const currentOrgName = currentOrg ? currentOrg.orgName : '';
       
       // 先移除当前组织的所有用户
-      //var otherOrgUsers = this.selectedUsers.filter(function(user) {
-        //return user.orgId !== currentOrgId;
-      //});
+      var otherOrgUsers = this.selectedUsers.filter(function(user) {
+        return user.orgId !== currentOrgId;
+      });
       
       // 收集当前选中的用户（去重）
       var currentOrgUsers = [];
