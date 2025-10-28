@@ -4,7 +4,7 @@
       <div class="tempSquare-main">
         <div class="tempSquare-content">
           <div class="tempSquare-card-box">
-            <div class="card-search card-search-cust">
+            <div class="card-search card-search-cust" v-if="templateUrl">
               <div>
                 <span
                   v-for="item in typeList"
@@ -23,7 +23,7 @@
               />
             </div>
 
-            <div class="card-loading-box" v-if="list.length">
+            <div class="card-loading-box" v-if="list.length && templateUrl">
               <div class="card-box" v-loading="loading">
                 <div
                   class="card"
@@ -83,21 +83,8 @@ export default {
     return {
       basePath: this.$basePath,
       category: '全部',
-      list: [
-        {
-          "author": "XXX",
-          "avatar": {
-            "key": "string",
-            "path": "http://192.168.0.21:8081/user/api/v1/cache/icon-Workflow-v2.jpg"
-          },
-          "category": "string",
-          "name": "工作流名称",
-          "desc": "工作流描述",
-          "downloadCount": 0,
-          "templateId": "gaodemap"
-        }
-      ],
-      templateUrl: 'https://baidu.com',
+      list: [],
+      templateUrl: '',
       isLogin: false,
       loading:false,
       typeRadio: 'all',
