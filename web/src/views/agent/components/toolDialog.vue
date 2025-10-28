@@ -22,9 +22,22 @@
                     :key="item[type + 'Id'] || item.id"
                     class="toolContent_item"
                     >
-                    <span>{{ item.apiName || item.name }}</span>
-                    <el-button type="text" @click="openTool($event,item,type)" v-if="!item.checked">添加</el-button>
-                    <el-button type="text" v-else style="color:#ccc;">已添加</el-button>
+                        <el-collapse  @change="handleToolChange">
+                            <el-collapse-item :title="item.name" :name="item.toolId">
+                                <template v-if="item.children && item.children.length">
+                                    <div v-for="tool in item.children">
+                                        <div>
+                                        <span>{{tool.name}}</span>
+                                        <span>{{tool.description}}</span>
+                                        </div>
+                                        <div>
+                                        <el-button type="text" @click="openTool($event,item,type)" v-if="!item.checked">添加</el-button>
+                                        <el-button type="text" v-else style="color:#ccc;">已添加</el-button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-collapse-item>
+                        </el-collapse>
                     </div>
                 </template>
             </div>
@@ -33,7 +46,7 @@
 </template>
 <script>
 import { getList } from '@/api/workflow.js';
-import { addWorkFlowInfo, addMcp,customList,addCustomBuiltIn } from "@/api/agent";
+import { addWorkFlowInfo, addMcp,customList,addCustomBuiltIn,toolList,toolActionList,mcptoolList,mcpActionList } from "@/api/agent";
 import { getExplorationFlowList} from "@/api/workflow";
 export default {
     props:['assistantId'],
@@ -82,16 +95,46 @@ export default {
         this.getCustomList('')
     },
     methods:{
-        getCustomList(name){
-            customList({name}).then(res =>{
+        handleToolChange(toolId){
+            if(this.activeValue === 'tool'){
+                const targetItem = this.customInfos.find(item => item.toolId === toolId)
+                if(targetItem) {
+                    const { toolId, toolType } = targetItem
+                    const index = this.customInfos.findIndex(item => item.toolId === toolId)
+                    this.getToolAction(toolId, toolType, index)
+                }
+            }else if(this.activeValue === 'mcp'){
+                const targetItem = this.customInfos.find(item => item.toolId === toolId)
+                if(targetItem) {
+                    const { toolId, toolType } = targetItem
+                    const index = this.mcpInfos.findIndex(item => item.toolId === toolId)
+                    this.getMcpAction(toolId, toolType, index)
+                }
+            }
+           
+        },
+        getCustomList(name){//获取自定义和内置工具
+            toolList({name}).then(res =>{
                 if(res.code === 0){
-                    this.customInfos = (res.data.list || []).map(m => ({
+                    this.customInfos  = (res.data.list || []).map(m => ({
                         ...m,
-                        checked: this.customList.some(item => item.customId === m.customToolId)
-                    }));
+                        children:[]
+                    }))
                 }
             }).catch(() =>{
 
+            })
+        },
+        getToolAction(toolId,toolType,index){
+            toolActionList({toolId,toolType}).then(res =>{
+                if(res.code === 0){
+                    this.$set(this.customInfos[index], 'children', res.data.actions)
+                    this.customInfos[index]['children'].forEach(m => {
+                        m.checked = this.customList.some(item => item.actionName === m.name)
+                    })
+                }
+            }).catch(() =>{
+                
             })
         },
         goCreate(){
@@ -170,19 +213,28 @@ export default {
                 this.getWorkflowList(this.toolName)
             }
         },
-        getMcpSelect(name){
-            getList({name}).then(res => {
+        getMcpSelect(name){//获取mcp工具
+            mcptoolList({name}).then(res => {
                 if(res.code === 0){
                     this.mcpInfos = (res.data.list || []).map(m => ({
                         ...m,
-                        checked: this.mcpList.some(item => item.mcpId === m.mcpId)
+                        children: []
                     }));
                 }
                
             }).catch(err => {
-
             })
             },
+        getMcpAction(toolId,toolType,index){
+            mcpActionList({toolId,toolType}).then(res => {
+                if(res.code === 0){
+                    this.$set(this.customInfos[index], 'children', res.data.actions)
+                    this.mcpInfos[index]['children'].forEach(m => {
+                        m.checked = this.mcpList.some(item => item.actionName === m.name)
+                    })
+                }
+            }).catch(() =>{})
+        },
         getWorkflowList(name) {
                 getExplorationFlowList({name,appType:'workflow',searchType:'all'}).then(res =>{
                     if (res.code === 0) {
@@ -228,6 +280,9 @@ export default {
         clickTool(item,i){
             this.toolIndex = i;
             this.activeValue = item.value;
+            if(this.activeValue === 'tool'){
+
+            }
         }
     }
 }

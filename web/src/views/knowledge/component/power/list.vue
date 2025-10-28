@@ -42,8 +42,8 @@
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
             <div class="action-buttons">
-              <!-- 管理员权限：只显示转让按钮 -->
-              <template v-if="scope.row.permissionType === 20 && !scope.row.editing">
+              <!-- 系统管理员权限：只显示转让按钮 -->
+              <template v-if="scope.row.permissionType === 30 && !scope.row.editing">
                 <el-button
                   type="text"
                   size="small"
@@ -54,9 +54,12 @@
                   转让
                 </el-button>
               </template>
-              
+              <!--管理员权限 -->
+              <template v-if="scope.row.permissionType === 20">
+                <span>--</span>
+              </template>
               <!-- 非管理员权限：显示编辑和删除按钮 -->
-              <template v-else>
+              <template v-if="scope.row.permissionType === 0 || scope.row.permissionType === 10">
                 <el-button
                   v-if="!scope.row.editing"
                   type="text"
@@ -124,7 +127,7 @@ export default {
     }
   },
   created() {
-    this.getUserPower()
+    //this.getUserPower()
   },
   methods: {
     getUserPower() {
@@ -146,15 +149,13 @@ export default {
       // 保存编辑
       row.editing = false
       row.originalType = row.type
-      const knowledgeUserList = [
-        {
+      const knowledgeUser = {
           orgId:row.orgId,
           userId:row.userId,
           permissionType:row.permissionType,
           permissionId:row.permissionId
         }
-      ]
-      editUserPower({knowledgeId:this.knowledgeId,knowledgeUserList:knowledgeUserList}).then(res => {
+      editUserPower({knowledgeId:this.knowledgeId,knowledgeUser:knowledgeUser}).then(res => {
         if(res.code === 0){
           this.$message.success('权限修改成功')
           this.getUserPower()

@@ -224,8 +224,47 @@ export const switchCustomBuiltIn = (data)=>{
         data
     })
 }
-
-
+//工具列表
+export const toolList = (data)=>{
+    return service({
+        url: `${BASE_URL}/tool/select`,
+        method: 'get',
+        params:data
+    })
+}
+//工具下面的action列表
+export const toolActionList = (data)=>{
+    return service({
+        url: `${BASE_URL}/tool/action/list`,
+        method: 'get',
+        params:data
+    })
+}
+//内置工具下面的action详情
+export const toolActionDetail = (data)=>{
+    return service({
+        url: `${BASE_URL}/tool/action/detail`,
+        method: 'get',
+        params:data
+    })
+}
+//mcp工具列表
+export const mcptoolList = (data)=>{
+    return service({
+        url: `${BASE_URL}/mcp/select`,
+        method: 'get',
+        params:data
+    })
+}
+//mcp工具下面的action列表
+export const mcpActionList = (data)=>{
+    return service({
+        url: `${BASE_URL}/mcp/action/list`,
+        method: 'get',
+        params:data
+    })
+}
+    
 //编辑url
 export const editOpenurl = (data)=>{
     return service({
