@@ -54,12 +54,8 @@
                   转让
                 </el-button>
               </template>
-              <!--管理员权限 -->
-              <template v-if="scope.row.permissionType === 20">
-                <span>--</span>
-              </template>
               <!-- 非管理员权限：显示编辑和删除按钮 -->
-              <template v-if="scope.row.permissionType === 0 || scope.row.permissionType === 10 || permissionType === 30 ">
+              <template v-if="(scope.row.permissionType === 0 || scope.row.permissionType === 10) && permissionType === 30 ">
                 <el-button
                   v-if="!scope.row.editing"
                   type="text"
