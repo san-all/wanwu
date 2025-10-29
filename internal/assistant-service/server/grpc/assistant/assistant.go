@@ -87,7 +87,7 @@ func (s *Service) AssistantUpdate(ctx context.Context, req *assistant_service.As
 	}
 
 	// 获取现有智能体信息
-	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
+	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID), "", "")
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
@@ -134,7 +134,7 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 	}
 
 	// 先获取现有智能体信息
-	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
+	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID), "", "")
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
@@ -263,7 +263,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 	}
 
 	// 调用client方法获取智能体详情
-	assistant, status := s.cli.GetAssistant(ctx, assistantId)
+	assistant, status := s.cli.GetAssistant(ctx, assistantId, "", "")
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
@@ -414,7 +414,7 @@ func (s *Service) AssistantCopy(ctx context.Context, req *assistant_service.Assi
 	}
 
 	// 获取父智能体信息
-	parentAssistant, status := s.cli.GetAssistant(ctx, assistantId)
+	parentAssistant, status := s.cli.GetAssistant(ctx, assistantId, "", "")
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
