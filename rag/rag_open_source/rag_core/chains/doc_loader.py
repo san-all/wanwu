@@ -28,6 +28,8 @@ import tempfile
 
 # analyzer = build_default_analyzer(language="zh")
 
+tiktoken_cache_dir = "/opt/tiktoken_cache"
+os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
 encoding = tiktoken.encoding_for_model("gpt-4")
 
 
