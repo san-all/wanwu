@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -225,49 +227,20 @@ func calculateGlobalBrowseTrend(ctx *gin.Context, browseData map[string]int64, d
 	}
 }
 
-// --- internal ---
-
-func buildWorkflowTempInfo(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateInfo {
-	iconUrl, _ := url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
-	return &response.WorkflowTemplateInfo{
-		TemplateId: wtfCfg.TemplateId,
-		Avatar: request.Avatar{
-			Path: iconUrl,
-		},
-		Name:          wtfCfg.Name,
-		Author:        wtfCfg.Author,
-		Desc:          wtfCfg.Desc,
-		Category:      wtfCfg.Category,
-		DownloadCount: getTemplateDownloadCount(ctx, wtfCfg.TemplateId),
-	}
-}
-
-func buildWorkflowTempDetail(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateDetail {
-	iconUrl, _ := url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
-	return &response.WorkflowTemplateDetail{
-		WorkflowTemplateInfo: response.WorkflowTemplateInfo{
-			TemplateId: wtfCfg.TemplateId,
-			Avatar: request.Avatar{
-				Path: iconUrl,
-			},
-			Name:          wtfCfg.Name,
-			Desc:          wtfCfg.Desc,
-			Category:      wtfCfg.Category,
-			Author:        wtfCfg.Author,
-			DownloadCount: getTemplateDownloadCount(ctx, wtfCfg.TemplateId),
-		},
-		Summary:  wtfCfg.Summary,
-		Feature:  wtfCfg.Feature,
-		Scenario: wtfCfg.Scenario,
-		Note:     wtfCfg.Note,
-	}
-}
-
 // --- 获取工作流模板列表 ---
 
 func getRemoteWorkflowTemplateList(ctx *gin.Context, category, name string) (*response.GetWorkflowTemplateListResp, error) {
-	client := resty.New()
-	client.SetTimeout(30 * time.Second)
+	client := resty.NewWithClient(&http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			DialContext: (&net.Dialer{
+				Timeout:   10 * time.Second, // 连接超时时间
+				KeepAlive: time.Minute,      // 连接保持活跃的时间
+			}).DialContext,
+			ResponseHeaderTimeout: time.Minute,
+		},
+		Timeout: time.Minute,
+	})
 	var res response.Response
 	var ret response.GetWorkflowTemplateListResp
 	resp, err := client.R().
@@ -333,7 +306,6 @@ func getLocalWorkflowTemplateList(ctx context.Context, category, name string) (*
 
 func getRemoteWorkflowTemplateDetail(ctx *gin.Context, templateId string) (*response.WorkflowTemplateDetail, error) {
 	client := resty.New()
-	client.SetTimeout(30 * time.Second)
 	var res response.Response
 	var ret response.WorkflowTemplateDetail
 	resp, err := client.R().
@@ -374,16 +346,13 @@ func getLocalWorkflowTemplateDetail(ctx context.Context, templateId string) (*re
 
 func getRemoteDownloadWorkflowTemplate(ctx *gin.Context, templateId string) ([]byte, error) {
 	client := resty.New()
-	client.SetTimeout(30 * time.Second)
-	var res response.Response
 	resp, err := client.R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"templateId": templateId,
 		}).
 		SetHeader("Accept", "application/json").
-		SetResult(&res).
-		Get(config.Cfg().WorkflowTemplatePath.DetailUrl)
+		Get(config.Cfg().WorkflowTemplatePath.DownloadUrl)
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_download", fmt.Sprintf("failed to call remote workflow template API: %v", err))
 	}
@@ -392,7 +361,45 @@ func getRemoteDownloadWorkflowTemplate(ctx *gin.Context, templateId string) ([]b
 		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_download", fmt.Sprintf("request remote workflow template http code: %v", resp.StatusCode()))
 	}
 	// 远程调用成功，返回远程结果
-	return convertToBytes(res.Data)
+	return convertToBytes(resp.Body())
+}
+
+// --- internal ---
+
+func buildWorkflowTempInfo(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateInfo {
+	iconUrl, _ := url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
+	return &response.WorkflowTemplateInfo{
+		TemplateId: wtfCfg.TemplateId,
+		Avatar: request.Avatar{
+			Path: iconUrl,
+		},
+		Name:          wtfCfg.Name,
+		Author:        wtfCfg.Author,
+		Desc:          wtfCfg.Desc,
+		Category:      wtfCfg.Category,
+		DownloadCount: getTemplateDownloadCount(ctx, wtfCfg.TemplateId),
+	}
+}
+
+func buildWorkflowTempDetail(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateDetail {
+	iconUrl, _ := url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
+	return &response.WorkflowTemplateDetail{
+		WorkflowTemplateInfo: response.WorkflowTemplateInfo{
+			TemplateId: wtfCfg.TemplateId,
+			Avatar: request.Avatar{
+				Path: iconUrl,
+			},
+			Name:          wtfCfg.Name,
+			Desc:          wtfCfg.Desc,
+			Category:      wtfCfg.Category,
+			Author:        wtfCfg.Author,
+			DownloadCount: getTemplateDownloadCount(ctx, wtfCfg.TemplateId),
+		},
+		Summary:  wtfCfg.Summary,
+		Feature:  wtfCfg.Feature,
+		Scenario: wtfCfg.Scenario,
+		Note:     wtfCfg.Note,
+	}
 }
 
 func getLocalDownloadWorkflowTemplate(templateId string) ([]byte, error) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	net_url "net/url"
 	"strings"
@@ -397,14 +398,14 @@ func getRemoteCreateWorkflowByTemplate(ctx *gin.Context, orgId string, req reque
 	if err != nil {
 		return nil, err
 	}
-	var schema string
+	var schema []byte
 	for _, i := range resp.List {
 		if i.TemplateId == req.TemplateId {
 			schemaJson, err := getRemoteDownloadWorkflowTemplate(ctx, i.TemplateId)
 			if err != nil {
 				return nil, err
 			}
-			schema = string(schemaJson)
+			schema = schemaJson
 			break
 		}
 	}
@@ -419,11 +420,22 @@ func getLocalCreateWorkflowByTemplate(ctx *gin.Context, orgId string, req reques
 	return createWorkflowByTemplate(ctx, orgId, req, wtfCfg.Schema)
 }
 
-// 提取的公共函数
-func createWorkflowByTemplate(ctx *gin.Context, orgId string, req request.CreateWorkflowByTemplateReq, schema string) (*response.CozeWorkflowIDData, error) {
+// 工作流文件解析结构体
+type workflowTemplateSchema struct {
+	Name   string `json:"name"`
+	Desc   string `json:"desc"`
+	Schema string `json:"schema"`
+}
+
+// 提取工作流创建的公共函数
+func createWorkflowByTemplate(ctx *gin.Context, orgId string, req request.CreateWorkflowByTemplateReq, schema []byte) (*response.CozeWorkflowIDData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ImportUri)
 	ret := &response.CozeWorkflowIDResp{}
-
+	// 解析外层结构
+	var templateSchema workflowTemplateSchema
+	if err := json.Unmarshal(schema, &templateSchema); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", err.Error())
+	}
 	if resp, err := resty.New().
 		R().
 		SetContext(ctx).
@@ -434,7 +446,7 @@ func createWorkflowByTemplate(ctx *gin.Context, orgId string, req request.Create
 			"space_id": orgId,
 			"name":     req.Name,
 			"desc":     req.Desc,
-			"schema":   schema,
+			"schema":   templateSchema.Schema,
 			"icon_url": req.Avatar.Key,
 		}).
 		SetResult(ret).
