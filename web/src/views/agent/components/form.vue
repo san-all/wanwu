@@ -266,7 +266,6 @@
           <div class="rl">
             <div
               class="block-link"
-              style="width:50%;"
             >
               <span class="link-text">
                 <img
@@ -309,9 +308,13 @@
                 >
                   <div
                     class="name"
-                    style="color: #333"
                   >
-                    <span>{{ displayName(n) }}</span>
+                  <el-tooltip class="item" effect="dark" :content="displayName(n)" placement="top-start">
+                    <span>{{ displayName(n).length > 20 ? displayName(n).substring(0, 20) + '...' : displayName(n) }}</span>
+                  </el-tooltip>
+                  <el-tooltip class="item" effect="dark" :content="n.mcpName || n.toolName" placement="top-start">
+                    <span class="el-icon-info desc-info" v-if="n.mcpName || n.toolName"></span>
+                  </el-tooltip>
                   </div>
                   <div class="bt">
                     <span class="el-icon-s-operation bt-operation"  @click="handleBuiltin(n)" v-if="n.type === 'action' && n.toolType && n.toolType === 'builtin'"></span>
@@ -651,11 +654,11 @@ export default {
         },
         mcp: {
           displayName: "MCP工具",
-          propName: "mcpName",
+          propName: "actionName",
         },
         action: {
           displayName: "自定义工具",
-          propName: "toolName",
+          propName: "actionName",
         },
         // 可以继续添加其他类型
         default: {
@@ -768,7 +771,7 @@ export default {
     },
     displayName(item) {
       const config = this.nameMap[item.type] || this.nameMap["default"];
-      return item[config.propName] + " " + `(${config.displayName})`;
+      return item[config.propName];
     },
     updateDetail() {
       this.getAppDetail();
@@ -1413,7 +1416,6 @@ export default {
         }
       }
       .block-link {
-        width: 300px;
         border: 1px solid #ddd;
         padding: 6px 10px;
         border-radius: 6px;
@@ -1442,9 +1444,9 @@ export default {
           overflow-y: auto;
           .action-list {
             width: 100%;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            // display: grid;
+            // grid-template-columns: repeat(2, minmax(0, 1fr));
+            // gap: 10px;
           }
         }
       }
@@ -1663,18 +1665,22 @@ export default {
     margin-bottom: 5px;
     width: 100%;
     .name {
-      width: 60%;
+      width: 80%;
       box-sizing: border-box;
-      padding: 10px 20px;
+      padding: 10px;
       cursor: pointer;
-      color: #2c7eea;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      display:flex;
+      align-items:center;
+      color: #333;
+      .desc-info{
+        color:#ccc;
+        margin-left:4px;
+      }
+
     }
     .bt {
       text-align: center;
-      width: 40%;
+      width: 30%;
       display: flex;
       justify-content: flex-end;
       align-items:center;

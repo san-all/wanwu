@@ -35,13 +35,17 @@
                             <el-collapse-item  :name="item.toolId">
                                 <template slot="title">
                                    <h3>{{item.toolName}}</h3>
-                                   <span v-if="item.loading" class="el-icon-loading"></span>
+                                   <span v-if="item.loading" class="el-icon-loading loading-text"></span>
                                 </template>
                                 <template v-if="item.children && item.children.length">
                                     <div v-for="tool in item.children" class="tool-action-item">
                                         <div style="padding-right:5px;">
-                                            <p>{{tool.name}}</p>
-                                            <p class="action-desc">{{tool.description}}</p>
+                                            <p>
+                                             <span>{{tool.name}}</span>
+                                             <el-tooltip class="item" effect="dark" :content="tool.description" placement="top-right">
+                                                <span class="el-icon-info desc-info" v-if="tool.description.length"></span>
+                                             </el-tooltip>
+                                            </p>
                                         </div>
                                         <div>
                                         <el-button type="text" @click="openTool($event,item,type,tool)" v-if="!tool.checked">添加</el-button>
@@ -175,12 +179,14 @@ export default {
         },
         openTool(e,item,type,action){
             if(!e) return;
-            action.checked = !action.checked
             if(type === 'workflow'){
                 this.addWorkFlow(item)
             }else if(type === 'mcp'){
                 this.addMcpItem(item,action)
             }else{
+                if(item.needApiKeyInput && !item.apiKey.length){
+                    this.$message.warning('该内置工具暂未绑定API Key，会导致调用失败!')
+                }
                 this.addCustomBuiltIn(item,action)
             }
         },
@@ -189,6 +195,7 @@ export default {
             addCustomBuiltIn({assistantId:this.assistantId,actionName:action.name,toolId:n.toolId,toolType:n.toolType}).then(res =>{
                 if(res.code === 0){
                     this.$set(action, 'checked', true);
+                    this.$forceUpdate();
                     this.$message.success('工具添加成功');
                     this.$emit('updateDetail');
                 }
@@ -201,6 +208,7 @@ export default {
             addMcp({assistantId:this.assistantId,actionName:action.name,mcpId:n.toolId,mcpType:n.toolType}).then(res =>{
                 if(res.code === 0){
                     this.$set(action, 'checked', true);
+                    this.$forceUpdate();
                     this.$message.success('工具添加成功');
                     this.$emit('updateDetail');
                 }
@@ -272,31 +280,23 @@ export default {
         },
         showDialog(row){
             this.dialogVisible = true;
-            this.setMcp(row.mcpInfos);
+            //this.setMcp(row.mcpInfos);
             this.setWorkflow(row.workFlowInfos);
-            this.setCustom(row.customInfos)
-            //this.mcpList = row.mcpInfos || [];
+            //this.setCustom(row.customInfos)
+            this.mcpList = row.mcpInfos || [];
             this.workFlowList = row.workFlowInfos || [];
-            //this.customList  = row.toolInfos || [];
+            this.customList  = row.customInfos || [];
+            console.log(this.customList)
+            console.log(this.mcpList)
         },
-        setMcp(data){
-           this.mcpInfos = this.mcpInfos.map(m => ({
-            ...m,
-            checked: data.some(item => item.mcpId === m.mcpId)
-            }));
-        },
+
         setWorkflow(data){
             this.workFlowInfos = this.workFlowInfos.map(m => ({
             ...m,
             checked: data.some(item => item.workFlowId === m.appId)
             }));
         },
-        setCustom(data){
-            this.customInfos = this.customInfos.map(m => ({
-                ...m,
-                checked: data.some(item => item.customId === m.customToolId)
-            }));
-        },
+
         handleClose(){
             this.toolIndex = -1;
             this.activeValue = 'tool';
@@ -306,7 +306,11 @@ export default {
             this.toolIndex = i;
             this.activeValue = item.value;
             if(this.activeValue === 'tool'){
-
+                this.getCustomList('')
+            }else if(this.activeValue === 'mcp'){
+                this.getMcpSelect('')
+            }else{
+                this.getWorkflowList('')
             }
         }
     }
@@ -378,15 +382,20 @@ export default {
         display: flex;
         align-items:center;
         justify-content:space-between;
+        .loading-text{
+            margin-left:4px;
+            color:var($color)
+        }
         .tool-action-item{
             display: flex;
             align-items:center;
             justify-content:space-between;
             border-top:1px solid #eee;
             padding:5px 0;
-            .action-desc{
-                color:#999;
-                font-size:12px;
+            .desc-info{
+                color:#ccc;
+                margin-left:4px;
+                cursor:pointer;
             }
         }
     }
