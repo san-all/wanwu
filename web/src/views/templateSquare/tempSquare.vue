@@ -142,6 +142,7 @@ export default {
         link.download = item.name + '.json'
         link.click()
         window.URL.revokeObjectURL(link.href)
+        this.doGetWorkflowTempList()
       })
     },
     handleClick(val) {
