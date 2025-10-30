@@ -42,7 +42,7 @@
                                         <div style="padding-right:5px;">
                                             <p>
                                              <span>{{tool.name}}</span>
-                                             <el-tooltip class="item" effect="dark" :content="tool.description" placement="top-start" v-if="tool.description.length > 0">
+                                             <el-tooltip class="item" effect="dark" :content="tool.description" placement="top-start" v-if="tool.description && tool.description.length > 0">
                                                 <span class="el-icon-info desc-info"></span>
                                              </el-tooltip>
                                             </p>
