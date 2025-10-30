@@ -193,7 +193,7 @@ func (s *Service) GetKnowledgeMetaSelect(ctx context.Context, req *knowledgebase
 }
 
 func (s *Service) GetKnowledgeMetaValueList(ctx context.Context, req *knowledgebase_service.KnowledgeMetaValueListReq) (*knowledgebase_service.KnowledgeMetaValueListResp, error) {
-	metaList, err := orm.SelectMetaByDocIds(ctx, req.UserId, req.OrgId, req.DocIdList)
+	metaList, err := orm.SelectMetaByDocIds(ctx, "", "", req.DocIdList)
 	if err != nil {
 		return nil, util.ErrCode(errs.Code_KnowledgeMetaFetchFailed)
 	}
@@ -202,7 +202,7 @@ func (s *Service) GetKnowledgeMetaValueList(ctx context.Context, req *knowledgeb
 
 func (s *Service) UpdateKnowledgeMetaValue(ctx context.Context, req *knowledgebase_service.UpdateKnowledgeMetaValueReq) (*emptypb.Empty, error) {
 	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, req.DocIdList, req.UserId, req.OrgId)
+	docList, err := orm.SelectDocByDocIdList(ctx, req.DocIdList, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
 		return nil, err
@@ -214,13 +214,13 @@ func (s *Service) UpdateKnowledgeMetaValue(ctx context.Context, req *knowledgeba
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	//3.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	//4.查询元数据
-	docMetaList, err := orm.SelectMetaByDocIds(ctx, req.UserId, req.OrgId, req.DocIdList)
+	docMetaList, err := orm.SelectMetaByDocIds(ctx, "", "", req.DocIdList)
 	if err != nil {
 		return nil, util.ErrCode(errs.Code_KnowledgeMetaFetchFailed)
 	}
@@ -229,7 +229,7 @@ func (s *Service) UpdateKnowledgeMetaValue(ctx context.Context, req *knowledgeba
 	//6.构造元数据列表
 	addList, updateList, deleteList := buildMetaList(req, docMetaMap, doc.KnowledgeId)
 	//7.更新数据库并发送rag请求
-	err = orm.BatchUpdateDocMetaValue(ctx, addList, updateList, deleteList, knowledge, docList, req.UserId, req.DocIdList)
+	err = orm.BatchUpdateDocMetaValue(ctx, addList, updateList, deleteList, knowledge, docList, knowledge.UserId, req.DocIdList)
 	if err != nil {
 		log.Errorf("更新文档元数据失败(%v)  参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeMetaUpdateFailed)

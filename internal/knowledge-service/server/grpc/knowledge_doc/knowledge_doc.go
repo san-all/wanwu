@@ -124,13 +124,13 @@ func buildMetaDocMap(metaList []*model.KnowledgeDocMeta) map[string][]*model.Kno
 // updateKnowledgeMetaData 更新知识库元数据
 func updateKnowledgeMetaData(ctx context.Context, req *knowledgebase_doc_service.UpdateDocMetaDataReq) (*emptypb.Empty, error) {
 	// 1.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, req.UserId, req.OrgId)
+	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	// 2.查询知识库元数据
-	metaList, err := orm.SelectMetaByKnowledgeId(ctx, req.UserId, req.OrgId, req.KnowledgeId)
+	metaList, err := orm.SelectMetaByKnowledgeId(ctx, "", "", req.KnowledgeId)
 	if err != nil {
 		log.Errorf("没有操作该知识库的权限 错误(%v) 参数(%v)", err, req)
 		return nil, err
@@ -161,7 +161,7 @@ func updateKnowledgeMetaData(ctx context.Context, req *knowledgebase_doc_service
 	// 6.执行批量更新
 	if len(updateList) > 0 {
 		err = orm.BatchUpdateMetaKey(ctx, updateList, req.KnowledgeId, &service.RagBatchUpdateMetaKeyParams{
-			UserId:        req.UserId,
+			UserId:        knowledge.UserId,
 			KnowledgeBase: knowledge.Name,
 			KnowledgeId:   req.KnowledgeId,
 			Mappings:      updateList,
@@ -201,7 +201,7 @@ func buildImportTaskIdList(docList []*model.KnowledgeDoc) []string {
 // updateDocMetaData 更新文档元数据
 func updateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.UpdateDocMetaDataReq) (*emptypb.Empty, error) {
 	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
 		return nil, err
@@ -213,13 +213,13 @@ func updateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.Updat
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	//3.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	//4.查询元数据
-	metaDocList, err := orm.SelectMetaByKnowledgeId(ctx, req.UserId, req.OrgId, knowledge.KnowledgeId)
+	metaDocList, err := orm.SelectMetaByKnowledgeId(ctx, "", "", knowledge.KnowledgeId)
 	if err != nil {
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
@@ -227,7 +227,7 @@ func updateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.Updat
 	//5.构造元数据操作列表
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
 	var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
-	addList, updateList, deleteList := buildDocMetaModelList(metaDataList, doc.OrgId, doc.UserId, req.KnowledgeId, req.DocId)
+	addList, updateList, deleteList := buildDocMetaModelList(metaDataList, "", "", req.KnowledgeId, req.DocId)
 	if err1 := checkMetaKeyType(addList, updateList, docMetaMap); err1 != nil {
 		return nil, err1
 	}
@@ -242,7 +242,7 @@ func updateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.Updat
 		&service.RagDocMetaParams{
 			FileName:      fileName,
 			KnowledgeBase: knowledge.RagName,
-			UserId:        req.UserId,
+			UserId:        knowledge.UserId,
 			MetaList:      params,
 		})
 	if err != nil {
@@ -446,7 +446,7 @@ func (s *Service) GetDocSegmentList(ctx context.Context, req *knowledgebase_doc_
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSplitFailed)
 	}
 	//5.查询文档元数据,忽略错误
-	metaDataList, _ := orm.SelectDocMetaList(ctx, req.UserId, req.OrgId, req.DocId)
+	metaDataList, _ := orm.SelectDocMetaList(ctx, "", "", req.DocId)
 	return buildSegmentListResp(importTask, docInfo, segmentListResp, req.PageNo, req.PageSize, metaDataList, segmentImportTask)
 }
 
@@ -497,13 +497,13 @@ func (s *Service) AnalysisDocUrl(ctx context.Context, req *knowledgebase_doc_ser
 // BatchUpdateDocMetaData 批量更新文档元数据
 func (s *Service) BatchUpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.BatchUpdateDocMetaDataReq) (*emptypb.Empty, error) {
 	//1.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, req.UserId, req.OrgId)
+	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, "", "")
 	if err != nil {
 		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	//2.查询知识库下所有文档
-	docList, err := orm.GetDocListByKnowledgeId(ctx, req.UserId, req.OrgId, req.KnowledgeId)
+	docList, err := orm.GetDocListByKnowledgeId(ctx, "", "", req.KnowledgeId)
 	if err != nil {
 		log.Errorf("没有查询到文档列表 错误(%v) 参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
@@ -512,7 +512,7 @@ func (s *Service) BatchUpdateDocMetaData(ctx context.Context, req *knowledgebase
 		return &emptypb.Empty{}, nil
 	}
 	//3.查询已经设置key的文档
-	metaList, err := orm.SelectMetaByKnowledgeId(ctx, req.UserId, req.OrgId, req.KnowledgeId)
+	metaList, err := orm.SelectMetaByKnowledgeId(ctx, "", "", req.KnowledgeId)
 	if err != nil {
 		log.Errorf("没有查询到文档列表 错误(%v) 参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
@@ -532,7 +532,7 @@ func (s *Service) BatchUpdateDocMetaData(ctx context.Context, req *knowledgebase
 	err = orm.UpdateBatchStatusDocMeta(ctx, req.KnowledgeId, docNameMap, addList, updateList, &service.BatchRagDocMetaParams{
 		KnowledgeId:   knowledge.KnowledgeId,
 		KnowledgeBase: knowledge.RagName,
-		UserId:        req.UserId,
+		UserId:        knowledge.UserId,
 	})
 	if err != nil {
 		log.Errorf("update doc tag fail %v", err)
@@ -781,13 +781,15 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 
 func buildChildSegmentListResp(resp *service.ChildContentListResp) (*knowledgebase_doc_service.GetDocChildSegmentListResp, error) {
 	var retList = make([]*knowledgebase_doc_service.ChildSegmentInfo, 0)
-	for _, item := range resp.ChildContentList {
-		retList = append(retList, &knowledgebase_doc_service.ChildSegmentInfo{
-			Content:  item.Content,
-			ChildId:  item.ContentId,
-			ChildNum: int32(item.MetaData.ChildChunkCurrentNum),
-			ParentId: resp.ParentChunkId,
-		})
+	if len(resp.ChildContentList) > 0 {
+		for _, item := range resp.ChildContentList {
+			retList = append(retList, &knowledgebase_doc_service.ChildSegmentInfo{
+				Content:  item.Content,
+				ChildId:  item.ContentId,
+				ChildNum: int32(item.MetaData.ChildChunkCurrentNum),
+				ParentId: resp.ParentChunkId,
+			})
+		}
 	}
 	return &knowledgebase_doc_service.GetDocChildSegmentListResp{
 		ContentList: retList,

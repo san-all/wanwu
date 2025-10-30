@@ -17,7 +17,7 @@ import (
 
 func (s *Service) SelectKnowledgeTagList(ctx context.Context, req *knowledgebase_tag_service.KnowledgeTagSelectReq) (*knowledgebase_tag_service.KnowledgeTagSelectListResp, error) {
 	if len(req.KnowledgeId) > 0 {
-		relation := orm.SelectKnowledgeTagListWithRelation(ctx, "", "", req.TagName, []string{req.KnowledgeId})
+		relation := orm.SelectKnowledgeTagListWithRelation(ctx, req.UserId, req.OrgId, req.TagName, []string{req.KnowledgeId})
 		if relation.TagErr != nil {
 			log.Errorf(fmt.Sprintf("获取知识库标签列表失败(%v)  参数(%v)", relation.TagErr, req))
 			return nil, util.ErrCode(errs.Code_KnowledgeTagSelectFailed)

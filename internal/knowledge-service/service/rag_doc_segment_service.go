@@ -446,12 +446,15 @@ func RagGetDocChildSegmentList(ctx context.Context, ragGetDocChildSegmentParams 
 	if resp.Code != successCode {
 		return nil, errors.New(resp.Message)
 	}
-	if resp.Data == nil || len(resp.Data.ChildContentList) == 0 {
+	if resp.Data == nil {
 		return nil, errors.New("doc child segment response is empty")
 	}
-	// 按排序
-	slices.SortFunc(resp.Data.ChildContentList, func(a, b ChildFileSplitContent) int {
-		return cmp.Compare(a.MetaData.ChildChunkCurrentNum, b.MetaData.ChildChunkCurrentNum)
-	})
+	if len(resp.Data.ChildContentList) > 0 {
+		// 按排序
+		slices.SortFunc(resp.Data.ChildContentList, func(a, b ChildFileSplitContent) int {
+			return cmp.Compare(a.MetaData.ChildChunkCurrentNum, b.MetaData.ChildChunkCurrentNum)
+		})
+	}
+
 	return resp.Data, nil
 }
