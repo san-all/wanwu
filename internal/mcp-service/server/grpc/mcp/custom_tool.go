@@ -254,10 +254,8 @@ func (s *Service) UpsertBuiltinToolAPIKey(ctx context.Context, req *mcp_service.
 	})
 	if info != nil {
 		// update
-		if err := s.cli.UpdateCustomTool(ctx, &model.CustomTool{
-			ID:     info.ID,
-			APIKey: req.ApiKey,
-		}); err != nil {
+		info.APIKey = req.ApiKey
+		if err := s.cli.UpdateCustomTool(ctx, info); err != nil {
 			return nil, errStatus(errs.Code_MCPUpdateCustomToolErr, err)
 		}
 		return &emptypb.Empty{}, nil

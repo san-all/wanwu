@@ -67,19 +67,20 @@ func (c *Client) ListCustomToolsByCustomToolIDs(ctx context.Context, ids []uint3
 func (c *Client) UpdateCustomTool(ctx context.Context, customTool *model.CustomTool) *err_code.Status {
 	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		// 检查是否已存在相同的记录
-		var dbCustomToolInfo model.CustomTool
-		if err := sqlopt.SQLOptions(
-			sqlopt.WithName(customTool.Name),
-			sqlopt.WithOrgID(customTool.OrgID),
-			sqlopt.WithUserID(customTool.UserID),
-		).Apply(tx).First(&dbCustomToolInfo).Error; err == nil {
-			if dbCustomToolInfo.ID != customTool.ID {
-				return toErrStatus("mcp_update_custom_tool_err", "custom tool name already exists")
+		if customTool.ToolSquareId == "" {
+			var dbCustomToolInfo model.CustomTool
+			if err := sqlopt.SQLOptions(
+				sqlopt.WithName(customTool.Name),
+				sqlopt.WithOrgID(customTool.OrgID),
+				sqlopt.WithUserID(customTool.UserID),
+			).Apply(tx).First(&dbCustomToolInfo).Error; err == nil {
+				if dbCustomToolInfo.ID != customTool.ID {
+					return toErrStatus("mcp_update_custom_tool_err", "custom tool name already exists")
+				}
+			} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return toErrStatus("mcp_update_custom_tool_err", err.Error())
 			}
-		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return toErrStatus("mcp_update_custom_tool_err", err.Error())
 		}
-
 		if err := sqlopt.SQLOptions(
 			sqlopt.WithID(customTool.ID),
 		).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
