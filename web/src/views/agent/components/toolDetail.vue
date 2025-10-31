@@ -8,8 +8,8 @@
     <template slot="title">
       <div class="custom-title">
         <div class="header-section">
-          <h2 class="dialog-title">{{actionDetail.action.name}}</h2>
-          <p class="dialog-subtitle">{{actionDetail.action.description}}</p>
+          <h2 class="dialog-title">{{actionDetail.action && actionDetail.action.name}}</h2>
+          <p class="dialog-subtitle">{{actionDetail.action && actionDetail.action.description}}</p>
         </div>
       </div>
     </template>
@@ -24,7 +24,7 @@
           class="api-key-input"
         />
         <div class="api-key-buttons">
-          <el-button type="primary" size="small" class="confirm-btn" v-if="!actionDetail.apiKey.length">
+          <el-button type="primary" size="small" class="confirm-btn" v-if="!actionDetail.apiKey || !actionDetail.apiKey.length">
             确认
           </el-button>
           <el-button type="primary" size="small" class="update-btn" else>
