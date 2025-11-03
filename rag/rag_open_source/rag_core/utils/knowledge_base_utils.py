@@ -648,7 +648,7 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
                     tmp_sl_content[item['content_id']] = item['snippet']
             for s, x in zip(sorted_scores, sorted_search_list):
                 if x['content_id'] not in tmp_sl_content:
-                    tmp_sl_content.append(x['snippet'])
+                    tmp_sl_content[x['content_id']] = x['snippet']
                     new_search_list.append(x)
                     new_scores.append(s)
 
