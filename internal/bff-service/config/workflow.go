@@ -10,7 +10,7 @@ const (
 	ConfigDir = "configs/microservice/bff-service/configs/workflow-temp"
 )
 
-type WorkflowTempConfig struct {
+type WorkflowTemplateConfig struct {
 	TemplateId string `json:"templateId" mapstructure:"templateId"`
 	Category   string `json:"category" mapstructure:"category"`
 	Avatar     string `json:"avatar"`
@@ -25,7 +25,7 @@ type WorkflowTempConfig struct {
 	Note       string `json:"note" mapstructure:"note"`
 }
 
-func (wtf *WorkflowTempConfig) load() error {
+func (wtf *WorkflowTemplateConfig) load() error {
 	schemaPath := filepath.Join(ConfigDir, wtf.SchemaPath)
 	b, err := os.ReadFile(schemaPath)
 	if err != nil {

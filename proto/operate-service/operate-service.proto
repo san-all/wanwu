@@ -14,12 +14,7 @@ service OperateService {
     rpc GetSystemCustom(GetSystemCustomReq) returns (SystemCustom) {}
 
     rpc AddClientRecord(AddClientRecordReq) returns (google.protobuf.Empty) {}
-    // 客户端统计总览
-    rpc GetClientOverview(GetClientOverviewReq) returns (ClientOverViewInfo) {}
-    // 客户端统计趋势
-    rpc GetClientTrend(GetClientTrendReq) returns (ClientTrendInfo) {}
-    // 累计客户端统计总览
-    rpc GetCumulativeClient(GetCumulativeClientReq) returns (GetCumulativeClientResp) {}
+    rpc GetClientStatistic(GetClientStatisticReq) returns (ClientStatistic) {}
 }
 
 message CreateSystemCustomTabReq {
@@ -75,32 +70,25 @@ message AddClientRecordReq {
     string clientId =1 ;
 }
 
-message GetClientOverviewReq{
+message GetClientStatisticReq{
     string startDate = 1;
     string endDate = 2;
 }
 
-message GetClientTrendReq{
-    string startDate = 1;
-    string endDate = 2;
+message ClientStatistic{
+    ClientOverViewInfo overview = 1;
+    ClientTrendInfo trend = 2;
 }
 
-message GetCumulativeClientReq{
-    int64 endAt = 1;
-}
-
-message GetCumulativeClientResp{
-    int32 total = 1;
+message ClientOverViewInfo{
+    ClientOverviewItem cumulative = 1; // 累计
+    ClientOverviewItem new = 2; // 新增
+    ClientOverviewItem active = 3; // 日活
 }
 
 message ClientOverviewItem {
     float value = 1;
     float periodOverperiod = 2;
-}
-
-message ClientOverViewInfo{
-    ClientOverviewItem activeClient = 1; // 活跃
-    ClientOverviewItem newClient = 2; // 新增
 }
 
 message ClientTrendInfo{

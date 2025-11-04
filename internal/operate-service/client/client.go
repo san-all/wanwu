@@ -13,7 +13,5 @@ type IClient interface {
 	GetSystemCustom(ctx context.Context, mode orm.SystemCustomMode) (*orm.SystemCustom, *err_code.Status)
 
 	AddClientRecord(ctx context.Context, clientId string) *err_code.Status
-	GetClientOverview(ctx context.Context, startDate, endDate string) (*orm.ClientOverView, *err_code.Status)
-	GetClientTrend(ctx context.Context, startDate, endDate string) (*orm.ClientTrends, *err_code.Status)
-	GetCumulativeClient(ctx context.Context, endAt int64) (int32, *err_code.Status)
+	GetClientStatistic(ctx context.Context, startDate, endDate string) (*orm.ClientStatistic, *err_code.Status)
 }

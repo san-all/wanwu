@@ -211,6 +211,9 @@ func toPermissions(isAdmin, isSystem bool, perms []*iam_service.Perm) []response
 			if !isSystem && r.Tag == "setting" {
 				continue
 			}
+			if !isSystem && r.Tag == "statistic_client" || config.Cfg().WorkflowTemplate.ServerMode == "remote" {
+				continue
+			}
 			ret = append(ret, response.Permission{
 				Perm: r.Tag,
 				Name: r.Name,
@@ -220,6 +223,9 @@ func toPermissions(isAdmin, isSystem bool, perms []*iam_service.Perm) []response
 	}
 	for _, r := range routes {
 		if r.Tag == "setting" {
+			continue
+		}
+		if r.Tag == "statistic_client" {
 			continue
 		}
 		for _, perm := range perms {

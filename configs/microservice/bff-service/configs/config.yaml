@@ -43,6 +43,7 @@ i18n:
     - rag-service
     - assistant-service
     - app-service
+    - operate-service
   jsonlPath: configs/microservice/bff-service/configs/wanwu-i18n.jsonl
   langs:
     - code: zh

@@ -45,7 +45,7 @@ func ListWorkflow(ctx *gin.Context, orgID, name string) (*response.CozeWorkflowL
 	ret := &response.CozeWorkflowListResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -80,7 +80,7 @@ func ListWorkflowByIDs(ctx *gin.Context, name string, workflowIDs []string) (*re
 	ret := &response.CozeWorkflowListResp{}
 	request := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -109,7 +109,7 @@ func CreateWorkflow(ctx *gin.Context, orgID, name, desc, iconUri string) (*respo
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -135,7 +135,7 @@ func CopyWorkflow(ctx *gin.Context, orgID, workflowID string) (*response.CozeWor
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -159,7 +159,7 @@ func DeleteWorkflow(ctx *gin.Context, orgID, workflowID string) error {
 	ret := &response.CozeWorkflowDeleteResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -183,7 +183,7 @@ func ExportWorkflow(ctx *gin.Context, orgID, workflowID string) ([]byte, error) 
 	ret := &response.CozeWorkflowExportResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -236,7 +236,7 @@ func ImportWorkflow(ctx *gin.Context, orgID string) (*response.CozeWorkflowIDDat
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).

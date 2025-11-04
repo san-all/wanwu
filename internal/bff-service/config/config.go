@@ -16,17 +16,17 @@ var (
 )
 
 type Config struct {
-	Server                 ServerConfig               `json:"server" mapstructure:"server"`
-	Log                    LogConfig                  `json:"log" mapstructure:"log"`
-	JWT                    JWTConfig                  `json:"jwt" mapstructure:"jwt"`
-	Decrypt                DecryptPasswd              `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
-	I18n                   i18n.Config                `json:"i18n" mapstructure:"i18n"`
-	AssistantTemplate      AssistantTemplateConfig    `json:"assistant-template" mapstructure:"assistant-template"`
-	CustomInfo             CustomInfoConfig           `json:"custom-info" mapstructure:"custom-info"`
-	DocCenter              DocCenterConfig            `json:"doc-center" mapstructure:"doc-center"`
-	DefaultIcon            DefaultIconConfig          `json:"default-icon" mapstructure:"default-icon"`
-	WorkflowTemplatePath   WorkflowTemplatePathConfig `json:"workflow-template" mapstructure:"workflow-template"`
-	WorkflowTemplateConfig []*WorkflowTempConfig      `json:"workflows" mapstructure:"workflows"`
+	Server            ServerConfig               `json:"server" mapstructure:"server"`
+	Log               LogConfig                  `json:"log" mapstructure:"log"`
+	JWT               JWTConfig                  `json:"jwt" mapstructure:"jwt"`
+	Decrypt           DecryptPasswd              `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
+	I18n              i18n.Config                `json:"i18n" mapstructure:"i18n"`
+	AssistantTemplate AssistantTemplateConfig    `json:"assistant-template" mapstructure:"assistant-template"`
+	CustomInfo        CustomInfoConfig           `json:"custom-info" mapstructure:"custom-info"`
+	DocCenter         DocCenterConfig            `json:"doc-center" mapstructure:"doc-center"`
+	DefaultIcon       DefaultIconConfig          `json:"default-icon" mapstructure:"default-icon"`
+	WorkflowTemplate  WorkflowTemplatePathConfig `json:"workflow-template" mapstructure:"workflow-template"`
+	WorkflowTemplates []*WorkflowTemplateConfig  `json:"workflows" mapstructure:"workflows"`
 	// middleware
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	Redis redis.Config `json:"redis" mapstructure:"redis"`
@@ -234,12 +234,11 @@ func LoadConfig(in string) error {
 		_c.DocCenter.docs[link.Key] = url
 	}
 	// 加载工作流模板配置
-	workflowIn := _c.WorkflowTemplatePath.ConfigPath
-	if err := util.LoadConfig(workflowIn, _c); err != nil {
+	if err := util.LoadConfig(_c.WorkflowTemplate.ConfigPath, _c); err != nil {
 		return fmt.Errorf("load workflow template config err: %v", err)
 	}
-	for _, wtf := range _c.WorkflowTemplateConfig {
-		if err := wtf.load(); err != nil {
+	for _, wt := range _c.WorkflowTemplates {
+		if err := wt.load(); err != nil {
 			return err
 		}
 	}
@@ -266,11 +265,11 @@ func (d *DocCenterConfig) GetDocs() map[string]string {
 	return result
 }
 
-func (c *Config) WorkflowTemp(templateId string) (WorkflowTempConfig, bool) {
-	for _, wtf := range c.WorkflowTemplateConfig {
+func (c *Config) WorkflowTemp(templateId string) (WorkflowTemplateConfig, bool) {
+	for _, wtf := range c.WorkflowTemplates {
 		if wtf.TemplateId == templateId {
 			return *wtf, true
 		}
 	}
-	return WorkflowTempConfig{}, false
+	return WorkflowTemplateConfig{}, false
 }

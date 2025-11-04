@@ -74,9 +74,15 @@ type HomeConfig struct {
 	BgColor  string `json:"bgColor"`  // 平台背景颜色
 }
 
+type ClientStatistic struct {
+	Overview ClientOverView `json:"overview"` // 统计面板
+	Trend    ClientTrend    `json:"trend"`    // 统计趋势
+}
+
 type ClientOverView struct {
-	ActiveClient ClientOverviewItem `json:"activeClient"` // 日活跃人数
-	NewClient    ClientOverviewItem `json:"newClient"`    // 日新增人数
+	Cumulative ClientOverviewItem `json:"cumulative"` // 累计客户端
+	New        ClientOverviewItem `json:"new"`        // 新增客户端
+	Active     ClientOverviewItem `json:"active"`     // 日活客户端
 }
 
 type ClientOverviewItem struct {
@@ -84,18 +90,18 @@ type ClientOverviewItem struct {
 	PeriodOverPeriod float32 `json:"periodOverPeriod"` // 环比上周期百分比
 }
 
-type ClientTrends struct {
+type ClientTrend struct {
 	Client StatisticChart `json:"client"`
 }
 
 type StatisticChart struct {
-	TableName string               `json:"tableName"` // 统计表名字
-	Lines     []StatisticChartLine `json:"lines"`     // 统计表中线段集合
+	Name  string               `json:"name"`  // 统计表名字
+	Lines []StatisticChartLine `json:"lines"` // 统计表中线段集合
 }
 
 type StatisticChartLine struct {
-	LineName string                   `json:"lineName"` // 线段名字
-	Items    []StatisticChartLineItem `json:"items"`    // 线段横纵坐标值
+	Name  string                   `json:"name"`  // 线段名字
+	Items []StatisticChartLineItem `json:"items"` // 线段横纵坐标值
 }
 
 type StatisticChartLineItem struct {
