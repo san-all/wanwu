@@ -33,7 +33,7 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 	if err != nil {
 		return nil, err
 	}
-	return getLoginRes(ctx, resp)
+	return getLoginResp(ctx, resp)
 }
 
 func LoginByEmail(ctx *gin.Context, login *request.Login) (*response.LoginByEmail, error) {
@@ -83,7 +83,7 @@ func LoginEmailCheck(ctx *gin.Context, login *request.LoginEmailCheck, language,
 	if err != nil {
 		return nil, err
 	}
-	return getLoginRes(ctx, resp)
+	return getLoginResp(ctx, resp)
 }
 
 func ChangeUserPasswordByEmail(ctx *gin.Context, login *request.ChangeUserPasswordByEmail, language, userId string) (*response.Login, error) {
@@ -109,7 +109,7 @@ func ChangeUserPasswordByEmail(ctx *gin.Context, login *request.ChangeUserPasswo
 	if err != nil {
 		return nil, err
 	}
-	return getLoginRes(ctx, resp)
+	return getLoginResp(ctx, resp)
 }
 
 // --- login email code---
@@ -123,7 +123,7 @@ func LoginSendEmailCode(ctx *gin.Context, email string) error {
 	return err
 }
 
-func getLoginRes(ctx *gin.Context, resp *iam_service.LoginResp) (*response.Login, error) {
+func getLoginResp(ctx *gin.Context, resp *iam_service.LoginResp) (*response.Login, error) {
 	// orgs
 	orgs, err := iam.GetOrgSelect(ctx.Request.Context(), &iam_service.GetOrgSelectReq{UserId: resp.User.GetUserId()})
 	if err != nil {

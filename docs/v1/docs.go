@@ -14720,7 +14720,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "activeClient": {
-                    "description": "活跃客户端",
+                    "description": "日活客户端",
                     "allOf": [
                         {
                             "$ref": "#/definitions/response.StatisticOverviewItem"

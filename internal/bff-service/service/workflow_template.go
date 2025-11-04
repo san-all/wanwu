@@ -30,18 +30,20 @@ const (
 )
 
 func GetWorkflowTemplateList(ctx *gin.Context, clientId, category, name string) (*response.GetWorkflowTemplateListResp, error) {
-	// 记录工作流模板浏览数据
-	if err := recordTemplateBrowse(ctx.Request.Context()); err != nil {
-		log.Errorf("record template browse count error: %v", err)
+	// 记录平台板浏览量
+	if category == "" || category == "all" {
+		if err := recordGlobalBrowse(ctx.Request.Context()); err != nil {
+			log.Errorf("record template browse count error: %v", err)
+		}
 	}
 	// 记录client数据
-	if _, err := operate.AddClientRecord(ctx, &operate_service.AddClientRecordReq{
+	if _, err := operate.AddClientRecord(ctx.Request.Context(), &operate_service.AddClientRecordReq{
 		ClientId: clientId,
 	}); err != nil {
-		log.Errorf("get workflow template list record err:%v", err)
+		log.Errorf("record client err:%v", err)
 	}
 
-	switch config.Cfg().WorkflowTemplatePath.ServerMode {
+	switch config.Cfg().WorkflowTemplate.ServerMode {
 	case "remote":
 		return getRemoteWorkflowTemplateList(ctx, category, name)
 	case "local":
@@ -53,7 +55,7 @@ func GetWorkflowTemplateList(ctx *gin.Context, clientId, category, name string) 
 }
 
 func GetWorkflowTemplateDetail(ctx *gin.Context, clientId, templateId string) (*response.WorkflowTemplateDetail, error) {
-	switch config.Cfg().WorkflowTemplatePath.ServerMode {
+	switch config.Cfg().WorkflowTemplate.ServerMode {
 	case "remote":
 		return getRemoteWorkflowTemplateDetail(ctx, templateId)
 	case "local":
@@ -65,7 +67,7 @@ func GetWorkflowTemplateDetail(ctx *gin.Context, clientId, templateId string) (*
 }
 
 func GetWorkflowTemplateRecommend(ctx *gin.Context, clientId, templateId string) (*response.GetWorkflowTemplateListResp, error) {
-	switch config.Cfg().WorkflowTemplatePath.ServerMode {
+	switch config.Cfg().WorkflowTemplate.ServerMode {
 	case "remote":
 		res, err := getRemoteWorkflowTemplateList(ctx, "", "")
 		if err != nil {
@@ -93,7 +95,7 @@ func DownloadWorkflowTemplate(ctx *gin.Context, clientId, templateId string) ([]
 	if err := recordTemplateDownloadCount(ctx.Request.Context(), templateId); err != nil {
 		log.Errorf("record template download count error: %v", err)
 	}
-	switch config.Cfg().WorkflowTemplatePath.ServerMode {
+	switch config.Cfg().WorkflowTemplate.ServerMode {
 	case "remote":
 		res, err := getRemoteDownloadWorkflowTemplate(ctx, templateId)
 		if err != nil {
@@ -117,7 +119,7 @@ func DownloadWorkflowTemplate(ctx *gin.Context, clientId, templateId string) ([]
 }
 
 func CreateWorkflowByTemplate(ctx *gin.Context, orgId, clientId string, req request.CreateWorkflowByTemplateReq) (*response.CozeWorkflowIDData, error) {
-	switch config.Cfg().WorkflowTemplatePath.ServerMode {
+	switch config.Cfg().WorkflowTemplate.ServerMode {
 	case "remote":
 		res, err := getRemoteCreateWorkflowByTemplate(ctx, orgId, req)
 		if err != nil {
@@ -157,14 +159,14 @@ func getRemoteWorkflowTemplateList(ctx *gin.Context, category, name string) (*re
 	var res response.Response
 	var ret response.GetWorkflowTemplateListResp
 	resp, err := client.R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetQueryParams(map[string]string{
 			"category": category,
 			"name":     name,
 		}).
 		SetHeader("Accept", "application/json").
 		SetResult(&res).
-		Get(config.Cfg().WorkflowTemplatePath.ListUrl)
+		Get(config.Cfg().WorkflowTemplate.ListUrl)
 	if err != nil {
 		// 远程调用失败，返回默认下载链接
 		log.Errorf("request remote workflow template err: %v", err)
@@ -172,7 +174,7 @@ func getRemoteWorkflowTemplateList(ctx *gin.Context, category, name string) (*re
 			Total: 0,
 			List:  make([]*response.WorkflowTemplateInfo, 0),
 			DownloadLink: response.WorkflowTemplateURL{
-				Url: config.Cfg().WorkflowTemplatePath.GlobalWebListUrl,
+				Url: config.Cfg().WorkflowTemplate.GlobalWebListUrl,
 			},
 		}, nil
 	}
@@ -184,7 +186,7 @@ func getRemoteWorkflowTemplateList(ctx *gin.Context, category, name string) (*re
 			Total: 0,
 			List:  make([]*response.WorkflowTemplateInfo, 0),
 			DownloadLink: response.WorkflowTemplateURL{
-				Url: config.Cfg().WorkflowTemplatePath.GlobalWebListUrl,
+				Url: config.Cfg().WorkflowTemplate.GlobalWebListUrl,
 			},
 		}, nil
 	}
@@ -200,7 +202,7 @@ func getRemoteWorkflowTemplateList(ctx *gin.Context, category, name string) (*re
 
 func getLocalWorkflowTemplateList(ctx context.Context, category, name string) (*response.GetWorkflowTemplateListResp, error) {
 	var resWorkflowTemp []*response.WorkflowTemplateInfo
-	for _, wtfCfg := range config.Cfg().WorkflowTemplateConfig {
+	for _, wtfCfg := range config.Cfg().WorkflowTemplates {
 		if name != "" && !strings.Contains(wtfCfg.Name, name) {
 			continue
 		}
@@ -222,13 +224,13 @@ func getRemoteWorkflowTemplateDetail(ctx *gin.Context, templateId string) (*resp
 	var res response.Response
 	var ret response.WorkflowTemplateDetail
 	resp, err := resty.New().R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetQueryParams(map[string]string{
 			"templateId": templateId,
 		}).
 		SetHeader("Accept", "application/json").
 		SetResult(&res).
-		Get(config.Cfg().WorkflowTemplatePath.DetailUrl)
+		Get(config.Cfg().WorkflowTemplate.DetailUrl)
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_detail", fmt.Sprintf("failed to call remote workflow template API: %v", err))
 	}
@@ -259,12 +261,12 @@ func getLocalWorkflowTemplateDetail(ctx context.Context, templateId string) (*re
 
 func getRemoteDownloadWorkflowTemplate(ctx *gin.Context, templateId string) ([]byte, error) {
 	resp, err := resty.New().R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetQueryParams(map[string]string{
 			"templateId": templateId,
 		}).
 		SetHeader("Accept", "application/json").
-		Get(config.Cfg().WorkflowTemplatePath.DownloadUrl)
+		Get(config.Cfg().WorkflowTemplate.DownloadUrl)
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_download", fmt.Sprintf("failed to call remote workflow template API: %v", err))
 	}
@@ -274,6 +276,14 @@ func getRemoteDownloadWorkflowTemplate(ctx *gin.Context, templateId string) ([]b
 	}
 	// 远程调用成功，返回远程结果
 	return convertToBytes(resp.Body())
+}
+
+func getLocalDownloadWorkflowTemplate(templateId string) ([]byte, error) {
+	wtfCfg, exist := config.Cfg().WorkflowTemp(templateId)
+	if !exist {
+		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_download", "get local workflow template download empty")
+	}
+	return []byte(wtfCfg.Schema), nil
 }
 
 // --- 复制工作流模板 ---
@@ -323,7 +333,7 @@ func createWorkflowByTemplate(ctx *gin.Context, orgId string, req request.Create
 	}
 	if resp, err := resty.New().
 		R().
-		SetContext(ctx).
+		SetContext(ctx.Request.Context()).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx)).
@@ -347,7 +357,7 @@ func createWorkflowByTemplate(ctx *gin.Context, orgId string, req request.Create
 
 // --- internal ---
 
-func buildWorkflowTempInfo(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateInfo {
+func buildWorkflowTempInfo(ctx context.Context, wtfCfg config.WorkflowTemplateConfig) *response.WorkflowTemplateInfo {
 	iconUrl, _ := net_url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
 	return &response.WorkflowTemplateInfo{
 		TemplateId: wtfCfg.TemplateId,
@@ -362,7 +372,7 @@ func buildWorkflowTempInfo(ctx context.Context, wtfCfg config.WorkflowTempConfig
 	}
 }
 
-func buildWorkflowTempDetail(ctx context.Context, wtfCfg config.WorkflowTempConfig) *response.WorkflowTemplateDetail {
+func buildWorkflowTempDetail(ctx context.Context, wtfCfg config.WorkflowTemplateConfig) *response.WorkflowTemplateDetail {
 	iconUrl, _ := net_url.JoinPath(config.Cfg().Server.ApiBaseUrl, config.Cfg().DefaultIcon.WorkflowIcon)
 	return &response.WorkflowTemplateDetail{
 		WorkflowTemplateInfo: response.WorkflowTemplateInfo{
@@ -381,14 +391,6 @@ func buildWorkflowTempDetail(ctx context.Context, wtfCfg config.WorkflowTempConf
 		Scenario: wtfCfg.Scenario,
 		Note:     wtfCfg.Note,
 	}
-}
-
-func getLocalDownloadWorkflowTemplate(templateId string) ([]byte, error) {
-	wtfCfg, exist := config.Cfg().WorkflowTemp(templateId)
-	if !exist {
-		return nil, grpc_util.ErrorStatus(errs.Code_BFFGeneral, "bff_workflow_template_download", "get local workflow template download empty")
-	}
-	return []byte(wtfCfg.Schema), nil
 }
 
 func convertToBytes(data any) ([]byte, error) {
@@ -424,15 +426,4 @@ func getTemplateDownloadCount(ctx context.Context, templateID string) int32 {
 		return 0
 	}
 	return util.MustI32(countStr)
-}
-
-// 记录模板下载量到单独的Redis Key
-func recordTemplateBrowse(ctx context.Context) error {
-	// 使用HINCRBY原子性增加模板下载量
-	date := util.Time2Date(time.Now().UnixMilli())
-	err := redis.OP().Cli().HIncrBy(ctx, redisGlobalBrowseKey, date, 1).Err()
-	if err != nil {
-		return fmt.Errorf("redis IncrBy key %v filed %v err: %v", redisGlobalBrowseKey, date, err)
-	}
-	return nil
 }

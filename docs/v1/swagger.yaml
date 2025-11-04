@@ -3338,7 +3338,7 @@ definitions:
       activeClient:
         allOf:
         - $ref: '#/definitions/response.StatisticOverviewItem'
-        description: 活跃客户端
+        description: 日活客户端
       additionClient:
         allOf:
         - $ref: '#/definitions/response.StatisticOverviewItem'

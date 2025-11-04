@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	operate_service "github.com/UnicomAI/wanwu/api/proto/operate-service"
@@ -46,18 +47,17 @@ func getClientStatistic(ctx *gin.Context, startDate, endDate string) (*response.
 	return &response.ClientStatistic{
 		Overview: response.ClientOverView{
 			CumulativeClient: clientOverviewPb2resp(resp.Overview.GetCumulative()),
-			ActiveClient:     clientOverviewPb2resp(resp.Overview.GetActive()),
 			AdditionClient:   clientOverviewPb2resp(resp.Overview.GetNew()),
+			ActiveClient:     clientOverviewPb2resp(resp.Overview.GetActive()),
 		},
 		Trend: response.ClientTrend{
-			Client: convertStatisticChart(resp.Trend.Client),
+			Client: convertStatisticChart(ctx, resp.Trend.Client),
 		},
 	}, nil
 }
 
 func clientOverviewPb2resp(item *operate_service.ClientOverviewItem) response.StatisticOverviewItem {
-	valueStr := fmt.Sprintf("%.2f", item.Value)
-	value, _ := strconv.ParseFloat(valueStr, 64)
+	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", item.Value), 64)
 	return response.StatisticOverviewItem{
 		Value:            float32(value),
 		PeriodOverPeriod: item.PeriodOverperiod,
@@ -66,11 +66,21 @@ func clientOverviewPb2resp(item *operate_service.ClientOverviewItem) response.St
 
 // --- global browse statistic ---
 
+func recordGlobalBrowse(ctx context.Context) error {
+	// 使用HINCRBY原子性增加模板下载量
+	date := util.Time2Date(time.Now().UnixMilli())
+	err := redis.OP().Cli().HIncrBy(ctx, redisGlobalBrowseKey, date, 1).Err()
+	if err != nil {
+		return fmt.Errorf("redis IncrBy key %v filed %v err: %v", redisGlobalBrowseKey, date, err)
+	}
+	return nil
+}
+
 func getGlobalBrowseStatistic(ctx *gin.Context, startDate, endDate string) (*response.StatisticOverviewItem, *response.StatisticChart, error) {
 	// 获取当前周期和上一个周期的日期列表
 	prevDates, currentDates, err := util.PreviousDateRange(startDate, endDate)
 	if err != nil {
-		return nil, nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_template_stats", fmt.Sprintf("get date range error: %v", err))
+		return nil, nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_global_browse_stats", fmt.Sprintf("get date range error: %v", err))
 	}
 
 	// 获取浏览数据
@@ -96,7 +106,7 @@ func getGlobalBrowseStatistic(ctx *gin.Context, startDate, endDate string) (*res
 func getBrowseDataFromRedis(ctx context.Context, dates []string) (map[string]int64, error) {
 	items, err := redis.OP().HGetAll(ctx, redisGlobalBrowseKey)
 	if err != nil {
-		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_template_stats", fmt.Sprintf("redis HGetAll key %v fields %v err: %v", redisGlobalBrowseKey, dates, err))
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_global_browse_stats", fmt.Sprintf("redis HGetAll key %v fields %v err: %v", redisGlobalBrowseKey, dates, err))
 	}
 
 	data := make(map[string]int64)
@@ -134,9 +144,9 @@ func calculateGlobalBrowseOverview(currentData, prevData map[string]int64) respo
 	}
 
 	// 计算环比
-	var pop float32
+	var pop float64
 	if prevTotal > 0 {
-		pop = (float32(currentTotal) - float32(prevTotal)) / float32(prevTotal) * 100
+		pop, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", (float32(currentTotal)-float32(prevTotal))/float32(prevTotal)*100), 64)
 	} else if currentTotal > 0 {
 		// 如果上期为0，本期有数据，增长率为100%
 		pop = 100
@@ -144,7 +154,7 @@ func calculateGlobalBrowseOverview(currentData, prevData map[string]int64) respo
 
 	return response.StatisticOverviewItem{
 		Value:            float32(currentTotal),
-		PeriodOverPeriod: pop,
+		PeriodOverPeriod: float32(pop),
 	}
 }
 
@@ -159,10 +169,10 @@ func calculateGlobalBrowseTrend(ctx *gin.Context, browseData map[string]int64, d
 		})
 	}
 	return response.StatisticChart{
-		TableName: gin_util.I18nKey(ctx, "ope_workflow_template_browse_table"),
+		TableName: gin_util.I18nKey(ctx, "ope_statistic_browse_table"),
 		Lines: []response.StatisticChartLine{
 			{
-				LineName: gin_util.I18nKey(ctx, "ope_workflow_template_browse_line"),
+				LineName: gin_util.I18nKey(ctx, "ope_statistic_browse_line"),
 				Items:    items,
 			},
 		},

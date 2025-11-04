@@ -11,8 +11,8 @@ type ClientStatistic struct {
 
 type ClientOverView struct {
 	CumulativeClient StatisticOverviewItem `json:"cumulativeClient"` // 累计客户端
-	ActiveClient     StatisticOverviewItem `json:"activeClient"`     // 活跃客户端
 	AdditionClient   StatisticOverviewItem `json:"additionClient"`   // 新增客户端
+	ActiveClient     StatisticOverviewItem `json:"activeClient"`     // 日活客户端
 	Browse           StatisticOverviewItem `json:"browse"`           // 浏览量
 }
 

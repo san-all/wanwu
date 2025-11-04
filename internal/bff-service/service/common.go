@@ -24,6 +24,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/imaging"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
@@ -327,17 +328,17 @@ func calculateResizeParameters(originalWidth, originalHeight, maxSize int) (int,
 	return newWidth, newHeight
 }
 
-func convertStatisticChart(pbChart *common.StatisticChart) response.StatisticChart {
+func convertStatisticChart(ctx *gin.Context, pbChart *common.StatisticChart) response.StatisticChart {
 	if pbChart == nil {
 		return response.StatisticChart{}
 	}
 	respChart := response.StatisticChart{
-		TableName: pbChart.TableName,
+		TableName: gin_util.I18nKey(ctx, pbChart.TableName),
 		Lines:     make([]response.StatisticChartLine, 0, len(pbChart.ChartLines)),
 	}
 	for _, pbLine := range pbChart.ChartLines {
 		goLine := response.StatisticChartLine{
-			LineName: pbLine.LineName,
+			LineName: gin_util.I18nKey(ctx, pbLine.LineName),
 			Items:    make([]response.StatisticChartLineItem, 0, len(pbLine.Items)),
 		}
 

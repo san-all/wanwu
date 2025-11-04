@@ -68,4 +68,7 @@ func Init() {
 
 	// --- setting ---
 	mid.NewSub("setting", "平台配置", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- statistic_client ---
+	mid.NewSub("statistic_client", "统计分析", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 }

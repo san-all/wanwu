@@ -46,4 +46,7 @@ func Register(apiV1 *gin.RouterGroup) {
 
 	// setting
 	registerSetting(apiV1)
+
+	// statistic_client
+	registerStatisticClient(apiV1)
 }

@@ -86,7 +86,8 @@
 {"code":110000,"key":"bff_workflow_template_list","langs":{"zh":"获取工作流模板列表错误: %v"}}
 {"code":110000,"key":"bff_workflow_template_detail","langs":{"zh":"获取工作流模板详情错误: %v"}}
 {"code":110000,"key":"bff_workflow_template_download","langs":{"zh":"下载工作流模板错误: %v"}}
-{"code":110000,"key":"bff_workflow_template_stats","langs":{"zh":"获取工作流模板统计错误: %V"}}
+{"code":110000,"key":"bff_global_browse_stats","langs":{"zh":"获取平台浏览量统计错误: %v"}}
+{"code":110000,"key":"bff_prompt_template_detail","langs":{"zh":"获取提示词模板详情错误: %v"}}
 {"code":0,"key":"------ custom ------","langs":{}}
 {"code":0,"key":"bff_custom_home_title","langs":{"en":"Yuanjing Wanwu Intelligent Body Development Platform","zh":"元景万悟智能体开发平台"}}
 {"code":0,"key":"bff_custom_tab_title","langs":{"en":"Yuanjing Wanwu","zh":"元景万悟"}}
@@ -328,6 +329,7 @@
 {"code":160006,"key":"assistant_tool_delete","langs":{"zh":"删除tool错误: %v"}}
 {"code":160006,"key":"assistant_tool_get","langs":{"zh":"获取tool错误: %v"}}
 {"code":160006,"key":"assistant_tool_update","langs":{"zh":"更新tool错误: %v"}}
+{"code":160006,"key":"assistant_tool_config_update","langs":{"zh":"更新tool错误: %v"}}
 {"code":160006,"key":"assistant_custom_count","langs":{"zh":"获取custom错误: %v"}}
 {"code":160006,"key":"assistant_custom_exist","langs":{"zh":"获取custom错误: %v"}}
 {"code":300000,"key":"app_config_delete","langs":{"zh":"删除应用配置错误:%v"}}
@@ -379,3 +381,16 @@
 {"code":300009,"key":"app_url_update_switch","langs":{"zh":"URL(%v)状态修改失败: %v"}}
 {"code":300010,"key":"","langs":{"zh":"URL已被禁用"}}
 {"code":300011,"key":"","langs":{"zh":"URL已过期"}}
+{"code":320001,"key":"ope_system_custom_query","langs":{"zh":"查询自定义配置(%v)错误: %v"}}
+{"code":320001,"key":"ope_system_custom_create","langs":{"zh":"创建自定义配置(%v)错误: %v"}}
+{"code":320001,"key":"ope_system_custom_update","langs":{"zh":"更新自定义配置(%v)错误: %v"}}
+{"code":320001,"key":"ope_system_custom_get","langs":{"zh":"获取自定义配置错误: %v"}}
+{"code":320002,"key":"ope_client_record_create","langs":{"zh":"新增客户端记录错误: %V"}}
+{"code":320002,"key":"ope_client_overview_get","langs":{"zh":"获取客户端统计总览错误: %v"}}
+{"code":320002,"key":"ope_client_statistic_get","langs":{"zh":"获取客户端统计错误: %v"}}
+{"code":0,"key":"ope_statistic_client_table","langs":{"zh":"用户量"}}
+{"code":0,"key":"ope_statistic_cumulative_client_line","langs":{"zh":"累计用户量"}}
+{"code":0,"key":"ope_statistic_active_client_line","langs":{"zh":"活跃用户量"}}
+{"code":0,"key":"ope_statistic_new_client_line","langs":{"zh":"新增用户量"}}
+{"code":0,"key":"ope_statistic_browse_table","langs":{"zh":"平台浏览量"}}
+{"code":0,"key":"ope_statistic_browse_line","langs":{"zh":"浏览量"}}

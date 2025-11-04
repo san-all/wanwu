@@ -33,7 +33,7 @@ func (c *Client) AddClientRecord(ctx context.Context, clientId string) *err_code
 		}
 	} else {
 		// 记录已存在，更新updated_at字段
-		if err := sqlopt.WithClientID(clientId).Apply(c.db).WithContext(ctx).Update("updated_at", nowTs).Error; err != nil {
+		if err := c.db.WithContext(ctx).Model(existingRecord).Update("updated_at", nowTs).Error; err != nil {
 			return toErrStatus("ope_client_record_create", err.Error())
 		}
 	}
@@ -47,12 +47,12 @@ func (c *Client) GetClientStatistic(ctx context.Context, startDate, endDate stri
 	// overview
 	overview, err := statisticClientOverView(ctx, c.db, startDate, endDate)
 	if err != nil {
-		return nil, toErrStatus("ope_client_overview_get", err.Error())
+		return nil, toErrStatus("ope_client_statistic_get", err.Error())
 	}
 	// trend
 	trend, err := statisticClientTrend(ctx, c.db, startDate, endDate)
 	if err != nil {
-		return nil, toErrStatus("ope_client_trend_get", err.Error())
+		return nil, toErrStatus("ope_client_statistic_get", err.Error())
 	}
 	return &ClientStatistic{
 		Overview: *overview,
@@ -67,18 +67,18 @@ func statisticClientOverView(ctx context.Context, db *gorm.DB, startDate, endDat
 	if err != nil {
 		return nil, err
 	}
-	activeOverview, err := statisticActiveClientOverview(ctx, db, startDate, endDate)
+	newOverview, err := statisticNewClientOverview(ctx, db, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
-	newOverview, err := statisticNewClientOverview(ctx, db, startDate, endDate)
+	activeOverview, err := statisticActiveClientOverview(ctx, db, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
 	return &ClientOverView{
 		Cumulative: *cumulativeOverview,
-		Active:     *activeOverview,
 		New:        *newOverview,
+		Active:     *activeOverview,
 	}, nil
 }
 
@@ -142,7 +142,7 @@ func statisticNewClient(ctx context.Context, db *gorm.DB, startDate, endDate str
 	return newCount, nil
 }
 
-// 统计活跃client
+// 统计日均活跃client
 func statisticActiveClientOverview(ctx context.Context, db *gorm.DB, startDate, endDate string) (*ClientOverviewItem, error) {
 	prevPeriod, currPeriod, err := util.PreviousDateRange(startDate, endDate)
 	if err != nil {
@@ -162,7 +162,7 @@ func statisticActiveClientOverview(ctx context.Context, db *gorm.DB, startDate, 
 	}, nil
 }
 
-func statisticActiveClient(ctx context.Context, db *gorm.DB, startDate, endDate string) (int64, error) {
+func statisticActiveClient(ctx context.Context, db *gorm.DB, startDate, endDate string) (float32, error) {
 	// 如果时间范围包含今天，则需要先更新今天的活跃用户统计数据
 	startTs, err := util.Date2Time(startDate)
 	if err != nil {
@@ -187,7 +187,9 @@ func statisticActiveClient(ctx context.Context, db *gorm.DB, startDate, endDate 
 	).Apply(db).WithContext(ctx).Select("SUM(dau_count) as dau_count").First(&activeClient).Error; err != nil {
 		return 0, fmt.Errorf("active client overview err: %v", err)
 	}
-	return int64(activeClient.DauCount), nil
+	day := (endTs - startTs) / (24 * time.Hour.Milliseconds())
+	dau, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", float32(activeClient.DauCount)/float32(day)), 64)
+	return float32(dau), nil
 }
 
 func updateActiveDailyStats(ctx context.Context, db *gorm.DB, date string) error {
@@ -238,7 +240,7 @@ func calculatePoP(current, previous float32) float32 {
 		}
 		return 100 // 避免除以零的错误
 	}
-	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", ((current-previous)/previous)*100), 32)
+	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", ((current-previous)/previous)*100), 64)
 	return float32(value)
 }
 
@@ -253,13 +255,17 @@ func statisticClientTrend(ctx context.Context, db *gorm.DB, startDate, endDate s
 	if err != nil {
 		return nil, err
 	}
-	startCumulative, err := statisticCumulativeClientOverview(ctx, db, startDate)
+	startTs, err := util.Date2Time(startDate)
+	if err != nil {
+		return nil, err
+	}
+	startCumulative, err := statisticCumulativeClientOverview(ctx, db, util.Time2Date(startTs-24*time.Hour.Milliseconds()))
 	if err != nil {
 		return nil, err
 	}
 	return &ClientTrend{
 		Client: StatisticChart{
-			Name: "ope_workflow_template_client_table",
+			Name: "ope_statistic_client_table",
 			Lines: []StatisticChartLine{
 				statisticCumulativeClientTrend(startCumulative.Value, newTrend.Items),
 				*activeTrend,
@@ -280,7 +286,7 @@ func statisticCumulativeClientTrend(startCumulative float32, newClients []Statis
 		})
 	}
 	return StatisticChartLine{
-		Name:  "ope_workflow_template_cumulative_client_line",
+		Name:  "ope_statistic_cumulative_client_line",
 		Items: values,
 	}
 }
@@ -294,7 +300,6 @@ func statisticActiveClientTrend(ctx context.Context, db *gorm.DB, startDate, end
 	if err != nil {
 		return nil, err
 	}
-	endTs = endTs + 24*time.Hour.Milliseconds()
 	var stats []*model.ClientDailyStats
 	if err := sqlopt.SQLOptions(
 		sqlopt.StartDate(startDate),
@@ -323,7 +328,7 @@ func statisticActiveClientTrend(ctx context.Context, db *gorm.DB, startDate, end
 		}
 	}
 	return &StatisticChartLine{
-		Name:  "ope_workflow_template_active_client_line",
+		Name:  "ope_statistic_active_client_line",
 		Items: values,
 	}, nil
 }
@@ -337,11 +342,10 @@ func statisticNewClientTrend(ctx context.Context, db *gorm.DB, startDate, endDat
 	if err != nil {
 		return nil, err
 	}
-	endTs = endTs + 24*time.Hour.Milliseconds()
 	var clients []*model.ClientRecord
 	if err := db.WithContext(ctx).
 		Model(&model.ClientRecord{}).
-		Where("created_at BETWEEN ? AND ?", startTs, endTs).
+		Where("created_at BETWEEN ? AND ?", startTs, endTs+24*time.Hour.Milliseconds()).
 		Find(&clients).Error; err != nil {
 		return nil, fmt.Errorf("new client trend err: %v", err)
 	}
@@ -358,7 +362,7 @@ func statisticNewClientTrend(ctx context.Context, db *gorm.DB, startDate, endDat
 		})
 	}
 	return &StatisticChartLine{
-		Name:  "ope_workflow_template_new_client_line",
+		Name:  "ope_statistic_new_client_line",
 		Items: values,
 	}, nil
 }

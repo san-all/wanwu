@@ -25,8 +25,8 @@ func (s *Service) GetClientStatistic(ctx context.Context, req *operate_service.G
 	return &operate_service.ClientStatistic{
 		Overview: &operate_service.ClientOverViewInfo{
 			Cumulative: convertClientOverview(stats.Overview.Cumulative),
-			Active:     convertClientOverview(stats.Overview.Active),
 			New:        convertClientOverview(stats.Overview.New),
+			Active:     convertClientOverview(stats.Overview.Active),
 		},
 		Trend: &operate_service.ClientTrendInfo{
 			Client: convertStatisticChart(stats.Trend.Client),

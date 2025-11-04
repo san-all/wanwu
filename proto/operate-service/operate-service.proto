@@ -82,8 +82,8 @@ message ClientStatistic{
 
 message ClientOverViewInfo{
     ClientOverviewItem cumulative = 1; // 累计
-    ClientOverviewItem active = 2; // 活跃
-    ClientOverviewItem new = 3; // 新增
+    ClientOverviewItem new = 2; // 新增
+    ClientOverviewItem active = 3; // 日活
 }
 
 message ClientOverviewItem {
