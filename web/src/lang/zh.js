@@ -951,6 +951,17 @@ export default {
         copyToInput:'复制入框',
         clearHistory:'清空历史',
         clickCopy:'点击复制',
+        toolDetail:{
+            modelLoadingText:'模型加载中...',
+            selectRerank:'请选择rerank模型',
+            inputApikey:'请输入apikey',
+            parameters:'参数',
+            type:'类型',
+            description:'描述',
+            required:'是否必填',
+            yes:'是',
+            no:'否'
+        }
     },
     agentDiglog:{
         createApp:'智能体创建',

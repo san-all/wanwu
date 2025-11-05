@@ -391,6 +391,7 @@ export default {
   height: 100%;
 }
 
+// weburl适配移动端样式
 /deep/ .chatBg,
 /deep/ .explore-container {
   @media (max-width: 768px) {
