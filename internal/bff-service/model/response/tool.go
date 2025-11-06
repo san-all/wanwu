@@ -62,12 +62,13 @@ type ToolSelect struct {
 }
 
 type ToolInfo struct {
-	ToolId          string `json:"toolId"`                                            // 工具id
-	ToolName        string `json:"toolName"`                                          // 工具名称
-	ToolType        string `json:"toolType" validate:"required,oneof=custom builtin"` // 工具类型
-	Desc            string `json:"desc"`                                              // 工具描述
-	NeedApiKeyInput bool   `json:"needApiKeyInput"`                                   // 是否需要apiKey输入
-	APIKey          string `json:"apiKey"`                                            // apiKey
+	ToolId          string         `json:"toolId"`                                            // 工具id
+	ToolName        string         `json:"toolName"`                                          // 工具名称
+	ToolType        string         `json:"toolType" validate:"required,oneof=custom builtin"` // 工具类型
+	Desc            string         `json:"desc"`                                              // 工具描述
+	NeedApiKeyInput bool           `json:"needApiKeyInput"`                                   // 是否需要apiKey输入
+	APIKey          string         `json:"apiKey"`                                            // apiKey
+	Avatar          request.Avatar `json:"avatar"`                                            // 图标
 }
 
 type ToolActionList struct {

@@ -3226,6 +3226,8 @@ definitions:
     properties:
       actionName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       mcpId:
@@ -3295,6 +3297,8 @@ definitions:
     properties:
       actionName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       toolConfig:
@@ -3319,6 +3323,8 @@ definitions:
     properties:
       apiName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       name:
@@ -4404,6 +4410,10 @@ definitions:
     type: object
   response.MCPSelect:
     properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
       description:
         description: 描述
         type: string
@@ -5038,6 +5048,10 @@ definitions:
       apiKey:
         description: apiKey
         type: string
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
       desc:
         description: 工具描述
         type: string

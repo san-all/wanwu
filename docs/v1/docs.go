@@ -15027,6 +15027,9 @@ const docTemplate = `{
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -15127,6 +15130,9 @@ const docTemplate = `{
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -15159,6 +15165,9 @@ const docTemplate = `{
             "properties": {
                 "apiName": {
                     "type": "string"
+                },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
                 },
                 "enable": {
                     "type": "boolean"
@@ -16827,6 +16836,14 @@ const docTemplate = `{
                 "toolType"
             ],
             "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
                 "description": {
                     "description": "描述",
                     "type": "string"
@@ -17768,6 +17785,14 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "apiKey",
                     "type": "string"
+                },
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "desc": {
                     "description": "工具描述",

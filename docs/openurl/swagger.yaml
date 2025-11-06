@@ -561,6 +561,8 @@ definitions:
     properties:
       actionName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       mcpId:
@@ -583,6 +585,8 @@ definitions:
     properties:
       actionName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       toolConfig:
@@ -607,6 +611,8 @@ definitions:
     properties:
       apiName:
         type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       enable:
         type: boolean
       name:

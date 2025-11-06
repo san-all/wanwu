@@ -199,43 +199,6 @@ func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req reques
 	return err
 }
 
-//func AssistantCustomToolCreate(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolAddRequest) error {
-//	_, err := assistant.AssistantCustomToolCreate(ctx.Request.Context(), &assistant_service.AssistantCustomToolCreateReq{
-//		AssistantId:  req.AssistantId,
-//		CustomToolId: req.CustomToolId,
-//		Identity: &assistant_service.Identity{
-//			UserId: userId,
-//			OrgId:  orgId,
-//		},
-//	})
-//	return err
-//}
-//
-//func AssistantCustomToolDelete(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolDelRequest) error {
-//	_, err := assistant.AssistantCustomToolDelete(ctx.Request.Context(), &assistant_service.AssistantCustomToolDeleteReq{
-//		AssistantId:  req.AssistantId,
-//		CustomToolId: req.CustomToolId,
-//		Identity: &assistant_service.Identity{
-//			UserId: userId,
-//			OrgId:  orgId,
-//		},
-//	})
-//	return err
-//}
-//
-//func AssistantCustomToolEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolEnableRequest) error {
-//	_, err := assistant.AssistantCustomToolEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantCustomToolEnableSwitchReq{
-//		AssistantId:  req.AssistantId,
-//		CustomToolId: req.CustomToolId,
-//		Enable:       req.Enable,
-//		Identity: &assistant_service.Identity{
-//			UserId: userId,
-//			OrgId:  orgId,
-//		},
-//	})
-//	return err
-//}
-
 func AssistantToolCreate(ctx *gin.Context, userId, orgId string, req request.AssistantToolAddRequest) error {
 	_, err := assistant.AssistantToolCreate(ctx.Request.Context(), &assistant_service.AssistantToolCreateReq{
 		AssistantId: req.AssistantId,
@@ -330,17 +293,20 @@ func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_servic
 	for _, info := range assistantMCPInfos {
 		var exists bool
 		var mcpName string
+		var avatar request.Avatar
 
 		switch info.McpType {
 		case constant.MCPTypeMCP:
 			if item, ok := mcpDetailMap[info.McpId]; ok {
 				exists = true
 				mcpName = item.Info.Name
+				avatar = cacheMCPAvatar(ctx, item.Info.AvatarPath, item.AvatarPath)
 			}
 		case constant.MCPTypeMCPServer:
 			if item, ok := mcpserverDetailMap[info.McpId]; ok {
 				exists = true
 				mcpName = item.Name
+				avatar = cacheMCPServerAvatar(ctx, item.AvatarPath)
 			}
 		}
 
@@ -353,56 +319,13 @@ func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_servic
 				ActionName: info.ActionName,
 				Enable:     info.Enable,
 				Valid:      true,
+				Avatar:     avatar,
 			})
 		}
 	}
 
 	return retMCPInfos, nil
 }
-
-//func assistantCustomConvert(ctx *gin.Context, assistantCustomInfos []*assistant_service.AssistantCustomToolInfos) ([]*response.CustomInfos, error) {
-//	// 若查询为空，返回空列表
-//	if len(assistantCustomInfos) == 0 {
-//		return nil, nil
-//	}
-//
-//	// 提取自定义工具ID列表
-//	var customToolIds []string
-//	for _, c := range assistantCustomInfos {
-//		customToolIds = append(customToolIds, c.CustomToolId)
-//	}
-//
-//	// 批量查询自定义工具详情
-//	mcpResp, err := mcp.GetCustomToolByCustomToolIdList(ctx.Request.Context(), &mcp_service.GetCustomToolByCustomToolIdListReq{
-//		CustomToolIdList: customToolIds,
-//	})
-//
-//	// 构建ID到工具信息的映射
-//	customToolMap := make(map[string]*mcp_service.GetCustomToolItem)
-//	if err == nil && mcpResp != nil { // 仅当查询成功且响应有效时才构建映射
-//		for _, item := range mcpResp.List {
-//			customToolMap[item.CustomToolId] = item
-//		}
-//	}
-//
-//	// 组装返回结果
-//	var retCustomInfos []*response.CustomInfos
-//	for _, c := range assistantCustomInfos {
-//		item, exists := customToolMap[c.CustomToolId]
-//		if exists {
-//			// 有效工具
-//			retCustomInfos = append(retCustomInfos, &response.CustomInfos{
-//				CustomId:   c.CustomToolId,
-//				UniqueId:   bff_util.ConcatAssistantToolUniqueId(constant.ToolTypeCustom, c.CustomToolId),
-//				Enable:     c.Enable,
-//				CustomName: item.Name,
-//				CustomDesc: item.Description,
-//			})
-//		}
-//	}
-//
-//	return retCustomInfos, nil
-//}
 
 func assistantToolsConvert(ctx *gin.Context, assistantToolInfos []*assistant_service.AssistantToolInfos) ([]*response.AssistantToolInfo, error) {
 	// 若查询为空，返回空列表
@@ -412,11 +335,12 @@ func assistantToolsConvert(ctx *gin.Context, assistantToolInfos []*assistant_ser
 
 	// 提取工具ID列表
 	var customToolIds, builtinToolIds []string
-	for _, b := range assistantToolInfos {
-		if b.ToolType == constant.ToolTypeCustom {
-			customToolIds = append(customToolIds, b.ToolId)
-		} else if b.ToolType == constant.ToolTypeBuiltIn {
-			builtinToolIds = append(builtinToolIds, b.ToolId)
+	for _, tool := range assistantToolInfos {
+		switch tool.ToolType {
+		case constant.ToolTypeCustom:
+			customToolIds = append(customToolIds, tool.ToolId)
+		case constant.ToolTypeBuiltIn:
+			builtinToolIds = append(builtinToolIds, tool.ToolId)
 		}
 	}
 
@@ -445,17 +369,20 @@ func assistantToolsConvert(ctx *gin.Context, assistantToolInfos []*assistant_ser
 	for _, info := range assistantToolInfos {
 		var exists bool
 		var toolName string
+		var avatar request.Avatar
 
 		switch info.ToolType {
 		case constant.ToolTypeCustom:
 			if item, ok := customToolMap[info.ToolId]; ok {
 				exists = true
 				toolName = item.Name
+				avatar = cacheToolAvatar(ctx, constant.ToolTypeCustom, item.AvatarPath)
 			}
 		case constant.ToolTypeBuiltIn:
 			if item, ok := builtinToolMap[info.ToolId]; ok {
 				exists = true
 				toolName = item.Name
+				avatar = cacheToolAvatar(ctx, constant.ToolTypeBuiltIn, item.AvatarPath)
 			}
 		}
 
@@ -475,6 +402,7 @@ func assistantToolsConvert(ctx *gin.Context, assistantToolInfos []*assistant_ser
 				Enable:     info.Enable,
 				Valid:      true,
 				ToolConfig: toolConfig,
+				Avatar:     avatar,
 			})
 		}
 	}
@@ -726,6 +654,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 					// 找到匹配的工作流，设置名称和描述
 					workFlowInfo.WorkFlowName = info.Name
 					workFlowInfo.WorkFlowDesc = info.Desc
+					workFlowInfo.AvatarPath = cacheWorkflowAvatar(info.URL)
 				}
 			}
 

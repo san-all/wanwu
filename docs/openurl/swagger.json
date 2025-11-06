@@ -1219,6 +1219,9 @@
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -1252,6 +1255,9 @@
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -1284,6 +1290,9 @@
             "properties": {
                 "apiName": {
                     "type": "string"
+                },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
                 },
                 "enable": {
                     "type": "boolean"

@@ -24,33 +24,36 @@ type Assistant struct {
 }
 
 type AssistantWorkFlowInfo struct {
-	UniqueId     string `json:"uniqueId"`
-	WorkFlowId   string `json:"workFlowId"`
-	ApiName      string `json:"apiName"`
-	Enable       bool   `json:"enable"`
-	WorkFlowName string `json:"name"`
-	WorkFlowDesc string `json:"workFlowDesc"`
+	UniqueId     string         `json:"uniqueId"`
+	WorkFlowId   string         `json:"workFlowId"`
+	ApiName      string         `json:"apiName"`
+	Enable       bool           `json:"enable"`
+	AvatarPath   request.Avatar `json:"avatar"`
+	WorkFlowName string         `json:"name"`
+	WorkFlowDesc string         `json:"workFlowDesc"`
 }
 
 type AssistantMCPInfo struct {
-	UniqueId   string `json:"uniqueId"`
-	MCPId      string `json:"mcpId"`
-	MCPType    string `json:"mcpType" validate:"required,oneof=mcp mcpserver"`
-	MCPName    string `json:"mcpName"`
-	ActionName string `json:"actionName"`
-	Enable     bool   `json:"enable"`
-	Valid      bool   `json:"valid"`
+	UniqueId   string         `json:"uniqueId"`
+	MCPId      string         `json:"mcpId"`
+	MCPType    string         `json:"mcpType" validate:"required,oneof=mcp mcpserver"`
+	MCPName    string         `json:"mcpName"`
+	ActionName string         `json:"actionName"`
+	Enable     bool           `json:"enable"`
+	Valid      bool           `json:"valid"`
+	Avatar     request.Avatar `json:"avatar"`
 }
 
 type AssistantToolInfo struct {
-	UniqueId   string     `json:"uniqueId"`
-	ToolId     string     `json:"toolId"`
-	ToolType   string     `json:"toolType" validate:"required,oneof=builtin custom"`
-	ToolName   string     `json:"toolName"`
-	ActionName string     `json:"actionName"`
-	Enable     bool       `json:"enable"`
-	Valid      bool       `json:"valid"`
-	ToolConfig ToolConfig `json:"toolConfig"`
+	UniqueId   string         `json:"uniqueId"`
+	ToolId     string         `json:"toolId"`
+	ToolType   string         `json:"toolType" validate:"required,oneof=builtin custom"`
+	ToolName   string         `json:"toolName"`
+	ActionName string         `json:"actionName"`
+	Enable     bool           `json:"enable"`
+	Valid      bool           `json:"valid"`
+	ToolConfig ToolConfig     `json:"toolConfig"`
+	Avatar     request.Avatar `json:"avatar"`
 }
 
 type ToolConfig struct {

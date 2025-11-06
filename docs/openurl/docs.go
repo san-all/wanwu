@@ -1227,6 +1227,9 @@ const docTemplate = `{
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -1260,6 +1263,9 @@ const docTemplate = `{
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -1292,6 +1298,9 @@ const docTemplate = `{
             "properties": {
                 "apiName": {
                     "type": "string"
+                },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
                 },
                 "enable": {
                     "type": "boolean"

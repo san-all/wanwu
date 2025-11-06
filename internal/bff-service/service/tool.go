@@ -36,6 +36,7 @@ func GetToolSelect(ctx *gin.Context, userID, orgID string, name string) (*respon
 				Desc:            item.Desc,
 				APIKey:          item.ApiKey,
 				NeedApiKeyInput: item.NeedApiKeyInput,
+				Avatar:          cacheToolAvatar(ctx, item.ToolType, item.AvatarPath),
 			},
 		})
 	}

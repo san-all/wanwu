@@ -15020,6 +15020,9 @@
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -15120,6 +15123,9 @@
                 "actionName": {
                     "type": "string"
                 },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -15152,6 +15158,9 @@
             "properties": {
                 "apiName": {
                     "type": "string"
+                },
+                "avatar": {
+                    "$ref": "#/definitions/request.Avatar"
                 },
                 "enable": {
                     "type": "boolean"
@@ -16820,6 +16829,14 @@
                 "toolType"
             ],
             "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
                 "description": {
                     "description": "描述",
                     "type": "string"
@@ -17761,6 +17778,14 @@
                 "apiKey": {
                     "description": "apiKey",
                     "type": "string"
+                },
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "desc": {
                     "description": "工具描述",
