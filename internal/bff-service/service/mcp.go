@@ -61,19 +61,21 @@ func CreateMCP(ctx *gin.Context, userID, orgID string, req request.MCPCreate) er
 		Desc:        req.Desc,
 		From:        req.From,
 		SseUrl:      req.SSEURL,
+		AvatarPath:  req.Avatar.Key,
 	})
 	return err
 }
 
 func UpdateMCP(ctx *gin.Context, userID, orgID string, req request.MCPUpdate) error {
 	_, err := mcp.UpdateCustomMCP(ctx.Request.Context(), &mcp_service.UpdateCustomMCPReq{
-		OrgId:  orgID,
-		UserId: userID,
-		McpId:  req.MCPID,
-		Name:   req.Name,
-		Desc:   req.Desc,
-		From:   req.From,
-		SseUrl: req.SSEURL,
+		OrgId:      orgID,
+		UserId:     userID,
+		McpId:      req.MCPID,
+		Name:       req.Name,
+		Desc:       req.Desc,
+		From:       req.From,
+		SseUrl:     req.SSEURL,
+		AvatarPath: req.Avatar.Key,
 	})
 	return err
 }
@@ -286,7 +288,7 @@ func toMCPCustomDetail(ctx *gin.Context, mcpDetail *mcp_service.CustomMCPDetail)
 		MCPInfo: response.MCPInfo{
 			MCPID:         mcpDetail.McpId,
 			SSEURL:        mcpDetail.SseUrl,
-			MCPSquareInfo: toMCPSquareInfo(ctx, mcpDetail.Info),
+			MCPSquareInfo: toCustomMCP(ctx, mcpDetail.Info),
 		},
 		MCPSquareIntro: toMCPSquareIntro(mcpDetail.Intro),
 	}
@@ -296,7 +298,7 @@ func toMCPCustomInfo(ctx *gin.Context, mcpInfo *mcp_service.CustomMCPInfo) respo
 	return response.MCPInfo{
 		MCPID:         mcpInfo.McpId,
 		SSEURL:        mcpInfo.SseUrl,
-		MCPSquareInfo: toMCPSquareInfo(ctx, mcpInfo.Info),
+		MCPSquareInfo: toCustomMCP(ctx, mcpInfo.Info),
 	}
 }
 
@@ -319,6 +321,17 @@ func toMCPSquareInfo(ctx *gin.Context, mcpSquareInfo *mcp_service.SquareMCPInfo)
 	return response.MCPSquareInfo{
 		MCPSquareID: mcpSquareInfo.McpSquareId,
 		Avatar:      cacheMCPAvatar(ctx, mcpSquareInfo.AvatarPath),
+		Name:        mcpSquareInfo.Name,
+		Desc:        mcpSquareInfo.Desc,
+		From:        mcpSquareInfo.From,
+		Category:    mcpSquareInfo.Category,
+	}
+}
+
+func toCustomMCP(ctx *gin.Context, mcpSquareInfo *mcp_service.SquareMCPInfo) response.MCPSquareInfo {
+	return response.MCPSquareInfo{
+		MCPSquareID: mcpSquareInfo.McpSquareId,
+		Avatar:      CacheAvatar(ctx, mcpSquareInfo.AvatarPath, true),
 		Name:        mcpSquareInfo.Name,
 		Desc:        mcpSquareInfo.Desc,
 		From:        mcpSquareInfo.From,

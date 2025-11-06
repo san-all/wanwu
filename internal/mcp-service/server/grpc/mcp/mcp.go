@@ -52,6 +52,7 @@ func (s *Service) CreateCustomMCP(ctx context.Context, req *mcp_service.CreateCu
 		From:        req.From,
 		Desc:        req.Desc,
 		SseUrl:      req.SseUrl,
+		AvatarPath:  req.AvatarPath,
 	}); err != nil {
 		return nil, errStatus(errs.Code_MCPCreateCustomMCPErr, err)
 	}
@@ -60,11 +61,12 @@ func (s *Service) CreateCustomMCP(ctx context.Context, req *mcp_service.CreateCu
 
 func (s *Service) UpdateCustomMCP(ctx context.Context, req *mcp_service.UpdateCustomMCPReq) (*emptypb.Empty, error) {
 	if err := s.cli.UpdateMCP(ctx, &model.MCPClient{
-		ID:     util.MustU32(req.McpId),
-		Name:   req.Name,
-		From:   req.From,
-		Desc:   req.Desc,
-		SseUrl: req.SseUrl,
+		ID:         util.MustU32(req.McpId),
+		Name:       req.Name,
+		From:       req.From,
+		Desc:       req.Desc,
+		SseUrl:     req.SseUrl,
+		AvatarPath: req.AvatarPath,
 	}); err != nil {
 		return nil, errStatus(errs.Code_MCPUpdateCustomMCPErr, err)
 	}
@@ -166,7 +168,7 @@ func buildCustomMCPDetail(mcp *model.MCPClient) *mcp_service.CustomMCPDetail {
 		SseUrl: mcp.SseUrl,
 		Info: &mcp_service.SquareMCPInfo{
 			McpSquareId: mcp.McpSquareId,
-			AvatarPath:  config.MCPLogo,
+			AvatarPath:  mcp.AvatarPath,
 			Name:        mcp.Name,
 			Desc:        mcp.Desc,
 			From:        mcp.From,
