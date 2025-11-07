@@ -34,7 +34,7 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload" >{{$t('common.gpuDialog.reload')}}</el-button>
-                <el-button size="mini" type="primary" @click="showBatchMeta" v-if="[10,20,30].includes(permissionType)">批量编辑元数据值</el-button>
+                <!--<el-button size="mini" type="primary" @click="showBatchMeta" v-if="[10,20,30].includes(permissionType)">批量编辑元数据值</el-button> -->
                 <el-button size="mini" type="primary" @click="showMeta" v-if="[10,20,30].includes(permissionType)">元数据管理</el-button>
                 <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&name=${knowledgeName}`)">命中测试</el-button>
                 <el-button
@@ -68,6 +68,7 @@
                 <el-table-column
                   type="selection"
                   reserve-selection
+                  v-if="[10,20,30].includes(permissionType)"
                   width="55">
                 </el-table-column>
                 <el-table-column
@@ -89,7 +90,6 @@
                 <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
-                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
@@ -100,6 +100,11 @@
                 <template slot-scope="scope">
                   <span>{{ getSegmentMethodText(scope.row.segmentMethod) }}</span>
                 </template>
+                </el-table-column>
+                <el-table-column
+                  prop="author"
+                  :label="$t('knowledgeManage.author')"
+                >
                 </el-table-column>
                 <el-table-column
                   prop="uploadTime"
@@ -181,6 +186,8 @@
     
     <!-- 批量编辑元数据值弹窗 -->
     <batchMetaData ref="batchMetaData" :selectedDocIds="selectedDocIds" @reLoadDocList="reLoadDocList" />
+    <!-- 批量编辑元数据值操作框 -->
+    <BatchMetatButton ref="BatchMetatButton" :selectedCount="selectedTableData.length" @showBatchMeta="showBatchMeta" @handleMetaCancel="handleMetaCancel"/>
   </div>
 </template>
 
@@ -189,10 +196,11 @@ import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import mataData from './metadata.vue'
 import batchMetaData from './meta/batchMetaData.vue'
+import BatchMetatButton from './meta/batchMetatButton.vue'
 import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
 import {mapGetters} from 'vuex';
 export default {
-  components: { Pagination,SearchInput,mataData,batchMetaData},
+  components: { Pagination,SearchInput,mataData,batchMetaData,BatchMetatButton},
   data() {
     return {
       knowledgeName:this.$route.query.name || '',
@@ -263,6 +271,17 @@ export default {
     this.clearTimer()
   },
   methods: {
+    handleMetaCancel(){
+      this.selectedTableData = []
+      this.selectedDocIds = []
+      // 取消所有表格数据的选中状态
+      this.$nextTick(() => {
+        const table = this.$refs.dataTable
+        if (table) {
+          table.clearSelection()
+        }
+      })
+    },
     reLoadDocList(){
       this.getTableData(this.docQuery)
       this.selectedTableData = []

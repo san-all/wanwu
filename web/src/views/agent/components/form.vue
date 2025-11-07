@@ -9,19 +9,18 @@
           class="el-icon-arrow-left btn"
           @click="goBack"
         ></span>
-        <!-- <span class="header-left-title">智能体编辑</span> -->
         <div class="basicInfo">
           <div class="img">
             <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
           </div>
           <div class="basicInfo-desc">
-            <span class="basicInfo-title">{{(editForm.name || '无信息').length > 12 ? (editForm.name || '无信息').substring(0, 12) + '...' : (editForm.name || '无信息')}}</span>
+            <span class="basicInfo-title">{{(editForm.name || $t('agent.form.noInfo')).length > 12 ? (editForm.name || $t('agent.form.noInfo')).substring(0, 12) + '...' : (editForm.name || $t('agent.form.noInfo'))}}</span>
             <span
               class="el-icon-edit-outline editIcon"
               @click="editAgent"
             ></span>
             <LinkIcon type="agent" />
-            <p>{{editForm.desc || '无信息'}}</p>
+            <p>{{editForm.desc || $t('agent.form.noInfo')}}</p>
           </div>
         </div>
       </div>
@@ -33,14 +32,14 @@
           @click="handlePublishSet"
         >
           <span class="el-icon-setting"></span>
-          发布配置
+          {{ $t('agent.form.publishConfig') }}
         </el-button>
         <el-button
           size="small"
           type="primary"
           @click="handlePublish"
           style="padding:13px 12px;"
-        >发布<span
+        >{{ $t('agent.form.publish') }}<span
             class="el-icon-arrow-down"
             style="margin-left:5px;"
           ></span></el-button>
@@ -52,50 +51,55 @@
             <el-radio
               :label="'private'"
               v-model="scope"
-            >私密发布为应用：仅自己可见</el-radio>
+            >{{ $t('agent.form.publishType') }}</el-radio>
           </div>
           <div>
             <el-radio
               :label="'organization'"
               v-model="scope"
-            >公开发布为应用：组织内可见</el-radio>
+            >{{ $t('agent.form.publishType1') }}</el-radio>
           </div>
           <div>
             <el-radio
               :label="'public'"
               v-model="scope"
-            >公开发布为应用：全局可见</el-radio>
+            >{{ $t('agent.form.publishType2') }}</el-radio>
           </div>
           <div class="saveBtn">
             <el-button
               size="mini"
               type="primary"
               @click="savePublish"
-            >保 存</el-button>
+            >{{ $t('common.button.save') }}</el-button>
           </div>
         </div>
       </div>
     </div>
+    <!-- 智能体配置 -->
     <div class="agent_form">
-      <!-- 智能体信息 -->
       <div class="block prompt-box drawer-info">
-            <h3 class="labelTitle">系统提示词</h3>
+            <div class="promptTitle">
+              <h3>{{ $t('agent.form.systemPrompt') }}</h3>
+              <el-tooltip class="item" effect="dark" :content="$t('agent.form.submitToPrompt')" placement="top-start">
+              <span class="el-icon-folder-add" @click="handleShowPrompt"></span>
+              </el-tooltip>
+            </div>
             <div class="rl" style="padding: 10px;">
               <el-input
                 class="desc-input "
                 v-model="editForm.instructions"
                 maxlength="600"
-                placeholder="描述你想创建的应用，详细描述应用的详细功能及作用，以及对该应用生成结果的要求"
+                :placeholder="$t('agent.form.promptTips')"
                 type="textarea"
                 show-word-limit
                 :rows="5"
               ></el-input>
             </div>
+            <promptTemplate ref="promptTemplate" />
       </div>
-      <!-- 智能体配置 -->
       <div class="drawer-form">
         <div class="agnetSet">
-          <h3 class="labelTitle">智能体配置</h3>
+          <h3 class="labelTitle">{{ $t('agent.form.agentConfig') }}</h3>
           <div class="block prompt-box">
             <p class="block-title model-title">
               <span class="label">
@@ -103,7 +107,7 @@
                   :src="require('@/assets/imgs/require.png')"
                   class="required-label"
                 />
-                模型选择
+                {{ $t('agent.form.modelSelect') }}
               </span>
               <span
                 class="el-icon-s-operation operation"
@@ -113,13 +117,12 @@
             <div class="rl">
               <el-select
                 v-model="editForm.modelParams"
-                placeholder="可输入模型名称搜索"
+                :placeholder="$t('agent.form.modelSearchPlaceholder')"
                 @visible-change="visibleChange"
-                loading-text="模型加载中..."
+                :loading-text="$t('agent.toolDetail.modelLoadingText')"
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
-                clearable
                 filterable
                 value-key="modelId"
                 @change="handleModelChange($event)"
@@ -149,7 +152,7 @@
               <div
                 class="model-select-tips"
                 v-if="editForm.visionsupport === 'support'"
-              >*您选择的是图文问答类模型，此类模型暂时无法调用知识库、联网检索及工具</div>
+              >{{ $t('agent.form.visionModelTips') }}</div>
             </div>
           </div>
           <div class="block prompt-box">
@@ -158,14 +161,14 @@
                 :src="require('@/assets/imgs/require.png')"
                 class="required-label"
               />
-              开场白
+              {{ $t('agent.form.prologue') }}
             </p>
             <div class="rl">
               <el-input
                 class="desc-input"
                 v-model="editForm.prologue"
                 maxlength="100"
-                placeholder="请输入开场白"
+                :placeholder="$t('agent.form.prologuePlaceholder')"
                 type="textarea"
               ></el-input>
               <span class="el-input__count">{{editForm.prologue.length}}/100</span>
@@ -173,13 +176,13 @@
           </div>
           <div class="block recommend-box">
             <p class="block-title recommend-title">
-              <span>推荐问题</span>
+              <span>{{ $t('agent.form.recommendQuestion') }}</span>
               <span
                 @click="addRecommend"
                 class="common-add"
               >
                 <span class="el-icon-plus"></span>
-                <span class="handleBtn">添加</span>
+                <span class="handleBtn">{{ $t('agent.add') }}</span>
               </span>
             </p>
             <div
@@ -205,21 +208,21 @@
         <div class="common-box">
           <div class="block recommend-box">
             <p class="block-title tool-title">
-              <span>关联知识库</span>
+              <span>{{ $t('agent.form.linkKnowledge') }}</span>
               <span>
                 <span
                   class="common-add"
                   @click="showKnowledgeDiglog"
                 >
                   <span class="el-icon-plus"></span>
-                  <span class="handleBtn">添加</span>
+                  <span class="handleBtn">{{ $t('agent.add') }}</span>
                 </span>
                 <span
                   class="common-add"
                   @click="showKnowledgeSet"
                 >
                   <span class="el-icon-s-operation"></span>
-                  <span class="handleBtn set">配置</span>
+                  <span class="handleBtn set">{{ $t('agent.form.config') }}</span>
                 </span>
               </span>
             </p>
@@ -241,7 +244,7 @@
                       <el-tooltip
                         class="item"
                         effect="dark"
-                        content="元数据过滤"
+                        :content="$t('agent.form.metaDataFilter')"
                         placement="top-start"
                       >
                         <span
@@ -261,38 +264,16 @@
             </div>
           </div>
         </div>
-        <div class="block prompt-box link-box">
-          <p class="block-title">联网检索</p>
-          <div class="rl">
-            <div
-              class="block-link"
-            >
-              <span class="link-text">
-                <img
-                  :src="require('@/assets/imgs/bocha.png')"
-                  style="width:20px;margin-right:8px;"
-                />
-                <span>博查</span>
-              </span>
-              <span style="display:flex;align-items: center;">
-                <span
-                  class="el-icon-s-operation link-operation"
-                  @click="showLinkDiglog"
-                ></span>
-                <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
-              </span>
-            </div>
-          </div>
-        </div>
+
         <div class="block recommend-box tool-box">
           <p class="block-title tool-title">
-            <span>工具</span>
+            <span>{{ $t('agent.form.tool') }}</span>
             <span
               @click="addTool"
               class="common-add"
             >
               <span class="el-icon-plus"></span>
-              <span class="handleBtn">添加</span>
+              <span class="handleBtn">{{ $t('agent.add') }}</span>
             </span>
           </p>
           <div class="rl tool-conent">
@@ -306,9 +287,10 @@
                   v-for="(n, i) in allTools"
                   :key="`${i}ac`"
                 >
-                  <div
-                    class="name"
-                  >
+                  <div class="name">
+                  <div class="toolImg">
+                    <img :src="'/user/api/'+n.avatar.path" v-show="n.avatar && n.avatar.path" />
+                  </div>
                   <el-tooltip class="item" effect="dark" :content="displayName(n)" placement="top-start">
                     <span>{{ displayName(n).length > 20 ? displayName(n).substring(0, 20) + '...' : displayName(n) }}</span>
                   </el-tooltip>
@@ -336,11 +318,11 @@
         <div class="block prompt-box link-box">
           <p class="block-title tool-title">
             <span>
-              安全护栏配置
+              {{ $t('agent.form.safetyConfig') }}
               <el-tooltip
                 class="item"
                 effect="dark"
-                content="实时拦截高风险内容的输入和输出，保障内容安全合规。"
+                :content="$t('agent.form.safetyConfigTips')"
                 placement="top"
               >
                 <span class="el-icon-question question-tips"></span>
@@ -351,7 +333,7 @@
               <span
                 class="handleBtn"
                 style="margin-right:10px;"
-              >配置</span>
+              >{{ $t('agent.form.config') }}</span>
               <el-switch
                 v-model="editForm.safetyConfig.enable"
                 :disabled="!(editForm.safetyConfig.tables || []).length"
@@ -362,11 +344,11 @@
         <div class="block prompt-box link-box" v-if="editForm.visionsupport === 'support'">
           <p class="block-title tool-title">
             <span>
-              视觉
+              {{ $t('agent.form.vision') }}
               <el-tooltip
                 class="item"
                 effect="dark"
-                content="允许用户上传图片，并进行图文问答。"
+                :content="$t('agent.form.visionTips')"
                 placement="top"
               >
                 <span class="el-icon-question question-tips"></span>
@@ -377,12 +359,11 @@
               <span
                 class="handleBtn"
                 style="margin-right:10px;"
-              >配置</span>
+              >{{ $t('agent.form.config') }}</span>
             </span>
           </p>
         </div>
       </div>
-      <!-- 问答调试 -->
       <div class="drawer-test">
         <Chat
           :editForm="editForm"
@@ -405,17 +386,11 @@
       :modelform="editForm.modelConfig"
       :limitMaxTokens="limitMaxTokens"
     />
-    <!-- 选择工作类型 -->
+    <!-- 选择工具类型 -->
     <ToolDiaglog
       ref="toolDiaglog"
       @updateDetail="updateDetail"
       :assistantId="editForm.assistantId"
-    />
-    <!-- 联网检索 -->
-    <LinkDialog
-      ref="linkDialog"
-      @setLinkSet="setLinkSet"
-      :linkform="editForm.onlineSearchConfig"
     />
     <!-- 敏感词设置 -->
     <setSafety
@@ -438,7 +413,9 @@
       @sendVisual="sendVisual"
     />
     <!-- 内置工具详情 -->
-    <ToolDeatail ref="toolDeatail" />
+    <ToolDeatail ref="toolDeatail" @updateDetail="updateDetail" />
+    <!-- 提交至提示词 -->
+    <createPrompt :isCustom="true" :type="promptType" ref="createPrompt" @reload="updatePrompt"/>
     <!-- 元数据设置 -->
     <el-dialog
       :visible.sync="metaSetVisible"
@@ -448,8 +425,8 @@
     >
       <template #title>
         <div class="metaHeader">
-          <h3>配置元数据过滤</h3>
-          <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
+          <h3>{{ $t('agent.form.configMetaDataFilter') }}</h3>
+          <span>{{ $t('agent.form.metaDataFilterDesc') }}</span>
         </div>
       </template>
       <metaSet
@@ -461,11 +438,11 @@
         slot="footer"
         class="dialog-footer"
       >
-        <el-button @click="handleMetaClose">取 消</el-button>
+        <el-button @click="handleMetaClose">{{ $t('common.button.cancel') }}</el-button>
         <el-button
           type="primary"
           @click="submitMeta"
-        >确 定</el-button>
+        >{{ $t('common.button.confirm') }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -495,11 +472,12 @@ import {
 } from "@/api/agent";
 import ToolDiaglog from "./toolDialog";
 import ToolDeatail from "./toolDetail";
-import LinkDialog from "./linkDialog";
 import knowledgeSetDialog from "./knowledgeSetDialog";
 import { readWorkFlow } from "@/api/workflow";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
+import promptTemplate from "./prompt/index.vue";
+import createPrompt from "@/components/createApp/createPrompt.vue"
 import knowledgeSelect from "@/components/knowledgeSelect.vue";
 export default {
   components: {
@@ -508,13 +486,19 @@ export default {
     CreateIntelligent,
     ModelSet,
     ToolDiaglog,
-    LinkDialog,
     setSafety,
     visualSet,
     knowledgeSetDialog,
     knowledgeSelect,
     metaSet,
-    ToolDeatail
+    ToolDeatail,
+    promptTemplate,
+    createPrompt
+  },
+  provide() {
+    return {
+      getPrompt: this.getPrompt
+    }
   },
   watch: {
     editForm: {
@@ -532,7 +516,6 @@ export default {
             "prologue",
             "knowledgebases",
             "instructions",
-            "onlineSearchConfig",
             "safetyConfig",
             "recommendQuestion",
             "visionConfig"
@@ -561,6 +544,7 @@ export default {
   },
   data() {
     return {
+      promptType: 'create',
       limitMaxTokens: 4096,
       knowledgeIndex: -1,
       currentKnowledgeId: "",
@@ -610,12 +594,6 @@ export default {
           temperatureEnable: true,
           topPEnable: true,
           presencePenaltyEnable: true,
-        },
-        onlineSearchConfig: {
-          enable: false,
-          searchKey: "",
-          searchUrl: "",
-          searchRerankId: "",
         },
         safetyConfig: {
           enable: false,
@@ -697,6 +675,15 @@ export default {
   },
   methods: {
     ...mapActions("app", ["setMaxPicNum","clearMaxPicNum"]),
+    updatePrompt(){
+        this.$refs.promptTemplate.getPromptTemplateList()
+    },
+    handleShowPrompt(){
+      this.$refs.createPrompt.openDialog();
+    },
+    getPrompt(prompt){
+      this.editForm.instructions = prompt;
+    },
     handleBuiltin(n){
       this.$refs.toolDeatail.showDiaglog(n)
     },
@@ -726,7 +713,7 @@ export default {
           metaData["metaDataFilterParams"]["metaFilterParams"]
         )
       ) {
-        this.$message.warning("存在未填信息,请补充");
+        this.$message.warning(this.$t('agent.form.incompleteInfo'));
         return;
       }
       this.$set(this.editForm.knowledgebases, this.knowledgeIndex, {
@@ -845,9 +832,6 @@ export default {
         })
         .catch(() => {});
     },
-    showLinkDiglog() {
-      this.$refs.linkDialog.showDialog();
-    },
     addTool() {
       const data = {
         mcpInfos: this.mcpInfos,
@@ -876,11 +860,11 @@ export default {
     },
     savePublish() {
       if (this.editForm.modelParams === "") {
-        this.$message.warning("请选择模型！");
+        this.$message.warning(this.$t('agent.form.selectModel'));
         return false;
       }
       if (this.editForm.prologue === "") {
-        this.$message.warning("请输入开场白！");
+        this.$message.warning(this.$t('agent.form.inputPrologue'));
         return false;
       }
       const data = {
@@ -896,11 +880,6 @@ export default {
     },
     setModelSet(data) {
       this.editForm.modelConfig = data;
-    },
-    setLinkSet(data) {
-      this.editForm.onlineSearchConfig.searchKey = data.searchKey;
-      this.editForm.onlineSearchConfig.searchUrl = data.searchUrl;
-      this.editForm.onlineSearchConfig.searchRerankId = data.searchRerankId;
     },
     showModelSet() {
       this.$refs.modelSetDialog.showDialog();
@@ -933,7 +912,7 @@ export default {
       delCustomBuiltIn({ assistantId: this.editForm.assistantId, toolId: n.toolId, toolType: n.toolType,actionName: n.actionName})
         .then((res) => {
           if (res.code === 0) {
-            this.$message.success("删除成功");
+            this.$message.success(this.$t('agent.form.deleteSuccess'));
             this.getAppDetail();
           }
         })
@@ -943,7 +922,7 @@ export default {
       deleteMcp({ assistantId: this.editForm.assistantId,actionName:n.actionName,mcpId:n.mcpId,mcpType:n.mcpType})
         .then((res) => {
           if (res.code === 0) {
-            this.$message.success("删除成功");
+            this.$message.success(this.$t('agent.form.deleteSuccess'));
             this.getAppDetail();
           }
         })
@@ -1003,7 +982,6 @@ export default {
           modelType: modeInfo.modelType,
           provider: modeInfo.provider,
         },
-        onlineSearchConfig: this.editForm.onlineSearchConfig,
         safetyConfig: this.editForm.safetyConfig,
         visionConfig: {picNum:this.editForm.visionConfig.picNum},
         rerankConfig: rerankInfo
@@ -1071,7 +1049,6 @@ export default {
                   };
                 })
               : [],
-          onlineSearchConfig: data.onlineSearchConfig,
           safetyConfig:
             data.safetyConfig !== null
               ? data.safetyConfig
@@ -1311,9 +1288,9 @@ export default {
   }
 }
 .agent-from-content {
-  height: 100%;
+  height:100%;
   width: 100%;
-  overflow: hidden;
+  overflow: hidden!important;
 }
 .agent_form {
   padding: 0 10px;
@@ -1322,6 +1299,7 @@ export default {
   gap: 10px;
   height: calc(100% - 60px);
   .drawer-info {
+    position:relative;
     width: 30%;
     margin: 10px 0;
     border-radius: 6px;
@@ -1334,6 +1312,24 @@ export default {
     font-weight: 800;
     padding: 10px 20px;
   }
+  .promptTitle{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 10px 0 10px;
+    h3{
+      font-size: 18px;
+      font-weight: 800;
+    }
+    span{
+      font-size: 16px;
+      color:$color;
+      cursor:pointer;
+      display:inline-block;
+      padding:8px;
+      border-radius:50%;
+      background:#E0E7FF;
+    }
+  }
   .actionConfig {
     overflow-y: auto;
     width: 60%;
@@ -1343,10 +1339,12 @@ export default {
     width: 30%;
     margin: 10px 0;
     position: relative;
-    height: calc(100% - 20px);
+    height: 100%;
     padding: 0 10px;
     border-radius: 6px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     /deep/.el-input__inner,
     /deep/.el-textarea__inner {
       background-color: transparent !important;
@@ -1678,6 +1676,19 @@ export default {
         color:#ccc;
         margin-left:4px;
       }
+      .toolImg{
+        width:30px;
+        height:30px;
+        border-radius:50%;
+        background:#eee;
+        margin-right:5px;
+        img{
+          width:100%;
+          height:100%;
+          border-radius:50%;
+          object-fit: cover;
+        }
+      }
 
     }
     .bt {
@@ -1704,52 +1715,6 @@ export default {
     }
   }
 }
-.workflow-dialog {
-  height: 700px;
-}
-.workflow-list {
-  height: calc(100% - 60px);
-  overflow: auto;
-  padding: 0 40px;
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    .workflow-item-icon {
-      width: 30px;
-      height: 30px;
-      object-fit: fill;
-    }
-    .workflow-item-info {
-      flex: 6;
-      margin-left: 20px;
-      .info-name {
-        font-size: 16px;
-        color: #111;
-      }
-      .info-desc {
-        margin-top: 10px;
-      }
-    }
-    .workflow-item-bt {
-      flex: 1;
-      margin-top: 7px;
-    }
-  }
-}
-.workflow-modal /deep/.el-dialog__body {
-  max-height: none;
-  padding: 10px 20px 30px 20px;
-}
-.workflow-list-checked {
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-  }
-}
 </style>
 <style lang="scss">
 .vue-treeselect .vue-treeselect__menu-container {
@@ -1766,7 +1731,9 @@ export default {
 .custom-tooltip.el-tooltip__popper.is-light[x-placement^="top"] .popper__arrow {
   border-top-color: #ccc !important;
 }
-
+.drawer-test .echo .session-item{
+  width:30vw!important;
+}
 .model-option-content {
   display: flex;
   justify-content: space-between;

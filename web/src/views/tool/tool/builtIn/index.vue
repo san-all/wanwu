@@ -4,11 +4,11 @@
       <div class="card-search card-search-cust">
         <div>
           <p class="card-search-des" style="display: flex; align-items: center">
-            <span>内置工具</span>
+            <span>{{ $t('menu.app.builtIn') }}</span>
           </p>
         </div>
         <div>
-          <search-input placeholder="请输入名称进行搜索" ref="searchInput" @handleSearch="handleSearch" />
+          <search-input :placeholder="$t('tool.builtIn.search')" ref="searchInput" @handleSearch="handleSearch" />
         </div>
       </div>
 
@@ -21,7 +21,7 @@
           @click.stop="handleClick(item)"
         >
           <div class="card-title">
-            <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
+            <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="avatarSrc(item.avatar.path)" />
             <div class="mcp_detailBox" style="width: 100%">
               <span class="mcp_name">{{ item.name }}</span>
               <span class="mcp_from tool_tag">
@@ -46,11 +46,11 @@
 <script>
 import SearchInput from "@/components/searchInput.vue"
 import { getBuiltInList } from "@/api/mcp";
+import {avatarSrc} from "@/utils/util";
 export default {
   components: { SearchInput },
   data() {
     return {
-      basePath: this.$basePath,
       list: [],
     };
   },
@@ -58,6 +58,7 @@ export default {
     this.fetchList()
   },
   methods: {
+    avatarSrc,
     handleSearch() {
       this.fetchList()
     },

@@ -4,11 +4,11 @@
       <div class="card-search card-search-cust">
         <div>
           <p class="card-search-des">
-           创建自定义工具
+            {{ $t('tool.custom.slogan') }}
           </p>
         </div>
         <div>
-          <search-input placeholder="请输入名称搜索" ref="searchInput" @handleSearch="fetchList" />
+          <search-input :placeholder="$t('tool.custom.search')" ref="searchInput" @handleSearch="fetchList" />
         </div>
       </div>
 
@@ -20,7 +20,7 @@
               <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
               <div class="create-filter"></div>
             </div>
-            <span>创建自定义工具</span>
+            <span>{{ $t('tool.custom.addTitle') }}</span>
           </div>
         </div>
         <div
@@ -31,7 +31,7 @@
           @click.stop="handleClick(item.customToolId)"
         >
           <div class="card-title">
-            <img class="card-logo" src="@/assets/imgs/toolImg.png" />
+            <img class="card-logo" :src="(item.avatar && item.avatar.path) ? avatarSrc(item.avatar.path) : defaultAvatar" alt=""/>
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
             </div>
@@ -44,11 +44,11 @@
               <el-dropdown-menu slot="dropdown"  style="margin-top: -10px">
                 <el-dropdown-item
                     @click.native="handleAddMCP(item.customToolId)">
-                  编辑
+                  {{$t('common.button.edit')}}
                 </el-dropdown-item>
                 <el-dropdown-item
                     @click.native="handleDelete(item)">
-                  删除
+                  {{$t('common.button.delete')}}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -62,14 +62,15 @@
   </div>
 </template>
 <script>
-import addDialog from "./addToolDialog.vue";
+import addDialog from "./addDialog.vue";
 import SearchInput from "@/components/searchInput.vue"
 import { getCustomList, deleteCustom } from "@/api/mcp";
+import {avatarSrc} from "@/utils/util";
 export default {
   components: { SearchInput, addDialog },
   data() {
     return {
-      basePath: this.$basePath,
+      defaultAvatar: require("@/assets/imgs/toolImg.png"),
       list: [],
     };
   },
@@ -77,6 +78,7 @@ export default {
     this.fetchList()
   },
   methods: {
+    avatarSrc,
     fetchList() {
       const searchInput = this.$refs.searchInput
       const params = {
@@ -95,11 +97,11 @@ export default {
     },
     handleDelete(item) {
       this.$confirm(
-        "删除后，历史引用了本自定义工具的智能体将自动取消引用，且此操作不可撤回，确认删除吗？",
-        "提示",
+        this.$t('tool.custom.deleteHint'),
+        this.$t('common.confirm.title'),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t('common.confirm.confirm'),
+          cancelButtonText: this.$t('common.confirm.cancel'),
           dangerouslyUseHTMLString: true,
           type: "warning",
           center: true,
@@ -109,10 +111,10 @@ export default {
           customToolId: item.customToolId,
         }).then((res) => {
           if (res.code === 0) {
-            this.$message.success("删除成功")
+            this.$message.success(this.$t('common.info.delInfo'))
             this.fetchList()
           } else {
-            this.$message.error( res.msg || '删除失败')
+            this.$message.error( res.msg || this.$t('common.info.delInfoErr'))
           }
         })
       })

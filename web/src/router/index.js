@@ -47,14 +47,15 @@ const constantRoutes = [
         path: '/webChat/:id',
         component:resolve =>require(['@/views/agent'],resolve),
     },
-    {
+    /* 暂时去掉模板广场公网的链接 */
+    /*{
         path: '/public/templateSquare',
         component:resolve =>require(['@/views/templateSquare'],resolve),
     },
     {
         path: '/public/templateSquare/detail',
         component: resolve => require(['@/views/templateSquare/tempDetail.vue'],resolve),
-    },
+    },*/
     {
         path: '/portal',
         name: 'portal',
@@ -90,7 +91,7 @@ const constantRoutes = [
             },
             {
                 path: '/tool/detail/builtIn',
-                component:resolve =>require(['@/views/tool/toolDetail'],resolve),
+                component:resolve =>require(['@/views/tool/tool/builtIn/detail'],resolve),
                 meta:{perm: [PERMS.TOOL]},
             },
             {
@@ -101,7 +102,7 @@ const constantRoutes = [
             },
             {
                 path: '/tool/detail/server',
-                component:resolve =>require(['@/views/tool/serverDetail'],resolve),
+                component:resolve =>require(['@/views/tool/mcp/server/detail'],resolve),
                 meta:{perm: [PERMS.TOOL]},
             },
             {
@@ -117,7 +118,7 @@ const constantRoutes = [
             },
             {
                 path: '/explore',
-                component:resolve =>require(['@/views/ExploreSquare'],resolve),
+                component:resolve =>require(['@/views/exploreSquare'],resolve),
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {

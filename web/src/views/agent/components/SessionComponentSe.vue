@@ -18,7 +18,7 @@
           <div :class="['session-item','rl']">
             <img
               class="logo"
-              :src="'/user/api/'+ userAvatar"
+              :src="userAvatarSrc"
             />
             <div class="answer-content">
               <div class="answer-content-query">
@@ -102,7 +102,7 @@
             />
             <div
               class="answer-content"
-              style="padding:0 10px;color:#E6A23C;"
+              style="padding:10px;color:#E6A23C;"
             >{{n.pendingResponse}}</div>
           </div>
         </div>
@@ -375,7 +375,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('user', ['userAvatar'])
+    ...mapGetters('user', ['userAvatar']),
+    userAvatarSrc(){
+      return this.userAvatar 
+      ? '/user/api/' + this.userAvatar 
+      : require('@/assets/imgs/robot-icon.png');
+    }
   },
   watch: {
     sessionStatus: {
@@ -1044,6 +1049,7 @@ export default {
           padding: 8px 10px 8px 20px;
           border-radius: 10px 0 10px 10px;
           margin:0!important;
+          line-height:1.5;
         }
         .session-setting-id {
           color: rgba(98, 98, 98, 0.5);

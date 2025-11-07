@@ -63,7 +63,6 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
-                clearable
                 filterable
                 value-key="modelId"
               >
@@ -237,7 +236,7 @@ export default {
         knowledgebases:[],
         knowledgeConfig:{
           keywordPriority: 0.8, //关键词权重
-          matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+          matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
           rerankModelId: "", //rerank模型id
           semanticsPriority: 0.2, //语义权重
@@ -293,7 +292,8 @@ export default {
           });
           if (changed && !this.isUpdating) {
             const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch'];
-            if(newVal['modelParams']!== '' &&  newVal['knowledgebases'].length > 0 || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
+            //&&  newVal['knowledgebases'].length > 0 
+            if(newVal['modelParams']!== '' || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
@@ -385,7 +385,18 @@ export default {
             if(knowledgeData && knowledgeData.length > 0){
               this.editForm.knowledgebases = knowledgeData;
             }
-            this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
+            if(res.data.knowledgeBaseConfig.config !== null){
+              this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;
+              const {matchType,priorityMatch} = res.data.knowledgeBaseConfig.config
+              if(matchType === ''){
+                this.editForm.knowledgeConfig = {
+                  ...this.editForm.knowledgeConfig,
+                  matchType:'mix',
+                  priorityMatch:1
+                }
+              }
+            }
+            
             this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
             // 使用nextTick确保所有数据设置完成后再重置标志位
             this.$nextTick(() => {
@@ -1047,52 +1058,6 @@ export default {
         font-size: 16px;
       }
     }
-  }
-}
-.workflow-dialog {
-  height: 700px;
-}
-.workflow-list {
-  height: calc(100% - 60px);
-  overflow: auto;
-  padding: 0 40px;
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    .workflow-item-icon {
-      width: 30px;
-      height: 30px;
-      object-fit: fill;
-    }
-    .workflow-item-info {
-      flex: 6;
-      margin-left: 20px;
-      .info-name {
-        font-size: 16px;
-        color: #111;
-      }
-      .info-desc {
-        margin-top: 10px;
-      }
-    }
-    .workflow-item-bt {
-      flex: 1;
-      margin-top: 7px;
-    }
-  }
-}
-.workflow-modal /deep/.el-dialog__body {
-  max-height: none;
-  padding: 10px 20px 30px 20px;
-}
-.workflow-list-checked {
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
   }
 }
 </style>

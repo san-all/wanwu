@@ -2,13 +2,13 @@
   <div class="mcp-detail" id="timeScroll">
     <span class="back" @click="back">{{$t('menu.back') + $t('menu.tool')}}</span>
     <div class="mcp-title">
-      <img class="logo" v-if="detail.avatar && detail.avatar.path" :src="basePath + '/user/api/' + detail.avatar.path" />
+      <img class="logo" v-if="detail.avatar && detail.avatar.path" :src="avatarSrc(detail.avatar.path)" />
       <div :class="['info',{fold:foldStatus}]">
         <p class="name">{{detail.name}}</p>
         <p v-if="detail.desc && detail.desc.length > 260" class="desc">
           {{foldStatus ? detail.desc : detail.desc.slice(0,268) + '...'}}
           <span class="arrow" v-show="detail.desc.length > 260" @click="fold">
-            {{foldStatus ? '收起' : '详情 >>'}}
+            {{foldStatus ? $t('common.button.fold') : $t('common.button.detail')}}
           </span>
         </p>
         <p v-else class="desc">{{detail.desc}}</p>
@@ -19,18 +19,18 @@
         <!-- tabs -->
         <div class="mcp-tabs">
           <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">
-            包含{{detail.actionSum || 0}}个Action
+            {{ $t('tool.builtIn.count', { count: detail.actionSum || 0 }) }}
           </div>
         </div>
 
         <div>
           <div class="tool bg-border" v-if="detail.needApiKeyInput">
             <div class="tool-item ">
-              <p class="title">授权-API Key:</p>
+              <p class="title">{{ $t('tool.builtIn.api') }}</p>
               <div class="sse-url" style="display: flex">
                 <el-input v-model="apiKey" style="margin-right: 20px" showPassword/>
                 <el-button style="width: 100px" size="mini" type="primary" :disabled="detail.hasCustom" @click="changeApiKey">
-                  {{detail.apiKey ? '更新' : '确认'}}
+                  {{detail.apiKey ? $t('tool.builtIn.update') : $t('tool.builtIn.confirm')}}
                 </el-button>
               </div>
             </div>
@@ -51,10 +51,10 @@
               <el-collapse class="mcp-el-collapse" v-model="activeNames">
                 <el-collapse-item v-for="(n,i) in tools" :key="n.name + i" :title="n.name" :name="i">
                   <div class="desc" v-if="n.description">
-                    描述：<span v-html="parseTxt(n.description)"></span>
+                    {{ $t('tool.builtIn.desc') }}<span v-html="parseTxt(n.description)"/>
                   </div>
                   <div class="params">
-                    <p>参数说明:</p>
+                    <p>{{ $t('tool.builtIn.params') }}</p>
                     <div class="params-table" v-for="(m, j) in n.params" :key="m.name + j">
                       <div class="tr">
                         <div class="td">{{m.name}}</div>
@@ -72,9 +72,9 @@
       </div>
 
       <div class="right-recommend">
-        <p style="margin: 20px 0;color: #333;">其他MCP服务查看</p>
+        <p style="margin: 20px 0;color: #333;">{{ $t('tool.builtIn.recommend') }}</p>
         <div class="recommend-item" v-for="(item ,i) in recommendList" :key="`${i}rc`" @click="handleClick(item)">
-          <img class="logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
+          <img class="logo" v-if="item.avatar && item.avatar.path" :src="avatarSrc(item.avatar.path)" />
           <p class="name">{{item.name}}</p>
           <p class="intro">{{item.desc}}</p>
         </div>
@@ -85,12 +85,11 @@
 <script>
 import { md } from '@/mixins/marksown-it'
 import { getRecommendsList, getToolDetail, changeApiKey } from "@/api/mcp"
-import { formatTools } from "@/utils/util"
+import {avatarSrc, formatTools} from "@/utils/util"
 
 export default {
   data() {
     return {
-      basePath: this.$basePath,
       md:md,
       toolSquareId:'',
       detail: {},
@@ -117,6 +116,7 @@ export default {
     this.getRecommendList()
   },
   methods: {
+    avatarSrc,
     initData(){
       this.toolSquareId = this.$route.query.toolSquareId
       this.tabActive = 0
@@ -176,7 +176,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import "@/style/markdown.scss";
+@import "@/style/markdown";
 .markdown-body{
   font-family: 'Microsoft YaHei', Arial, sans-serif;
 }

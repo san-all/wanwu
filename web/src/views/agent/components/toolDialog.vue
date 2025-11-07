@@ -23,7 +23,10 @@
                     class="toolContent_item"
                     >
                         <template v-if="type === 'workflow'">
-                                <div>
+                                <div class="tool_box">
+                                   <div class="tool_img">
+                                        <img :src="'/user/api/' + item.avatar.path" v-show="item.avatar && item.avatar.path" />
+                                    </div>
                                     <span>{{item.name}}</span>
                                 </div>
                                 <div>
@@ -34,6 +37,9 @@
                         <el-collapse  @change="handleToolChange" v-else class="tool_collapse">
                             <el-collapse-item  :name="item.toolId">
                                 <template slot="title">
+                                   <div class="tool_img">
+                                        <img :src="'/user/api/' + item.avatar.path" v-show="item.avatar && item.avatar.path" />
+                                    </div>
                                    <h3>{{item.toolName}}</h3>
                                    <span v-if="item.loading" class="el-icon-loading loading-text"></span>
                                 </template>
@@ -163,7 +169,7 @@ export default {
             if(this.activeValue === 'tool'){
                 this.$router.push({path:'/tool?type=tool&mcp=custom'})
             }else if(this.activeValue === 'mcp'){
-                this.$router.push({path:'/tool?type=mcp&mcp=mcp'})
+                this.$router.push({path:'/tool?type=mcp&mcp=integrate'})
             }else{
                 this.$router.push({path:'/appSpace/workflow'})
             }
@@ -204,7 +210,6 @@ export default {
             })
         },
         addMcpItem(n,action){
-            console.log(action)
             addMcp({assistantId:this.assistantId,actionName:action.name,mcpId:n.toolId,mcpType:n.toolType}).then(res =>{
                 if(res.code === 0){
                     this.$set(action, 'checked', true);
@@ -286,8 +291,6 @@ export default {
             this.mcpList = row.mcpInfos || [];
             this.workFlowList = row.workFlowInfos || [];
             this.customList  = row.customInfos || [];
-            console.log(this.customList)
-            console.log(this.mcpList)
         },
 
         setWorkflow(data){
@@ -382,6 +385,24 @@ export default {
         display: flex;
         align-items:center;
         justify-content:space-between;
+        .tool_box{
+            display:flex;
+            align-items:center;
+        }
+        .tool_img{
+            width:35px;
+            height:35px;
+            background:#eee;
+            border-radius:50%;
+            display:inline-block;
+            margin-right:5px;
+            img{
+                width:100%;
+                height:100%;
+                border-radius:50%;
+                object-fit: cover;
+            }
+        }
         .loading-text{
             margin-left:4px;
             color:var($color)
