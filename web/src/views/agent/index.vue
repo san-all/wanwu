@@ -172,7 +172,6 @@ export default {
     },
     initUUID() {
       const storedUUID = localStorage.getItem("chatUUID");
-      console.log(storedUUID)
       this.uuid = storedUUID || this.$guid();
       if (!storedUUID) {
         localStorage.setItem("chatUUID", this.uuid);
