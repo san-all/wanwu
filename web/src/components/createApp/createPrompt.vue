@@ -48,9 +48,21 @@
           ></el-input>
         </el-form-item>
         <el-form-item v-if="type !== 'copy'" :label="$t('tempSquare.promptText')+':'" prop="prompt">
+          <el-tooltip
+            effect="dark"
+            :content="$t('tempSquare.promptOptimize')"
+            placement="top-start"
+            popper-class="prompt-optimize-tooltip"
+          >
+            <i
+              v-if="type !== detail"
+              class="el-icon-s-help prompt-optimize-icon"
+              @click="showPromptOptimize"
+            />
+          </el-tooltip>
           <el-input
             type="textarea"
-            :rows="3"
+            :rows="10"
             :placeholder="$t('tempSquare.promptPlaceholder')"
             :disabled="type === detail"
             v-model="form.prompt"
@@ -59,9 +71,10 @@
       </el-form>
       <span v-if="type !== detail" slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">{{$t('common.button.cancel')}}</el-button>
-        <el-button type="primary" @click="doPublish">{{$t('common.button.confirm')}}</el-button>
+        <el-button type="primary" @click="doSubmit">{{$t('common.button.confirm')}}</el-button>
       </span>
     </el-dialog>
+    <PromptOptimize ref="promptOptimize" @promptSubmit="promptSubmit" />
   </div>
 </template>
 
@@ -69,8 +82,10 @@
 import { uploadAvatar } from "@/api/user"
 import { copyPromptTemplate, createCustomPrompt, editCustomPrompt } from "@/api/templateSquare"
 import { PROMPT } from "@/views/tool/constants"
+import PromptOptimize from "@/components/promptOptimize.vue"
 
 export default {
+  components: { PromptOptimize },
   props: {
     type: {
       type: String,
@@ -178,7 +193,17 @@ export default {
         prompt: ''
       };
     },
-    async doPublish() {
+    showPromptOptimize() {
+      if (!this.form.prompt) {
+        this.$message.warning(this.$t('tempSquare.promptOptimizeHint'))
+        return
+      }
+      this.$refs.promptOptimize.openDialog(this.form)
+    },
+    promptSubmit(prompt) {
+      this.form.prompt = prompt
+    },
+    async doSubmit() {
       await this.$refs.form.validate(async (valid) => {
         if (valid) {
           if (this.type === 'copy') {
@@ -233,5 +258,16 @@ export default {
     z-index: 10;
     border-radius: 0 0 8px 8px;
   }
+}
+.prompt-optimize-icon {
+  font-size: 16px;
+  color: $color;
+  margin-top: -10px;
+  margin-bottom: 2px;
+  float: right;
+  cursor: pointer;
+}
+.prompt-optimize-tooltip {
+  z-index: 2100;
 }
 </style>
