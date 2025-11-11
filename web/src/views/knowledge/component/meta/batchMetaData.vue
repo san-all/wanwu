@@ -54,7 +54,7 @@
             </div>
 
             <div class="field-group type-group">
-              <span class="type-label">类型:</span>
+              <span class="type-label">{{$t('knowledgeManage.meta.type')}}:</span>
               <span class="type-value">[{{ item.metaValueType }}]</span>
             </div>
 
@@ -71,7 +71,7 @@
                 closable
                 @close="handleCloseArray(item)"
               >
-                多个值
+                {{$t('knowledgeManage.meta.multipleValue')}}
               </el-tag>
               <template v-else>
                 <el-input
@@ -124,10 +124,10 @@
           v-model="applyToSelected"
           class="apply-checkbox"
         >
-          应用于所有选定文档
+          {{$t('knowledgeManage.meta.applyAll')}}
         </el-checkbox>
         <el-tooltip
-          content="若勾选,则自动为所有选定文档创建或编辑元数据值;否则仅对已具有对应元数据值的文档进行编辑。"
+          :content="$t('knowledgeManage.meta.applyAllTips')"
           placement="right"
         >
           <i class="el-icon-question question-icon"></i>
