@@ -160,6 +160,7 @@
                       v-if="m.link"
                       :href="m.link"
                       target="_blank"
+                      rel="noopener noreferrer"
                       class="link"
                     >{{m.link}}</a>
                     <span v-if="m.title">
@@ -352,7 +353,7 @@ export default {
         }
       }
       if (openUrl !== "") {
-        window.open(openUrl, "_blank");
+        window.open(openUrl, "_blank","noopener,noreferrer");
       } else {
         this.$message.warning("暂不支持此格式查看");
       }

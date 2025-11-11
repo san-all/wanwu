@@ -69,7 +69,6 @@ export default {
                 }
                 return originalFetch(url, options).then(response => {
                     // 可以在这里修改响应或者添加额外的处理
-                    console.log('原始 fetch 响应:', response);
                     let query = this.query
 
                     if(response.status != 200){

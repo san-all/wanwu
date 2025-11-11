@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新增分段"
+    :title="$t('knowledgeManage.create.createChunk')"
     :visible.sync="dialogVisible"
     width="40%"
     :before-close="handleClose"
@@ -19,15 +19,15 @@
           v-model="createType"
           @input="typeChange($event)"
         >
-          <el-radio-button :label="'single'">单条新增</el-radio-button>
-          <el-radio-button :label="'file'">批量上传</el-radio-button>
+          <el-radio-button :label="'single'">{{$t('knowledgeManage.create.single')}}</el-radio-button>
+          <el-radio-button :label="'file'">{{$t('knowledgeManage.create.file')}}</el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item
-        label="批量上传"
+        :label="$t('knowledgeManage.create.file')"
         v-if="createType === 'file' && !isChildChunk"
         prop="fileUploadId"
-        :rules="[{ required: true, message: '请上传文件', trigger: 'blur' }]"
+        :rules="[{ required: true, message: $t('common.input.placeholder'), trigger: 'blur' }]"
       >
         <fileUpload
           ref="fileUpload"
@@ -38,19 +38,19 @@
       </el-form-item>
       <template v-if="createType === 'single' || isChildChunk">
         <el-form-item
-          label="分段内容"
+          :label="$t('knowledgeManage.create.chunkContent')"
           prop="content"
-          :rules="[{ required: true, message: '请输入分段内容', trigger: 'blur' }]"
+          :rules="[{ required: true, message: $t('knowledgeManage.create.chunkContentPlaceholder'), trigger: 'blur' }]"
         >
           <el-input
-            placeholder="请输入分段内容"
+            :placeholder="$t('knowledgeManage.create.chunkContentPlaceholder')"
             v-model="ruleForm.content"
             type="textarea"
             :rows="4"
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="关键词"
+          :label="$t('knowledgeManage.create.chunkKeywords')"
           prop="labels"
           v-if="!isChildChunk"
         >
@@ -78,14 +78,14 @@
             class="button-new-tag"
             size="small"
             @click="showInput"
-          >+ 新建关键词</el-button>
+          >+ {{$t('knowledgeManage.create.chunkKeywords')}}</el-button>
         </el-form-item>
-        <el-form-item label="新增方式">
+        <el-form-item :label="$t('knowledgeManage.create.typeTitle')">
           <el-checkbox-group v-model="checkType">
             <el-checkbox
               label="more"
               name="type"
-            >连续新增</el-checkbox>
+            >{{$t('knowledgeManage.create.continue')}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </template>
@@ -94,12 +94,12 @@
       slot="footer"
       class="dialog-footer"
     >
-      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="dialogVisible = false">{{ $t('common.confirm.cancel') }}</el-button>
       <el-button
         type="primary"
         @click="submit('ruleForm')"
         :loading="btnLoading"
-      >确 定</el-button>
+      >{{ $t('common.confirm.confirm') }}</el-button>
     </span>
   </el-dialog>
 </template>
@@ -178,7 +178,7 @@ export default {
         this.inputVisible = false;
         this.inputValue = "";
       } else {
-        this.$message.warning("请输入关键词");
+        this.$message.warning(this.$t('knowledgeManage.create.chunkKeywordsPlaceholder'));
       }
     },
     submit(formName) {
@@ -213,7 +213,7 @@ export default {
       createSegment(data)
         .then((res) => {
           if (res.code === 0) {
-            this.$message.success("创建成功");
+            this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
             if (!this.checkType.length) {
               this.dialogVisible = false;
               this.$emit("updateDataBatch");
@@ -236,7 +236,7 @@ export default {
       };
       createSegmentChild(data).then((res) => {
         if (res.code === 0) {
-            this.$message.success("创建成功");
+            this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
             if (!this.checkType.length) {
               this.dialogVisible = false;
             } else {
@@ -258,7 +258,7 @@ export default {
       createBatchSegment(data)
         .then((res) => {
           if (res.code === 0) {
-            this.$message.success("创建成功");
+            this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
             this.dialogVisible = false;
             this.btnLoading = false;
             this.$emit("updateDataBatch");

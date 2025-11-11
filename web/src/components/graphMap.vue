@@ -1,50 +1,58 @@
 <template>
   <div class="graph-map-container">
-    <div class="graph-toolbar">
-      <el-tooltip content="放大" placement="top">
-        <el-button 
-          icon="el-icon-zoom-in" 
-          circle 
-          size="mini" 
-          @click="zoomIn"
-        ></el-button>
-      </el-tooltip>
-      <el-tooltip content="缩小" placement="top">
-        <el-button 
-          icon="el-icon-zoom-out" 
-          circle 
-          size="mini" 
-          @click="zoomOut"
-        ></el-button>
-      </el-tooltip>
-      <el-tooltip content="适应画布" placement="top">
-        <el-button 
-          icon="el-icon-full-screen" 
-          circle 
-          size="mini" 
-          @click="fitView"
-        ></el-button>
-      </el-tooltip>
-      <el-tooltip content="实际大小" placement="top">
-        <el-button 
-          icon="el-icon-refresh-left" 
-          circle 
-          size="mini" 
-          @click="resetZoom"
-        ></el-button>
-      </el-tooltip>
-      <el-divider direction="vertical"></el-divider>
-      <el-tooltip content="刷新数据" placement="top">
-        <el-button 
-          icon="el-icon-refresh" 
-          circle 
-          size="mini" 
-          :loading="loading"
-          @click="refreshData"
-        ></el-button>
-      </el-tooltip>
+    <div class="graph-map-content">
+      <div class="graph-header" v-if="showHeader">
+        <span class="el-icon-arrow-left back" @click="goBack"></span>
+        <span class="header-text">
+          {{headerName}}
+        </span>
+      </div>
+      <div class="graph-toolbar">
+        <el-tooltip :content="$t('knowledgeManage.graph.zoomIn')" placement="top">
+          <el-button 
+            icon="el-icon-zoom-in" 
+            circle 
+            size="mini" 
+            @click="zoomIn"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip :content="$t('knowledgeManage.graph.zoomOut')" placement="top">
+          <el-button 
+            icon="el-icon-zoom-out" 
+            circle 
+            size="mini" 
+            @click="zoomOut"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip :content="$t('knowledgeManage.graph.fitView')" placement="top">
+          <el-button 
+            icon="el-icon-full-screen" 
+            circle 
+            size="mini" 
+            @click="fitView"
+          ></el-button>
+        </el-tooltip>
+        <el-tooltip :content="$t('knowledgeManage.graph.resetZoom')" placement="top">
+          <el-button 
+            icon="el-icon-refresh-left" 
+            circle 
+            size="mini" 
+            @click="resetZoom"
+          ></el-button>
+        </el-tooltip>
+        <el-divider direction="vertical"></el-divider>
+        <el-tooltip :content="$t('knowledgeManage.graph.refresh')" placement="top">
+          <el-button 
+            icon="el-icon-refresh" 
+            circle 
+            size="mini" 
+            :loading="loading"
+            @click="refreshData"
+          ></el-button>
+        </el-tooltip>
+      </div>
+      <div ref="graphContainer" class="graph-container" v-loading="loading"></div>
     </div>
-    <div ref="graphContainer" class="graph-container" v-loading="loading"></div>
   </div>
 </template>
 
@@ -54,56 +62,55 @@ import G6 from '@antv/g6'
 export default {
   name: 'GraphMap',
   props: {
-    // 图谱数据
     data: {
       type: Object,
       default: function() {
         return {
-          nodes: [],
-          edges: []
+          nodes: [
+            { id: '1', label: '中心节点', type: 'circle', size: 20, style: { fill: '#5B8FF9', stroke: '#1890ff' } },
+            { id: '2', label: '节点A', type: 'circle', size: 20, style: { fill: '#C6E5FF' } },
+            { id: '3', label: '节点B', type: 'circle', size: 20, style: { fill: '#C6E5FF' } },
+            { id: '4', label: '节点C', type: 'circle', size: 20, style: { fill: '#C6E5FF' } },
+            { id: '5', label: '节点D', type: 'circle', size: 20, style: { fill: '#C6E5FF' } }
+          ],
+          edges: [
+            { id: 'e1', source: '1', target: '2', label: '连接1' },
+            { id: 'e2', source: '1', target: '3', label: '连接2' },
+            { id: 'e3', source: '1', target: '4', label: '连接3' },
+            { id: 'e4', source: '1', target: '5', label: '连接4' },
+            { id: 'e5', source: '2', target: '2', label: '连接5' },
+          ]
         }
       }
     },
-    // 是否自动适应画布
+    showHeader:{
+      type:Boolean,
+      default:true
+    },
+    knowledgeId: {
+      type: [String, Number],
+      default: null
+    },
     autoFit: {
       type: Boolean,
       default: true
     },
-    // 布局类型
     layout: {
       type: String,
-      default: 'force' // force, dagre, circular, radial, etc.
+      default: 'force'
     },
-    // 节点样式配置
     nodeStyle: {
       type: Object,
       default: function() {
         return {}
       }
     },
-    // 边样式配置
     edgeStyle: {
       type: Object,
       default: function() {
         return {}
       }
     },
-    // 是否使用内置假数据
-    useMock: {
-      type: Boolean,
-      default: false
-    },
-    // 假数据节点数量
-    mockNodes: {
-      type: Number,
-      default: 200
-    },
-    // 假数据边数量
-    mockEdges: {
-      type: Number,
-      default: 300
-    },
-    // 性能优化配置
     performance: {
       type: Object,
       default: function() {
@@ -125,6 +132,14 @@ export default {
       lastLabelSwitchRAF: 0
     }
   },
+  computed: {
+    headerName() {
+      if (this.$route && this.$route.query && this.$route.query.name) {
+        return this.$route.query.name
+      }
+      return '知识库'
+    }
+  },
   watch: {
     data: {
       handler(newData) {
@@ -138,10 +153,6 @@ export default {
   },
   mounted() {
     this.initGraph()
-    if (this.useMock && (!this.data || (!this.data.nodes && !this.data.edges) || (this.data.nodes || []).length === 0)) {
-      const mock = this.generateMockData(this.mockNodes, this.mockEdges)
-      this.updateGraphData(mock)
-    }
   },
   beforeDestroy() {
     if (this.graph) {
@@ -151,14 +162,20 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    // 初始化图谱
+    goBack(){
+      let id = this.knowledgeId
+      if (!id && this.$route && this.$route.params) {
+        id = this.$route.params.id
+      }
+      
+      if (id) {
+        this.$router.push({
+          path: `/knowledge/doclist/${id}`
+        })
+      }
+    },
     initGraph() {
       if (!this.$refs.graphContainer) {
-        return
-      }
-
-      if (!G6) {
-        console.error('G6 is not available')
         return
       }
 
@@ -166,17 +183,13 @@ export default {
       const width = container.clientWidth || 800
       const height = container.clientHeight || 600
 
-      // 注册自定义节点
       this.registerCustomNodes()
-
-      // 获取 Graph 构造函数（兼容不同的导入方式）
       const Graph = G6.Graph || G6
 
-      // 创建图谱实例
       const graphConfig = {
-        container: container,
-        width: width,
-        height: height,
+        container,
+        width,
+        height,
         animate: false,
         modes: {
           default: [
@@ -190,17 +203,25 @@ export default {
         layout: {
           type: this.layout,
           preventOverlap: true,
-          nodeSize: 50,
-          nodeSpacing: 30,
+          nodeSize: 20,
+          nodeSpacing: 50,
           ...this.getLayoutConfig()
         },
         defaultNode: {
           type: 'circle',
-          size: 50,
+          size: 20,
           labelCfg: {
+            position: 'bottom',
+            offset: 10,
             style: {
               fill: '#333',
-              fontSize: 12
+              fontSize: 14,
+              fontWeight: 'normal',
+              background: {
+                fill: '#fff',
+                padding: [2, 4, 2, 4],
+                radius: 2
+              }
             }
           },
           style: {
@@ -215,17 +236,21 @@ export default {
           style: {
             stroke: '#A3B1BF',
             lineWidth: 2,
-            endArrow: true
+            endArrow: false
           },
           labelCfg: {
             autoRotate: true,
+            refY: -10,
             style: {
               fill: '#666',
-              fontSize: 10,
+              fontSize: 14,
+              fontWeight: 'normal',
               background: {
                 fill: '#fff',
-                padding: [2, 2, 2, 2],
-                radius: 2
+                padding: [2, 4, 2, 4],
+                radius: 2,
+                stroke: '#e4e7ed',
+                lineWidth: 1
               }
             }
           },
@@ -256,40 +281,37 @@ export default {
       }
 
       this.graph = new Graph(graphConfig)
-
-      // 监听事件
+ 
       this.bindEvents()
 
-      // 加载数据
       if (this.data && (this.data.nodes || this.data.edges)) {
-        const prepared = this.prepareDataForPerformance(this.data)
-        this.graph.data(prepared)
+        this.graph.data(this.data)
         this.graph.render()
         
         if (this.autoFit) {
           this.fitView()
         }
       }
-
-      // 监听窗口大小变化
+ 
       window.addEventListener('resize', this.handleResize)
     },
 
-    // 注册自定义节点
     registerCustomNodes() {
-      // 可以在这里注册自定义节点类型
-      // 例如：G6.registerNode('custom-node', {...})
     },
-
-    // 获取布局配置
+ 
     getLayoutConfig() {
       const configs = {
         force: {
           preventOverlap: true,
-          nodeSize: 50,
-          linkDistance: 100,
-          nodeStrength: -50,
-          edgeStrength: 0.2
+          nodeSize: 20,
+          nodeSpacing: 50,
+          linkDistance: 150,
+          nodeStrength: -100,
+          edgeStrength: 0.3,
+          collideStrength: 0.8,
+          alpha: 0.3,
+          alphaDecay: 0.02,
+          alphaMin: 0.001
         },
         dagre: {
           rankdir: 'TB',
@@ -309,48 +331,41 @@ export default {
       return configs[this.layout] || configs.force
     },
 
-    // 绑定事件
     bindEvents() {
-      if (!this.graph) return
-
-      // 节点点击事件
-      this.graph.on('node:click', (e) => {
-        const node = e.item
-        this.$emit('node-click', node.getModel())
-      })
-
-      // 节点鼠标进入
-      this.graph.on('node:mouseenter', (e) => {
-        const node = e.item
-        this.graph.setItemState(node, 'hover', true)
-      })
-
-      // 节点鼠标离开
-      this.graph.on('node:mouseleave', (e) => {
-        const node = e.item
-        this.graph.setItemState(node, 'hover', false)
-      })
-
-      // 边点击事件
-      this.graph.on('edge:click', (e) => {
-        const edge = e.item
-        this.$emit('edge-click', edge.getModel())
-      })
-
-      // 画布点击事件
-      this.graph.on('canvas:click', () => {
-        this.graph.getNodes().forEach(node => {
-          this.graph.setItemState(node, 'selected', false)
-        })
-        this.graph.getEdges().forEach(edge => {
-          this.graph.setItemState(edge, 'selected', false)
-        })
-      })
-
-      // 缩放事件
-      this.graph.on('viewportchange', () => {
-        if (this.graph) {
-          const zoom = this.graph.getZoom()
+       if (!this.graph) return
+ 
+       this.graph.on('node:click', (e) => {
+         const node = e.item
+         this.$emit('node-click', node.getModel())
+       })
+ 
+       this.graph.on('node:mouseenter', (e) => {
+         const node = e.item
+         this.graph.setItemState(node, 'hover', true)
+       })
+ 
+       this.graph.on('node:mouseleave', (e) => {
+         const node = e.item
+         this.graph.setItemState(node, 'hover', false)
+       })
+ 
+       this.graph.on('edge:click', (e) => {
+         const edge = e.item
+         this.$emit('edge-click', edge.getModel())
+       })
+ 
+       this.graph.on('canvas:click', () => {
+         this.graph.getNodes().forEach(node => {
+           this.graph.setItemState(node, 'selected', false)
+         })
+         this.graph.getEdges().forEach(edge => {
+           this.graph.setItemState(edge, 'selected', false)
+         })
+       })
+ 
+       this.graph.on('viewportchange', () => {
+         if (this.graph) {
+           const zoom = this.graph.getZoom()
           this.zoom = zoom
           this.$emit('zoom-change', zoom)
           this.toggleLabelsByZoom()
@@ -358,12 +373,21 @@ export default {
       })
     },
 
-    // 更新图谱数据
     updateGraphData(data) {
       if (!this.graph) return
-
-      const prepared = this.prepareDataForPerformance(data)
-      this.graph.data(prepared)
+ 
+      const safeData = {
+        nodes: Array.isArray(data && data.nodes)
+          ? data.nodes.map(n => ({ ...n }))
+          : [],
+        edges: Array.isArray(data && data.edges)
+          ? data.edges.map(e => {
+              const { label, ...rest } = e || {}
+              return { ...rest }
+            })
+          : []
+      }
+      this.graph.data(safeData)
       this.graph.render()
       
       if (this.autoFit) {
@@ -372,8 +396,7 @@ export default {
         })
       }
     },
-
-    // 根据缩放控制标签显隐
+ 
     toggleLabelsByZoom() {
       if (!this.graph) return
       const threshold = (this.performance && this.performance.hideLabelZoom) || 0
@@ -397,138 +420,49 @@ export default {
       this.graph.paint()
     },
 
-    // 是否大数据量
     isLargeData(data) {
       const nodesLen = (data && data.nodes && data.nodes.length) || 0
       const threshold = (this.performance && this.performance.largeThreshold) || 500
       return nodesLen >= threshold
     },
 
-    // 按性能优化准备数据和布局
-    prepareDataForPerformance(data) {
-      const cloned = {
-        nodes: (data.nodes || []).map(n => ({ ...n })),
-        edges: (data.edges || []).map(e => ({ ...e }))
-      }
-      const large = this.isLargeData(cloned)
-      if (large) {
-        if (this.performance && this.performance.simplifyEdgeOnLarge) {
-          cloned.edges.forEach(e => {
-            e.style = e.style || {}
-            e.style.endArrow = false
-            e.style.lineWidth = 1
-          })
-        }
-        cloned.nodes.forEach(n => {
-          if (typeof n.label === 'string' && n.label) {
-            n.originalLabel = n.label
-            n.label = ''
-          }
-        })
-        if (this.performance && this.performance.disableAnimateOnLarge && this.graph) {
-          this.graph.updateLayout({ animate: false })
-        }
-      } else {
-        cloned.nodes.forEach(n => {
-          if (n.originalLabel && !n.label) {
-            n.label = n.originalLabel
-          }
-        })
-      }
-      // 更新布局配置（含 worker / gpu）
-      const layoutCfgBase = this.getLayoutConfig()
-      const enableWorker = !!(this.performance && this.performance.enableWorkerLayout)
-      if ((this.layout === 'force' || this.layout === 'gForce') && this.graph) {
-        const extra = {
-          preventOverlap: true,
-          maxIteration: 500
-        }
-        if (this.layout === 'gForce') {
-          extra.gpuEnabled = true
-        }
-        if (enableWorker) {
-          extra.workerEnabled = true
-        }
-        this.graph.updateLayout({ type: this.layout, ...layoutCfgBase, ...extra })
-      }
-      return cloned
-    },
-
-    // 生成假数据
-    generateMockData(nodeCount = 200, edgeCount = 300) {
-      const nodes = []
-      const edges = []
-      for (let i = 0; i < nodeCount; i++) {
-        nodes.push({
-          id: 'n-' + i,
-          label: '节点 ' + i
-        })
-      }
-      for (let i = 0; i < edgeCount; i++) {
-        const s = Math.floor(Math.random() * nodeCount)
-        let t = Math.floor(Math.random() * nodeCount)
-        if (t === s) t = (t + 1) % nodeCount
-        edges.push({
-          id: 'e-' + i,
-          source: 'n-' + s,
-          target: 'n-' + t,
-          label: ''
-        })
-      }
-      return { nodes, edges }
-    },
-
-    // 放大
     zoomIn() {
       if (!this.graph) return
       const currentZoom = this.graph.getZoom()
       const newZoom = Math.min(currentZoom * 1.2, 3)
       this.graph.zoomTo(newZoom)
     },
-
-    // 缩小
+ 
     zoomOut() {
       if (!this.graph) return
       const currentZoom = this.graph.getZoom()
       const newZoom = Math.max(currentZoom * 0.8, 0.3)
       this.graph.zoomTo(newZoom)
     },
-
-    // 适应画布
+ 
     fitView() {
       if (!this.graph) return
-      // G6 v3 仅支持传 padding
       this.graph.fitView(20)
     },
-
-    // 重置缩放
+ 
     resetZoom() {
       if (!this.graph) return
       this.graph.zoomTo(1)
       this.fitView()
     },
-
-    // 刷新数据
+ 
     refreshData() {
       this.loading = true
-      if (this.useMock) {
-        const mock = this.generateMockData(this.mockNodes, this.mockEdges)
-        this.updateGraphData(mock)
-        this.finishRefresh()
-      } else {
-        this.$emit('refresh', () => {
-          // 刷新完成回调
-          this.loading = false
-          if (this.autoFit) {
-            this.$nextTick(() => {
-              this.fitView()
-            })
-          }
-        })
-      }
+      this.$emit('refresh', () => {
+        this.loading = false
+        if (this.autoFit) {
+          this.$nextTick(() => {
+            this.fitView()
+          })
+        }
+      })
     },
-    
-    // 手动完成刷新（供外部调用）
+     
     finishRefresh() {
       this.loading = false
       if (this.autoFit && this.graph) {
@@ -537,8 +471,7 @@ export default {
         })
       }
     },
-
-    // 处理窗口大小变化
+ 
     handleResize() {
       if (!this.graph || !this.$refs.graphContainer) return
       
@@ -548,13 +481,11 @@ export default {
       
       this.graph.changeSize(width, height)
     },
-
-    // 获取图谱实例（供外部调用）
+ 
     getGraph() {
       return this.graph
     },
-
-    // 导出图片
+ 
     downloadImage(fileName = 'graph') {
       if (!this.graph) return
       
@@ -574,16 +505,36 @@ export default {
 <style lang="scss" scoped>
 .graph-map-container {
   position: relative;
-  width: calc(100% - 20px);
-  height: calc(100% - 20px);
-  background: #fff;
-  border-radius: 4px;
+  width: 100%;
+  height:100%;
+  box-sizing: border-box;
   overflow: hidden;
-  margin:10px;
+  padding:10px;
+  .graph-map-content{
+     width: 100%;
+     height:100%;
+     background:#fff;
+     border-radius:6px;
+      .graph-header {
+    width:calc(100% - 20px);
+    padding:24px 0 14px 30px;
+    border-bottom:1px solid #eeeeee;
+    .back{
+      font-size:20px;
+      cursor:pointer;
+    }
+    .header-text {
+      color: #434C6C;
+      font-size: 18px;
+      font-weight: bold;
+      user-select: none;
+    }
+  }
   .graph-toolbar {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
     display: flex;
     align-items: center;
@@ -607,7 +558,7 @@ export default {
   .graph-container {
     width: 100%;
     height: 100%;
-    min-height: 400px;
+  }
   }
 }
 </style>

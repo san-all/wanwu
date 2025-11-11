@@ -16,16 +16,16 @@
         :size="''"
         border
       >
-        <el-descriptions-item label="名称">{{
+        <el-descriptions-item :label="$t('knowledgeManage.communityReport.name')">{{
           res.fileName
         }}</el-descriptions-item>
-        <el-descriptions-item label="社区报告数量">
+        <el-descriptions-item :label="$t('knowledgeManage.communityReport.segmentTotalNum')">
           {{ res.segmentTotalNum }}
         </el-descriptions-item>
-        <el-descriptions-item label="生成时间">{{
+        <el-descriptions-item :label="$t('knowledgeManage.communityReport.uploadTime')">{{
           res.uploadTime
         }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{
+        <el-descriptions-item :label="$t('knowledgeManage.communityReport.segmentType')">{{
           Number(res.segmentType) === 0 ? $t('knowledgeManage.autoChunk') : $t('knowledgeManage.autoConfigChunk')
         }}</el-descriptions-item>
       </el-descriptions>
@@ -37,14 +37,14 @@
           size="mini"
           :loading="loading.stop"
           v-if="[10,20,30].includes(permissionType)"
-          >生成/重新生成</el-button>
+          >{{$t('knowledgeManage.communityReport.generate')}}</el-button>
         <el-button
           type="primary"
-          @click="handleStatus('stop')"
+          @click="openCreate()"
           size="mini"
           :loading="loading.stop"
           v-if="[10,20,30].includes(permissionType)"
-          >新增社区报告</el-button>
+          >{{$t('knowledgeManage.communityReport.addCommunityReport')}}</el-button>
       </div>
 
       <div class="card">
@@ -57,12 +57,7 @@
           >
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span>
-                  {{ $t('knowledgeManage.split')+":" + item.contentNum }}
-                  <span class="segment-type">#{{ item.isParent?"父子分段":"通用分段" }}</span>
-                  <span class="segment-length" v-if="!item.isParent">#{{ item.content.length }}{{$t('knowledgeManage.character')}}</span>
-                  <span class="segment-child" v-if="item.childNum">#{{ item.childNum || 0 }}个子分段</span>
-                </span>
+                <span>{{ $t('knowledgeManage.split') + ":" + item.contentNum }}</span>
                 <div>
                   <el-dropdown @command="handleCommand" placement="bottom" v-if="[10,20,30].includes(permissionType)">
                     <span class="el-dropdown-link">
@@ -100,13 +95,19 @@
         </el-pagination>
       </div>
     </div>
+
+    <community-report-create
+      ref="communityCreate"
+      @success="onCreateSuccess"
+    />
   </div>
 </template>
 <script>
 import { getSectionList,setSectionStatus,delSegment } from "@/api/knowledge";
 import {mapGetters} from 'vuex';
+import CommunityReportCreate from './create.vue'
 export default {
-  components:{},
+  components:{ CommunityReportCreate },
   data() {
     return {
       obj: {},
@@ -179,7 +180,6 @@ export default {
         });
     },
     handleClick(item, index) {
-      // 点击卡片事件，可根据需求添加功能
     },
     handleCurrentChange(val) {
       this.page.pageNo = val;
@@ -208,6 +208,12 @@ export default {
           this.loading.stop = false;
         });
     },
+    openCreate(){
+      this.$refs.communityCreate.showDialog(this.obj.id)
+    },
+    onCreateSuccess(){
+      this.getList()
+    }
   },
 };
 </script>
