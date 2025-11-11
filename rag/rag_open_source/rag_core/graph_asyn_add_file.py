@@ -126,7 +126,7 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
         logger.error('all_wait_extrac_chunks 获取失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
         master_control_logger.error(
             'all_wait_extrac_chunks 获取失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name) + repr(e))
-        mq_rel_utils.update_doc_status(file_id, status=101, type=type)
+        mq_rel_utils.update_doc_status(file_id, status=101)
         return
 
 
@@ -156,7 +156,7 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
                              + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
                 master_control_logger.error(f'提取graph schema失败'
                                             + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name) + repr(e))
-                mq_rel_utils.update_doc_status(file_id, status=104, type=type)
+                mq_rel_utils.update_doc_status(file_id, status=104)
                 return
 
         extracted_graph_datas = []
@@ -164,7 +164,7 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
             batch_num = int(i/batch_size) + 1
             temp_chunks = all_wait_extrac_chunks[i:i + batch_size]
             try:
-                result_data = graph_utils.get_extrac_graph_data(temp_chunks, file_name, schema=schema)
+                result_data = graph_utils.get_extrac_graph_data(user_id, kb_name, temp_chunks, file_name, schema=schema)
                 graph_chunks = result_data['graph_chunks']
                 all_graph_chunks.extend(graph_chunks)
                 all_graph_vocabulary_set.update(result_data['graph_vocabulary_set'])
@@ -180,7 +180,7 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
                              + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
                 master_control_logger.error(f'第{batch_num}批文档提取graph数据失败'
                     + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name) + repr(e))
-                mq_rel_utils.update_doc_status(file_id, status=102, type=type)
+                mq_rel_utils.update_doc_status(file_id, status=102)
                 return
 
         # if extracted_graph_datas:
@@ -229,7 +229,7 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
                 logger.error('graph_data插入es失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
                 master_control_logger.error(
                     'graph_data插入es失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-                mq_rel_utils.update_doc_status(file_id, status=56, type=type)
+                mq_rel_utils.update_doc_status(file_id, status=103)
                 return
             else:
                 # 插入成功后，更新update_graph_vocabulary_set 数据
@@ -240,39 +240,20 @@ def add_files(user_id, kb_name, file_name, file_id, enable_knowledge_graph, grap
                 logger.info('graph_data插入es完成' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
                 master_control_logger.info(
                     'graph_data插入es完成' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-                # mq_rel_utils.update_doc_status(file_id, status=35, type=type)
     except Exception as e:
         logger.error(repr(e))
         logger.error('graph_data插入es失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
         master_control_logger.error(
             'graph_data插入es失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name) + repr(e))
-        mq_rel_utils.update_doc_status(file_id, status=103, type=type)
+        mq_rel_utils.update_doc_status(file_id, status=103)
         return
 
     # --------------7、最终完成
     # 回调
     logger.info("user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name) + '===== 文档grahp解析成功且完成')
     master_control_logger.info("user_id=%s,kb_name=%s,file_name=%s,kb_id=%s" % (user_id, kb_name, file_name, kb_id) + '===== 文档grahp解析成功且完成')
-    mq_rel_utils.update_doc_status(file_id, status=100, type=type)
+    mq_rel_utils.update_doc_status(file_id, status=100)
 
-
-def truncate_filename(filename, max_byte_length=255):
-    """
-    从后往前截取文件名，确保其长度不超过 max_byte_length 并保留扩展名
-    :param filename: 原始文件名
-    :max_byte_length: 最大允许的文件名字节长度，默认为 255
-    :return: 截断后的文件名
-    """
-    byte_length = len(filename.encode('utf-8'))
-    # print(f"文件名的字节长度为: {byte_length}")
-    base, ext = os.path.splitext(filename)
-    res_file_name = base + ext
-    while byte_length >= max_byte_length:
-        base = base[:-1]
-        res_file_name = base + ext
-        byte_length = len(res_file_name.encode('utf-8'))
-    # ======= 直到符合标准，返回 =======
-    return res_file_name
 
 if __name__ == "__main__":
     kafkal()

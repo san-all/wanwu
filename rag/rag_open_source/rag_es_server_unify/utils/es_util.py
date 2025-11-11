@@ -585,6 +585,9 @@ def snippet_bulk_add_index_data(index_name, kb_name, data):
                     content_str = kb_name + item["parent_snippet"] + item["meta_data"]["file_name"] + str(
                         item["meta_data"]["chunk_current_num"])
                     item.pop("parent_snippet")
+                elif "graph_data_text" in item:
+                    content_str = kb_name + item["graph_data_text"] + item["meta_data"]["file_name"] + str(
+                        item["meta_data"]["chunk_current_num"])
                 else:
                     content_str = kb_name + item["snippet"] + item["meta_data"]["file_name"] + str(
                         item["meta_data"]["chunk_current_num"])

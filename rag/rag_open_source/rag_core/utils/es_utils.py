@@ -100,10 +100,20 @@ def add_es(user_id, kb_name, docs, file_name, kb_id=""):
         for doc in docs[i:i + batch_size]:
             chunk_dict = {
                 "title": file_name,
-                "snippet": doc["text"],
                 "source_type": "RAG_KB",
                 "meta_data": doc["meta_data"]
             }
+            # 普通文档切片
+            if "text" in doc:
+                chunk_dict["snippet"] = doc["text"]
+
+            if "graph_data_text" in doc:  # 图谱数据切片
+                chunk_dict["graph_data_text"] = doc["graph_data_text"]
+                chunk_dict["graph_data"] = doc["graph_data"]
+
+            # 图谱数据切片和社区报告
+            if "chunk_type" in doc:
+                chunk_dict["chunk_type"] = doc["chunk_type"]
 
             if "parent_text" in doc:
                  chunk_dict["parent_snippet"] = doc["parent_text"]
