@@ -48,6 +48,18 @@ export default {
       default: function() {
         return KNOWLEDGE_GRAPH_TIPS
       }
+    },
+    graphSwitch: {
+      type: Boolean,
+      default: false
+    }
+  },
+  watch:{
+    graphSwitch: {
+      handler(newVal) {
+        this.switchValue = newVal
+      },
+      immediate: true
     }
   },
   data() {

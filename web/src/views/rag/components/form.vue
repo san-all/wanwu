@@ -145,7 +145,7 @@
           </p>
         </div>
         <div class="block prompt-box safety-box" v-if="showGraphSwitch">
-          <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="'知识图谱'"/>
+          <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="'知识图谱'" :graphSwitch="editForm.knowledgeConfig.useGraph"/>
         </div>
       </div>
       <div class="drawer-test">
@@ -309,7 +309,6 @@ export default {
   },
   computed:{
       showGraphSwitch() {
-      console.log(this.editForm.knowledgebases)
       return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
     }
   },
