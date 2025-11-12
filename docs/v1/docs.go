@@ -6991,7 +6991,7 @@ const docTemplate = `{
                                                         "list": {
                                                             "type": "array",
                                                             "items": {
-                                                                "$ref": "#/definitions/response.OauthAppInfo"
+                                                                "$ref": "#/definitions/response.OAuthAppInfo"
                                                             }
                                                         }
                                                     }
@@ -17395,7 +17395,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.OauthAppInfo": {
+        "response.OAuthAppInfo": {
             "type": "object",
             "properties": {
                 "clientId": {
