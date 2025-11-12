@@ -1,10 +1,10 @@
 import service from "@/utils/request"
-const BASE_URL = '/user/api/v1'
+import {USER_API} from "@/utils/requestConstants"
 
 // 获取客户端统计数据
 export const getData = (params) => {
     return service({
-        url: `${BASE_URL}/statistic/client"`,
+        url: `${USER_API}/statistic/client"`,
         method: "get",
         params,
     });

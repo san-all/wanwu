@@ -1,8 +1,8 @@
 import service from "@/utils/request"
-const BASE_URL = '/user/api/v1'
+import {USER_API} from "@/utils/requestConstants"
 export const createAgent = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant`,
+        url: `${USER_API}/assistant`,
         method: 'post',
         data
     })
@@ -10,140 +10,140 @@ export const createAgent = (data)=>{
 
 export const updateAgent = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant`,
+        url: `${USER_API}/assistant`,
         method: 'put',
         data
     })
 }
 export const delAgent = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant`,
+        url: `${USER_API}/assistant`,
         method: 'delete',
         data
     })
 }
 export const getAgentInfo = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant`,
+        url: `${USER_API}/assistant`,
         method: 'get',
         params
     })
 }
 export const getAgentDetail = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant/draft`,
+        url: `${USER_API}/assistant/draft`,
         method: 'get',
         params
     })
 }
 export const putAgentInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/config`,
+        url: `${USER_API}/assistant/config`,
         method: 'put',
         data
     })
 }
 export const createConversation = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/conversation`,
+        url: `${USER_API}/assistant/conversation`,
         method: 'post',
         data
     })
 }
 export const delConversation = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/conversation`,
+        url: `${USER_API}/assistant/conversation`,
         method: 'delete',
         data
     })
 }
 export const getConversationHistory = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant/conversation/detail`,
+        url: `${USER_API}/assistant/conversation/detail`,
         method: 'get',
         params
     })
 }
 export const getConversationlist = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant/conversation/list`,
+        url: `${USER_API}/assistant/conversation/list`,
         method: 'get',
         params
     })
 }
 export const getActionInfo = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant/action`,
+        url: `${USER_API}/assistant/action`,
         method: 'get',
         params
     })
 }
 export const editActionInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/action`,
+        url: `${USER_API}/assistant/action`,
         method: 'put',
         data
     })
 }
 export const addActionInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/action`,
+        url: `${USER_API}/assistant/action`,
         method: 'post',
         data
     })
 }
 export const delActionInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/action`,
+        url: `${USER_API}/assistant/action`,
         method: 'delete',
         data
     })
 }
 export const enableAction = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/action/enable`,
+        url: `${USER_API}/assistant/action/enable`,
         method: 'put',
         data
     })
 }
 export const addWorkFlowInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/workflow`,
+        url: `${USER_API}/assistant/tool/workflow`,
         method: 'post',
         data
     })
 }
 export const delWorkFlowInfo = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/workflow`,
+        url: `${USER_API}/assistant/tool/workflow`,
         method: 'delete',
         data
     })
 }
 export const enableWorkFlow = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/workflow/switch`,
+        url: `${USER_API}/assistant/tool/workflow/switch`,
         method: 'put',
         data
     })
 }
 export const agentStream = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/stream`,
+        url: `${USER_API}/assistant/stream`,
         method: 'post',
         data
     })
 }
 export const agentTestStream = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/test/stream`,
+        url: `${USER_API}/assistant/test/stream`,
         method: 'post',
         data
     })
 }
 export const getAgentList = (params)=>{
     return service({
-        url: `${BASE_URL}/assistant/list`,
+        url: `${USER_API}/assistant/list`,
         method: 'get',
         params
     })
@@ -152,7 +152,7 @@ export const getAgentList = (params)=>{
 //删除mcp工具
 export const deleteMcp = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/mcp`,
+        url: `${USER_API}/assistant/tool/mcp`,
         method: 'delete',
         data
     })
@@ -160,7 +160,7 @@ export const deleteMcp = (data)=>{
 //添加mcp工具
 export const addMcp = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/mcp`,
+        url: `${USER_API}/assistant/tool/mcp`,
         method: 'post',
         data
     })
@@ -168,7 +168,7 @@ export const addMcp = (data)=>{
 //启停mcp工具
 export const enableMcp = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/mcp/switch`,
+        url: `${USER_API}/assistant/tool/mcp/switch`,
         method: 'put',
         data
     })
@@ -177,7 +177,7 @@ export const enableMcp = (data)=>{
 // 删除自定义、内置工具
 export const delCustomBuiltIn = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool`,
+        url: `${USER_API}/assistant/tool`,
         method: 'delete',
         data
     })
@@ -185,7 +185,7 @@ export const delCustomBuiltIn = (data)=>{
 // 添加自定义、内置工具
 export const addCustomBuiltIn = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool`,
+        url: `${USER_API}/assistant/tool`,
         method: 'post',
         data
     })
@@ -193,7 +193,7 @@ export const addCustomBuiltIn = (data)=>{
 // 启停自定义、内置工具
 export const switchCustomBuiltIn = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/switch`,
+        url: `${USER_API}/assistant/tool/switch`,
         method: 'put',
         data
     })
@@ -201,7 +201,7 @@ export const switchCustomBuiltIn = (data)=>{
 //工具列表
 export const toolList = (data)=>{
     return service({
-        url: `${BASE_URL}/tool/select`,
+        url: `${USER_API}/tool/select`,
         method: 'get',
         params:data
     })
@@ -209,7 +209,7 @@ export const toolList = (data)=>{
 //工具下面的action列表
 export const toolActionList = (data)=>{
     return service({
-        url: `${BASE_URL}/tool/action/list`,
+        url: `${USER_API}/tool/action/list`,
         method: 'get',
         params:data
     })
@@ -217,7 +217,7 @@ export const toolActionList = (data)=>{
 //内置工具下面的action详情
 export const toolActionDetail = (data)=>{
     return service({
-        url: `${BASE_URL}/tool/action/detail`,
+        url: `${USER_API}/tool/action/detail`,
         method: 'get',
         params:data
     })
@@ -225,7 +225,7 @@ export const toolActionDetail = (data)=>{
 //mcp工具列表
 export const mcptoolList = (data)=>{
     return service({
-        url: `${BASE_URL}/mcp/select`,
+        url: `${USER_API}/mcp/select`,
         method: 'get',
         params:data
     })
@@ -233,7 +233,7 @@ export const mcptoolList = (data)=>{
 //mcp工具下面的action列表
 export const mcpActionList = (data)=>{
     return service({
-        url: `${BASE_URL}/mcp/action/list`,
+        url: `${USER_API}/mcp/action/list`,
         method: 'get',
         params:data
     })
@@ -242,7 +242,7 @@ export const mcpActionList = (data)=>{
 //编辑url
 export const editOpenurl = (data)=>{
     return service({
-        url: `${BASE_URL}/appspace/app/openurl`,
+        url: `${USER_API}/appspace/app/openurl`,
         method: 'put',
         data
     })
@@ -250,7 +250,7 @@ export const editOpenurl = (data)=>{
 //创建url
 export const createOpenurl = (data)=>{
     return service({
-        url: `${BASE_URL}/appspace/app/openurl`,
+        url: `${USER_API}/appspace/app/openurl`,
         method: 'post',
         data
     })
@@ -258,7 +258,7 @@ export const createOpenurl = (data)=>{
 //删除应用url
 export const delOpenurl = (data)=>{
     return service({
-        url: `${BASE_URL}/appspace/app/openurl`,
+        url: `${USER_API}/appspace/app/openurl`,
         method: 'delete',
         data
     })
@@ -266,7 +266,7 @@ export const delOpenurl = (data)=>{
 //获取应用url列表
 export const getOpenurl = (data)=>{
     return service({
-        url: `${BASE_URL}/appspace/app/openurl/list`,
+        url: `${USER_API}/appspace/app/openurl/list`,
         method: 'get',
         params:data
     })
@@ -274,7 +274,7 @@ export const getOpenurl = (data)=>{
 //启停应用url状态
 export const switchOpenurl = (data)=>{
     return service({
-        url: `${BASE_URL}/appspace/app/openurl/status`,
+        url: `${USER_API}/appspace/app/openurl/status`,
         method: 'put',
         data
     })
@@ -342,7 +342,7 @@ export const OpenurlStream = (data,suffix,config={})=>{
 //更新博查rerank模型
 export const updateRerank = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/tool/config`,
+        url: `${USER_API}/assistant/tool/config`,
         method: 'put',
         data
     })
