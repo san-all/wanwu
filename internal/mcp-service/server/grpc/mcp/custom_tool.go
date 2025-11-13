@@ -347,7 +347,7 @@ func (s *Service) GetToolSelect(ctx context.Context, req *mcp_service.GetToolSel
 	if err != nil {
 		return nil, errStatus(errs.Code_MCPGetCustomToolListErr, err)
 	}
-	builtinToolMap := make(map[string]*model.CustomTool)
+	builtinToolMap := make(map[string]*model.BuiltinTool)
 	for _, tool := range builtinTools {
 		builtinToolMap[tool.ToolSquareId] = tool
 	}
@@ -366,7 +366,12 @@ func (s *Service) GetToolSelect(ctx context.Context, req *mcp_service.GetToolSel
 		}
 		// 从map中查询内置工具
 		if tool, ok := builtinToolMap[toolCfg.ToolSquareId]; ok {
-			toolTab.ApiKey = tool.APIKey
+			apiAuth := &common.ApiAuthWebRequest{}
+			if err := json.Unmarshal([]byte(tool.AuthJSON), apiAuth); err != nil {
+				return nil, errStatus(errs.Code_MCPGetCustomToolListErr, toErrStatus("mcp_get_custom_tool_list_err", err.Error()))
+			}
+			toolTab.ApiKey = apiAuth.ApiKeyValue
+
 		}
 		list = append(list, toolTab)
 	}
