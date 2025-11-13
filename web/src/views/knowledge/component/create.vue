@@ -355,7 +355,9 @@ export default {
       this.modelLoading = true;
       const res = await selectModelList();
       if (res.code === 0) {
-        this.knowledgeGraphModelOptions = res.data.list || [];
+        this.knowledgeGraphModelOptions = (res.data.list || []).filter(
+          (item) => !item.config || item.config.visionSupport !== "support"
+        );
         this.modelLoading = false;
       }
       this.modelLoading = false;

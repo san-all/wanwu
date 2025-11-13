@@ -505,7 +505,7 @@ export const getDocMetaList = (data)=>{
 //获取知识图谱详情
 export const getGraphDetail = (data)=>{
     return service({
-        url: `${BASE_URL}/knowledge/graph`,
+        url: `${USER_API}/knowledge/graph`,
         method: 'get',
         params:data
     })

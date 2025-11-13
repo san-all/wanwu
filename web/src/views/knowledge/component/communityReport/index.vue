@@ -148,7 +148,7 @@ export default {
   },
   methods: {
     createReport(){
-      this.$refs.createReport.showDialog(this.obj.knowledgeId);
+      this.$refs.createReport.showDialog(this.obj.knowledgeId,'add');
     },
     generateReport(){
       generateCommunityReport({knowledgeId:this.obj.knowledgeId}).then(res =>{
@@ -192,9 +192,7 @@ export default {
     },
     handleClick(item, index) {
       // 点击卡片事件，可根据需求添加功能
-      this.$refs.createReport.ruleForm.content = item.content;
-      this.$refs.createReport.ruleForm.title = item.title;
-      this.$refs.createReport.showDialog(this.obj.knowledgeId,'edit')
+      this.$refs.createReport.showDialog(this.obj.knowledgeId, 'edit', item)
     },
     handleCurrentChange(val) {
       this.page.pageNo = val;

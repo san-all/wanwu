@@ -143,8 +143,8 @@ export default {
   watch: {
     data: {
       handler(newData) {
-        if (this.graph && newData) {
-          const transformedData = transformGraphData(newData)
+        if (this.graph && newData && newData.graph) {
+          const transformedData = transformGraphData(newData.graph)
           this.graphData = transformedData
           this.updateGraphData(transformedData)
         }
@@ -277,8 +277,14 @@ export default {
  
       this.bindEvents()
 
-      if (this.data && (this.data.nodes || this.data.edges)) {
-        const transformedData = transformGraphData(this.data)
+      if (
+        this.data &&
+        this.data.graph &&
+        (Array.isArray(this.data.graph.nodes) ||
+          Array.isArray(this.data.graph.edges))
+      ) {
+        const transformedData = transformGraphData(this.data.graph)
+        console.log(transformedData)
         this.graph.data(transformedData)
         this.graph.render()
         

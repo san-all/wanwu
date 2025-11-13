@@ -18,7 +18,12 @@ module.exports = {
   assetsDir: "static",
   lintOnSave: process.env.NODE_ENV === "development",
   productionSourceMap: false,//源码映射
-  transpileDependencies: ['@antv/g6','@antv/graphlib'],
+  transpileDependencies: [
+    'ml-matrix',
+    '@antv/layout',
+    '@antv/g6',
+    '@antv/graphlib'
+  ],
   chainWebpack(config){
     config.module
       .rule('md')

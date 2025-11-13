@@ -33,8 +33,13 @@
               </div>
 
               <div class="content_title">
-                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/graphMap/${docQuery.knowledgeId}`)" v-if="graphSwitch && tableData.length > 0">知识图谱</el-button>
-                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/communityReport?knowledgeId=${docQuery.knowledgeId}`)" v-if="graphSwitch && tableData.length > 0">社区报告</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/graphMap/${docQuery.knowledgeId}?name=${knowledgeName}`)" v-if="graphSwitch && tableData.length > 0">知识图谱</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/communityReport?knowledgeId=${docQuery.knowledgeId} &name=${knowledgeName}`)" v-if="graphSwitch && tableData.length > 0">
+                  <span>社区报告</span>
+                  <el-tooltip class="item" effect="dark" content="社区报告在上传文件或删除文件时不会自动触发构建,如需更新报告需要点击生成/重新生成构建" placement="top">
+                    <i class="el-icon-question" style="margin-left: 2px;"></i>
+                  </el-tooltip>
+                </el-button>
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload" >{{$t('common.gpuDialog.reload')}}</el-button>
                 <el-button size="mini" type="primary" @click="showMeta" v-if="[10,20,30].includes(permissionType)">元数据管理</el-button>
                 <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&graphSwitch=${graphSwitch}`)">命中测试</el-button>

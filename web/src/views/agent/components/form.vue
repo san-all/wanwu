@@ -133,7 +133,7 @@
               >
                 <el-option
                   class="model-option-item"
-                  v-for="(item, index) in modleOptions"
+                  v-for="(item) in modleOptions"
                   :key="item.modelId"
                   :value="item.modelId"
                   :label="item.displayName"

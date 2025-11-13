@@ -11,7 +11,7 @@
       label-width="120px"
       class="demo-ruleForm"
     >
-      <el-form-item
+      <!-- <el-form-item
         class="itemCenter"
       >
         <el-radio-group
@@ -22,7 +22,7 @@
           <el-radio-button :label="'single'">{{$t('knowledgeManage.create.single')}}</el-radio-button>
           <el-radio-button :label="'file'">{{$t('knowledgeManage.create.file')}}</el-radio-button>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item
         :label="$t('knowledgeManage.create.file')"
         v-if="createType === 'file'"
@@ -104,7 +104,8 @@ export default {
         content: "",
         knowledgeId: "",
         title: "",
-        fileUploadId:""
+        fileUploadId:"",
+        contentId: ""
       },
       type:'add',
       dialogVisible: false,
@@ -128,16 +129,26 @@ export default {
     handleClose() {
       this.dialogVisible = false;
     },
-    showDialog(knowledgeId,type="") {
-      this.type = type
-      if(type === 'edit'){
-        this.title = this.$t('knowledgeManage.communityReport.viewDetail')
-      }else{
-        this.title = this.$t('knowledgeManage.communityReport.addCommunityReport')
+    showDialog(knowledgeId, type = "", item = null) {
+      this.type = type;
+      if (type === 'edit') {
+        this.title = this.$t('knowledgeManage.communityReport.viewDetail');
+        this.dialogVisible = true;
+        this.ruleForm.knowledgeId = knowledgeId;
+        if (item) {
+          this.ruleForm.content = item.content || "";
+          this.ruleForm.title = item.title || "";
+          this.ruleForm.contentId = item.contentId || "";
+          this.createType = "single";
+        } else {
+          this.clearForm();
+        }
+      } else {
+        this.title = this.$t('knowledgeManage.communityReport.addCommunityReport');
+        this.dialogVisible = true;
+        this.ruleForm.knowledgeId = knowledgeId;
+        this.clearForm();
       }
-      this.dialogVisible = true;
-      this.ruleForm.knowledgeId = knowledgeId;
-      this.clearForm();
     },
     submit(formName) {
       if (this.createType === "single") {
@@ -165,7 +176,8 @@ export default {
        const data = {
         content: this.ruleForm.content,
         knowledgeId: this.ruleForm.knowledgeId,
-        title: this.ruleForm.title
+        title: this.ruleForm.title,
+        contentId: this.ruleForm.contentId
       };
       editCommunityReportList(data).then(res =>{
         if(res.code === 0){
@@ -223,6 +235,7 @@ export default {
       this.ruleForm.content = "";
       this.ruleForm.title = "";
       this.ruleForm.fileUploadId = "";
+      this.ruleForm.contentId = "";
       this.checkType = [];
     },
   },

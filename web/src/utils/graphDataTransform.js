@@ -30,8 +30,8 @@ export function transformGraphData(backendData, options = {}) {
   })
   
   const {
-    getNodeId = (node, index) => node.entity_name `,
-    getNodeLabel = (node, index) => node.entity_name `,
+    getNodeId = (node, index) => node.entity_name || `node_${index}`,
+    getNodeLabel = (node, index) => node.entity_name || `node_${index}`,
     getNodeSize = (node, index) => node.pagerank ? Math.max(15, Math.min(30, node.pagerank * 100)) : 20,
     getNodeColor = (node, index) => {
       const entityType = node.entity_type || ''
@@ -41,21 +41,34 @@ export function transformGraphData(backendData, options = {}) {
     getEdgeLabel = (edge, index) => edge.description || ''
   } = options
 
+  const nodeIdMap = new Map()
+
   const transformedNodes = nodes.map((node, index) => {
     const nodeId = getNodeId(node, index)
     const nodeLabel = getNodeLabel(node, index)
     const nodeSize = getNodeSize(node, index)
     const nodeColor = getNodeColor(node, index)
 
+    if (node && node.entity_name) {
+      nodeIdMap.set(node.entity_name, nodeId)
+    }
+    if (node && node.entity_id) {
+      nodeIdMap.set(String(node.entity_id), nodeId)
+    }
+    if (node && node.id) {
+      nodeIdMap.set(String(node.id), nodeId)
+    }
+
     return {
+      ...node,
       id: nodeId,
       label: nodeLabel,
+      originalLabel: nodeLabel,
       type: 'circle',
       size: nodeSize,
       style: {
         fill: nodeColor
-      },
-      ...node
+      }
     }
   })
 
@@ -63,10 +76,32 @@ export function transformGraphData(backendData, options = {}) {
     const edgeId = getEdgeId(edge, index)
     const edgeLabel = getEdgeLabel(edge, index)
 
+    const source =
+      nodeIdMap.get(edge && edge.source_entity) ||
+      nodeIdMap.get(edge && edge.source) ||
+      nodeIdMap.get(
+        edge && edge.source_id ? String(edge.source_id) : undefined
+      ) ||
+      (edge && edge.source_entity) ||
+      (edge && edge.source) ||
+      (edge && edge.source_id ? String(edge.source_id) : undefined) ||
+      `source_${index}`
+
+    const target =
+      nodeIdMap.get(edge && edge.target_entity) ||
+      nodeIdMap.get(edge && edge.target) ||
+      nodeIdMap.get(
+        edge && edge.target_id ? String(edge.target_id) : undefined
+      ) ||
+      (edge && edge.target_entity) ||
+      (edge && edge.target) ||
+      (edge && edge.target_id ? String(edge.target_id) : undefined) ||
+      `target_${index}`
+
     return {
       id: edgeId,
-      source: edge.source_entity,
-      target: edge.target_entity,
+      source,
+      target,
       label: edgeLabel,
       ...(edge.weight && {
         style: {
