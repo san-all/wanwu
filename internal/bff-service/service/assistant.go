@@ -765,6 +765,9 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 			PriorityMatch:     kbConfig.PriorityMatch,
 			SemanticsPriority: kbConfig.SemanticsPriority,
 			KeywordPriority:   kbConfig.KeywordPriority,
+			TermWeight:        kbConfig.TermWeight,
+			TermWeightEnable:  kbConfig.TermWeightEnable,
+			UseGraph:          kbConfig.UseGraph,
 		},
 	}, nil
 

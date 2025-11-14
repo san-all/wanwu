@@ -52,6 +52,7 @@ type RagUpdateParams struct {
 type RagDeleteParams struct {
 	UserId            string `json:"userId"`
 	KnowledgeBaseName string `json:"knowledgeBase"`
+	KnowledgeId       string `json:"kb_id"`
 }
 
 type KnowledgeHitParams struct {
