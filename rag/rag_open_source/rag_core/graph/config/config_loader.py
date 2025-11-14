@@ -48,13 +48,6 @@ class ConstructionConfig:
 
 
 @dataclass
-class FAISSConfig:
-    """FAISS configuration"""
-    search_k: int = 50
-    max_workers: int = 4
-    device: str = "cpu"
-
-@dataclass
 class AgentConfig:
     """Agent mode configuration"""
     max_steps: int = 5
@@ -72,13 +65,9 @@ class RetrievalConfig:
     enable_reranking: bool = True
     enable_high_recall: bool = True
     enable_caching: bool = True
-    cache_dir: str = "retriever/faiss_cache_new"
-    faiss: FAISSConfig = None
     agent: AgentConfig = None
     
     def __post_init__(self):
-        if self.faiss is None:
-            self.faiss = FAISSConfig()
         if self.agent is None:
             self.agent = AgentConfig()
 
@@ -173,10 +162,8 @@ class ConfigManager:
         self.construction = ConstructionConfig(**construction_data)
 
         retrieval_data = self.config_data.get("retrieval", {})
-        faiss_data = retrieval_data.pop("faiss", {})
         agent_data = retrieval_data.pop("agent", {})
         self.retrieval = RetrievalConfig(**retrieval_data)
-        self.retrieval.faiss = FAISSConfig(**faiss_data)
         self.retrieval.agent = AgentConfig(**agent_data)
         
         embeddings_data = self.config_data.get("embeddings", {})

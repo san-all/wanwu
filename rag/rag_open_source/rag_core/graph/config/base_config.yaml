@@ -204,15 +204,10 @@ retrieval:
     enable_ircot: true
     enable_parallel_subquestions: true
     max_steps: 5
-  cache_dir: retriever/faiss_cache_new
   enable_caching: true
   enable_high_recall: true
   enable_query_enhancement: true
   enable_reranking: true
-  faiss:
-    device: cpu
-    max_workers: 4
-    search_k: 50
   recall_paths: 2
   similarity_threshold: 0.3
   top_k: 20
