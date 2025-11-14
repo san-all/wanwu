@@ -240,6 +240,7 @@ def agent_start():
                 metadata_filtering = kn_params.get('metadata_filtering',True)
                 knowledgeIdList = kn_params.get('knowledgeIdList',[])
                 metadata_filtering_conditions = kn_params.get('metadata_filtering_conditions',[])
+                use_graph = kn_params.get('use_graph',false)
 
 
 #如果是多模态模型，则进入多模态模式
@@ -471,7 +472,8 @@ def agent_start():
                     "term_weight_coefficient":term_weight_coefficient,
                     "metadata_filtering":metadata_filtering,
                     "metadata_filtering_conditions":metadata_filtering_conditions,
-                    "knowledgeIdList":knowledgeIdList
+                    "knowledgeIdList":knowledgeIdList,
+                    "use_graph":use_graph
 
                 }
 
@@ -648,7 +650,7 @@ def agent_start():
                         "Content-Type": "application/json"
                     }
                     if upload_file_url:
-                        question = '问题是:'+question+'\n'+'以下是调用工具可能用到的参数：'+'upload_file_url:'+upload_file_url[0]+'\n'+'session_id：'+session_id
+                        question = '问题是:'+question+'\n'+'以下是调用工具可能用到的参数：'+'upload_file_url:'+upload_file_url[0]
                     else:
                         question = '问题是:' + question
                     logger.info("送入action问题是:{question}")
