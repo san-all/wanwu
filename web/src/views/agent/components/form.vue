@@ -133,7 +133,7 @@
               >
                 <el-option
                   class="model-option-item"
-                  v-for="(item, index) in modleOptions"
+                  v-for="(item) in modleOptions"
                   :key="item.modelId"
                   :value="item.modelId"
                   :label="item.displayName"
@@ -368,9 +368,9 @@
           </p>
         </div>
         <!-- 知识图谱开关 -->
-        <!-- <div class="block prompt-box link-box">
-            <graphSwitch ref="graphSwitch" />
-        </div> -->
+        <div class="block prompt-box link-box" v-if="showGraphSwitch">
+            <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="$t('knowledgeManage.create.knowledgeGraph')" :graphSwitch="editForm.knowledgeConfig.useGraph"/>
+        </div>
       </div>
       <div class="drawer-test">
         <Chat
@@ -595,6 +595,7 @@ export default {
           topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
           maxHistory: 0, //最长上下文
+          useGraph:false
         },
         recommendQuestion: [{ value: "" }],
         modelConfig: {
@@ -660,6 +661,11 @@ export default {
       },
     };
   },
+  computed:{
+    showGraphSwitch() {
+      return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
+    }
+  },
   mounted() {
     this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
@@ -689,6 +695,9 @@ export default {
   },
   methods: {
     ...mapActions("app", ["setMaxPicNum","clearMaxPicNum"]),
+    graphSwitchchange(val){
+      this.editForm.knowledgeConfig.useGraph = val;
+    },
     updatePrompt(){
         this.$refs.promptTemplate.getPromptTemplateList()
     },

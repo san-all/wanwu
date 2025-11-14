@@ -239,7 +239,6 @@ import { selectModelList } from "@/api/modelAccess";
 import { KNOWLEDGE_GRAPH_TIPS } from "../config";
 import uploadChunk from "@/mixins/uploadChunk";
 import { delfile } from "@/api/chunkFile";
-import {USER_API} from "@/utils/requestConstants"
 export default {
   mixins: [uploadChunk],
   data() {
@@ -331,8 +330,8 @@ export default {
       }
     },
     async downloadTemplate() {
-      const url = `${USER_API}/static/docs/graph_schema.xlsx`;
-      const fileName = "url_import_template.xlsx";
+      const url = "/user/api/v1/static/docs/graph_schema.xlsx";
+      const fileName = "graph_schema.xlsx";
       try {
         const response = await fetch(url);
         if (!response.ok)
@@ -355,7 +354,9 @@ export default {
       this.modelLoading = true;
       const res = await selectModelList();
       if (res.code === 0) {
-        this.knowledgeGraphModelOptions = res.data.list || [];
+        this.knowledgeGraphModelOptions = (res.data.list || []).filter(
+          (item) => !item.config || item.config.visionSupport !== "support"
+        );
         this.modelLoading = false;
       }
       this.modelLoading = false;

@@ -193,6 +193,16 @@ const constantRoutes = [
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
+                path: '/knowledge/communityReport',
+                component:resolve =>require(['@/views/knowledge/component/communityReport'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
+                path: '/knowledge/graphMap/:id',
+                component:resolve =>require(['@/views/knowledge/component/graph'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
                 path:'/safety',
                 component:resolve =>require(['@/views/safety'],resolve),
                 meta:{perm: [PERMS.SAFETY]},

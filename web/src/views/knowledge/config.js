@@ -95,3 +95,15 @@ export const KNOWLEDGE_GRAPH_TIPS = [
         content: i18n.t('knowledgeManage.config.attentionDescriptionContent')
     }
 ]
+export const COMMUNITY_REPORT_STATUS = {
+    0: '-',
+    1: i18n.t('knowledgeManage.config.generating'),
+    2: i18n.t('knowledgeManage.config.generated'),
+    3: i18n.t('knowledgeManage.config.generationFailed'),
+}
+export const KNOWLEDGE_GRAPH_STATUS = {
+    0: i18n.t('knowledgeManage.config.pending'),
+    1: i18n.t('knowledgeManage.config.processing'),
+    2: i18n.t('knowledgeManage.config.finished'),
+    3: i18n.t('knowledgeManage.config.failed'),
+}

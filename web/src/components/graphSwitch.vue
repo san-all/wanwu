@@ -25,7 +25,6 @@
       <div class="graph-switch-content">
         <el-switch 
           v-model="switchValue" 
-          :disabled="disabled"
           @change="handleChange"
         ></el-switch>
       </div>
@@ -39,38 +38,38 @@ import { KNOWLEDGE_GRAPH_TIPS } from '@/views/knowledge/config'
 export default {
   name: 'GraphSwitch',
   props: {
-    value: {
-      type: Boolean,
-      default: false
-    },
     label: {
       type: String,
-      default: '知识图谱'
-    },
-    disabled: {
-      type: Boolean,
-      default: false
+      required: true,
+      default: ''
     },
     tips: {
       type: Array,
       default: function() {
         return KNOWLEDGE_GRAPH_TIPS
       }
+    },
+    graphSwitch: {
+      type: Boolean,
+      default: false
     }
   },
-  computed: {
-    switchValue: {
-      get() {
-        return this.value
+  watch:{
+    graphSwitch: {
+      handler(newVal) {
+        this.switchValue = newVal
       },
-      set(val) {
-        this.$emit('input', val)
-      }
+      immediate: true
+    }
+  },
+  data() {
+    return {
+      switchValue: false
     }
   },
   methods: {
     handleChange(val) {
-      this.$emit('change', val)
+      this.$emit('graphSwitchchange', val)
     }
   }
 }

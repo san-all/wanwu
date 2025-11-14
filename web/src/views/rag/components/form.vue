@@ -131,7 +131,7 @@
         </div>
         <div class="block prompt-box safety-box">
             <p class="block-title tool-title">
-            <span>
+            <span class="block-title-text">
               安全护栏配置
               <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
                   <span class="el-icon-question question-tips"></span>
@@ -143,6 +143,9 @@
               <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
             </span>
           </p>
+        </div>
+        <div class="block prompt-box safety-box" v-if="showGraphSwitch">
+          <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="'知识图谱'" :graphSwitch="editForm.knowledgeConfig.useGraph"/>
         </div>
       </div>
       <div class="drawer-test">
@@ -194,6 +197,7 @@ import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import graphSwitch from "@/components/graphSwitch.vue"
 import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
@@ -206,7 +210,8 @@ export default {
     setSafety,
     searchConfig,
     knowledgeSelect,
-    metaSet
+    metaSet,
+    graphSwitch
   },
   data() {
     return {
@@ -242,7 +247,8 @@ export default {
           semanticsPriority: 0.2, //语义权重
           topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
-          maxHistory:0//最长上下文
+          maxHistory:0,//
+          useGraph:false
         },
         safetyConfig:{
           enable: false,
@@ -269,7 +275,7 @@ export default {
       logoFileList: [],
       debounceTimer:null, //防抖计时器
       isUpdating: false, // 防止重复更新标记
-      isSettingFromDetail: false // 防止详情数据触发更新标记
+      isSettingFromDetail: false, // 防止详情数据触发更新标记
     };
   },
   watch:{
@@ -292,7 +298,6 @@ export default {
           });
           if (changed && !this.isUpdating) {
             const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch'];
-            //&&  newVal['knowledgebases'].length > 0 
             if(newVal['modelParams']!== '' || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
@@ -300,6 +305,11 @@ export default {
       },500)
     },
     deep: true
+    },
+  },
+  computed:{
+      showGraphSwitch() {
+      return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
     }
   },
   mounted() {
@@ -321,6 +331,9 @@ export default {
     }
   },
   methods: {
+    graphSwitchchange(val){
+      this.editForm.knowledgeConfig.useGraph = val;
+    },
     submitMeta(){
       const metaData  = this.$refs.metaSet.getMetaData();
       if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
@@ -780,6 +793,9 @@ export default {
       font-weight: bold;
       display: flex;
       align-items: center;
+      .block-title-text{
+        font-size:15px;
+      }
       .handleBtn{
         cursor: pointer;
       }

@@ -34,9 +34,15 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload" >{{$t('common.gpuDialog.reload')}}</el-button>
-                <!--<el-button size="mini" type="primary" @click="showBatchMeta" v-if="[10,20,30].includes(permissionType)">批量编辑元数据值</el-button> -->
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/graphMap/${docQuery.knowledgeId}?name=${knowledgeName}`)" v-if="graphSwitch && tableData.length > 0">知识图谱</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/communityReport?knowledgeId=${docQuery.knowledgeId} &name=${knowledgeName}`)" v-if="graphSwitch && tableData.length > 0">
+                  <span>社区报告</span>
+                  <el-tooltip class="item" effect="dark" content="社区报告在上传文件或删除文件时不会自动触发构建,如需更新报告需要点击生成/重新生成构建" placement="top">
+                    <i class="el-icon-question" style="margin-left: 2px;"></i>
+                  </el-tooltip>
+                </el-button>
                 <el-button size="mini" type="primary" @click="showMeta" v-if="[10,20,30].includes(permissionType)">元数据管理</el-button>
-                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&name=${knowledgeName}`)">命中测试</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&graphSwitch=${graphSwitch}`)">命中测试</el-button>
                 <el-button
                   size="mini"
                   type="primary"
@@ -95,7 +101,6 @@
                 <el-table-column
                   prop="segmentMethod"
                   label="分段模式"
-                  width="200"
                 >
                 <template slot-scope="scope">
                   <span>{{ getSegmentMethodText(scope.row.segmentMethod) }}</span>
@@ -133,6 +138,28 @@
                       ></span>
                     </el-tooltip>
                   </template>
+                </el-table-column>
+                <el-table-column
+                  v-if="graphSwitch"
+                  prop="graphStatus"
+                  :label="$t('knowledgeManage.graph.graphStatus')"
+                >
+                   <template slot-scope="scope">
+                      <span>{{knowledgeGraphStatus[scope.row.graphStatus]}}</span>
+                      <el-tooltip
+                      class="item"
+                      effect="light"
+                      :content="scope.row.graphErrMsg?scope.row.graphErrMsg:''"
+                      placement="top"
+                      v-if="scope.row.graphStatus === 3"
+                      popper-class="custom-tooltip"
+                    >
+                      <span
+                        class="el-icon-warning"
+                        style="margin-left:5px;color:#E6A23C;"
+                      ></span>
+                    </el-tooltip>
+                   </template>
                 </el-table-column>
                 <el-table-column
                   :label="$t('knowledgeManage.operate')"
@@ -199,11 +226,12 @@ import batchMetaData from './meta/batchMetaData.vue'
 import BatchMetatButton from './meta/batchMetatButton.vue'
 import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
 import {mapGetters} from 'vuex';
+import { KNOWLEDGE_GRAPH_STATUS } from '../config';
 export default {
   components: { Pagination,SearchInput,mataData,batchMetaData,BatchMetatButton},
   data() {
     return {
-      knowledgeName:this.$route.query.name || '',
+      knowledgeName:'',
       loading:false,
       tableLoading:false,
       docQuery: {
@@ -226,7 +254,9 @@ export default {
       metaData:[],
       isDisabled:false,
       selectedTableData:[],
-      selectedDocIds:[]
+      selectedDocIds:[],
+      graphSwitch:false,
+      knowledgeGraphStatus: KNOWLEDGE_GRAPH_STATUS
     };
   },
   watch:{
@@ -554,9 +584,14 @@ export default {
     handleUpload() {
       this.$router.push({path:'/knowledge/fileUpload',query:{id:this.docQuery.knowledgeId,name:this.knowledgeName}})
     },
-    refreshData(data) {
+    refreshData(data,tableInfo) {
       this.tableData = data
-      // 分页组件刷新当前页数据后，基于全局已选集合恢复当前页的勾选
+      if(tableInfo && tableInfo.docKnowledgeInfo){
+        this.graphSwitch = tableInfo.docKnowledgeInfo.graphSwitch === 1 ? true : false
+        this.knowledgeName = tableInfo.docKnowledgeInfo.knowledgeName
+      }else{
+        this.graphSwitch = false
+      }
     }
   }
 };
