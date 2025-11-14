@@ -143,6 +143,7 @@ func deleteKnowledgeByKnowledgeId(ctx context.Context, taskCtx string) Result {
 		err := service.RagKnowledgeDelete(ctx, &service.RagDeleteParams{
 			UserId:            knowledge.UserId,
 			KnowledgeBaseName: knowledge.RagName,
+			KnowledgeId:       knowledge.KnowledgeId,
 		})
 		if err != nil {
 			return err
