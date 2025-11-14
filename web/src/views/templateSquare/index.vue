@@ -38,7 +38,7 @@ export default {
   },
   created() {
     this.isPublic = this.$route.path.includes('/public/')
-    this.type = this.$route.query.type || PROMPT // WORKFLOW
+    this.type = this.$route.query.type || PROMPT //WORKFLOW
   },
   methods: {
     tabClick(type) {

@@ -9,8 +9,8 @@
       slot="title"
       class="custom-title"
     >
-      <h1>批量编辑元数据值</h1>
-      <span>[ 编辑{{ selectedDocIds.length }}个文档 ]</span>
+      <h1>{{$t('metaData.batchEdit')}}</h1>
+      <span>[ {{$t('metaData.selected')}} {{ selectedDocIds.length }} ]</span>
     </div>
     <div class="dialog-content">
       <div class="create-section">
@@ -20,7 +20,7 @@
           class="create-btn"
         >
           <i class="el-icon-plus"></i>
-          创建元数据值
+          {{$t('common.button.add')}}
         </el-button>
       </div>
 
@@ -39,7 +39,7 @@
               <label class="field-label">Key:</label>
               <el-select
                 v-model="item.metaKey"
-                placeholder="请选择"
+                :placeholder="$t('common.select.placeholder')"
                 class="field-select"
                 :disabled="item.metaId && item.metaId !== '' ? true : false"
                 @change="handleMetaKeyChange($event,item)"
@@ -54,7 +54,7 @@
             </div>
 
             <div class="field-group type-group">
-              <span class="type-label">类型:</span>
+              <span class="type-label">{{$t('knowledgeManage.meta.type')}}:</span>
               <span class="type-value">[{{ item.metaValueType }}]</span>
             </div>
 
@@ -71,20 +71,20 @@
                 closable
                 @close="handleCloseArray(item)"
               >
-                多个值
+                {{$t('knowledgeManage.meta.multipleValue')}}
               </el-tag>
               <template v-else>
                 <el-input
                   v-if="item.metaValueType === 'string'"
                   v-model="item.metaValue"
-                  placeholder="请输入"
+                  :placeholder="$t('common.input.placeholder')"
                   class="field-input"
                   @change="handleMetaValueChange(item, index)"
                 />
                 <el-input
                   v-if="item.metaValueType === 'number'"
                   v-model="item.metaValue"
-                  placeholder="请输入"
+                  :placeholder="$t('common.input.placeholder')"
                   class="field-input"
                   type="number"
                   @change="handleMetaValueChange(item, index)"
@@ -93,7 +93,7 @@
                   v-if="item.metaValueType === 'time'"
                   v-model="item.metaValue"
                   type="datetime"
-                  placeholder="请选择时间"
+                  :placeholder="$t('common.select.placeholder')"
                   class="field-input"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="timestamp"
@@ -124,10 +124,10 @@
           v-model="applyToSelected"
           class="apply-checkbox"
         >
-          应用于所有选定文档
+          {{$t('knowledgeManage.meta.applyAll')}}
         </el-checkbox>
         <el-tooltip
-          content="若勾选,则自动为所有选定文档创建或编辑元数据值;否则仅对已具有对应元数据值的文档进行编辑。"
+          :content="$t('knowledgeManage.meta.applyAllTips')"
           placement="right"
         >
           <i class="el-icon-question question-icon"></i>
@@ -142,14 +142,14 @@
       <el-button
         @click="handleClose"
         class="cancel-btn"
-      >取 消</el-button>
+      >{{ $t('common.confirm.cancel') }}</el-button>
       <el-button
         type="primary"
         @click="handleConfirm"
         class="confirm-btn"
         :loading="loading"
       >
-        确 认
+        {{ $t('common.confirm.confirm') }}
       </el-button>
     </span>
   </el-dialog>
@@ -248,9 +248,9 @@ export default {
     },
 
     removeMetaData(item, index) {
-      this.$confirm("确定要删除这条元数据吗？", "删除确认", {
-        confirmButtonText: "确定删除",
-        cancelButtonText: "取消",
+      this.$confirm(this.$t('knowledgeManage.deleteTips'), this.$t('common.confirm.title'), {
+        confirmButtonText: this.$t('common.confirm.confirm'),
+        cancelButtonText: this.$t('common.confirm.cancel'),
         type: "warning",
       })
         .then(() => {
@@ -270,7 +270,7 @@ export default {
           this.unpdateMetaApi(data, "delete");
         })
         .catch(() => {
-          this.$message.info("已取消删除");
+          this.$message.info(this.$t('common.noData'))
         });
     },
     unpdateMetaApi(data, type) {
@@ -278,7 +278,7 @@ export default {
       updateMetaData(data)
         .then((res) => {
           if (res.code === 0) {
-            this.$message.success("操作成功");
+            this.$message.success(this.$t('common.message.success'));
             this.getMetaList();
             if (type === "submit") {
               this.handleClose();
@@ -290,18 +290,18 @@ export default {
     },
     handleConfirm() {
       if (this.metaDataList.length === 0) {
-        this.$message.warning("请至少添加一个元数据值");
+        this.$message.warning(this.$t('common.noData'))
         return;
       }
 
       for (let i = 0; i < this.metaDataList.length; i++) {
         const item = this.metaDataList[i];
         if (!item.metaKey) {
-          this.$message.warning(`第${i + 1}行的Key不能为空`);
+          this.$message.warning(`${this.$t('knowledgeManage.meta.rowKey')} ${i + 1} ${this.$t('knowledgeManage.meta.rowKeyTips')}`)
           return;
         }
         if (!item.metaValue) {
-          this.$message.warning(`第${i + 1}行的Value不能为空`);
+          this.$message.warning(`${this.$t('knowledgeManage.meta.rowKey')} ${i + 1} ${this.$t('knowledgeManage.meta.rowValueTips')}`)
           return;
         }
       }
@@ -311,7 +311,7 @@ export default {
       );
 
       if (updateData.length === 0) {
-        this.$message.info("没有需要更新的数据");
+        this.$message.info(this.$t('common.noData'))
         return;
       }
       const processedUpdateData = updateData.map((item) => ({

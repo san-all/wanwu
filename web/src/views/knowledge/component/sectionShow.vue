@@ -10,7 +10,8 @@
       <!-- 父分段区域 -->
       <div class="parent-segment" v-if="parentSegment">
         <div class="segment-header">
-          <span class="parent-badge">{{segmentList.length > 0 ? '父分段' :'通用分段'}}</span>
+          <span class="parent-badge" v-if="['graph','community_report'].includes(parentSegment.contentType)">{{parentSegment.contentType === 'graph' ? '知识图谱' : '社区报告'}}</span>
+          <span class="parent-badge" v-else>{{segmentList.length > 0 ? '父分段' :'通用分段'}}</span>
           <div class="parent-score">
             <span class="score-label">命中得分:</span>
             <span class="score-value">{{ formatScore(parentSegment.score) }}</span>
@@ -21,7 +22,7 @@
       </div>
 
       <!-- 子分段区域 -->
-          <div class="sub-segments" v-if="segmentList.length > 0">
+        <div class="sub-segments" v-if="segmentList.length > 0">
         <div class="segment-header">
           <span class="sub-badge">命中{{ segmentList.length }}个子分段</span>
         </div>
@@ -77,7 +78,8 @@ export default {
         if (data.searchList) {
           this.parentSegment = {
             score: parseFloat(data.score) || 0,
-            content: data.searchList.snippet||'暂无内容'
+            content: data.searchList.snippet||'暂无内容',
+            contentType: data.searchList.contentType
           };
         }
         

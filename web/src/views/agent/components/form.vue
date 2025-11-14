@@ -78,24 +78,28 @@
     <!-- 智能体配置 -->
     <div class="agent_form">
       <div class="block prompt-box drawer-info">
-            <div class="promptTitle">
-              <h3>{{ $t('agent.form.systemPrompt') }}</h3>
-              <el-tooltip class="item" effect="dark" :content="$t('agent.form.submitToPrompt')" placement="top-start">
+        <div class="promptTitle">
+          <h3>{{ $t('agent.form.systemPrompt') }}</h3>
+          <div>
+            <el-tooltip class="item" effect="dark" :content="$t('agent.form.submitToPrompt')" placement="top-start">
               <span class="el-icon-folder-add" @click="handleShowPrompt"></span>
-              </el-tooltip>
-            </div>
-            <div class="rl" style="padding: 10px;">
-              <el-input
-                class="desc-input "
-                v-model="editForm.instructions"
-                maxlength="600"
-                :placeholder="$t('agent.form.promptTips')"
-                type="textarea"
-                show-word-limit
-                :rows="5"
-              ></el-input>
-            </div>
-            <promptTemplate ref="promptTemplate" />
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" :content="$t('tempSquare.promptOptimize')" placement="top-start">
+              <span style="margin-left: 5px" class="el-icon-s-help" @click="showPromptOptimize"></span>
+            </el-tooltip>
+          </div>
+        </div>
+        <div class="rl" style="padding: 10px;">
+          <el-input
+            class="desc-input "
+            v-model="editForm.instructions"
+            :placeholder="$t('agent.form.promptTips')"
+            type="textarea"
+            show-word-limit
+            :rows="12"
+          ></el-input>
+        </div>
+        <promptTemplate ref="promptTemplate" />
       </div>
       <div class="drawer-form">
         <div class="agnetSet">
@@ -129,7 +133,7 @@
               >
                 <el-option
                   class="model-option-item"
-                  v-for="(item, index) in modleOptions"
+                  v-for="(item) in modleOptions"
                   :key="item.modelId"
                   :value="item.modelId"
                   :label="item.displayName"
@@ -328,12 +332,14 @@
                 <span class="el-icon-question question-tips"></span>
               </el-tooltip>
             </span>
-            <span class="common-add"  @click="showSafety">
+            <span class="common-add">
+              <span @click="showSafety">
               <span class="el-icon-s-operation"></span>
               <span
                 class="handleBtn"
                 style="margin-right:10px;"
-              >{{ $t('agent.form.config') }}</span>
+              >{{ $t('agent.form.config') }}</span> 
+              </span>
               <el-switch
                 v-model="editForm.safetyConfig.enable"
                 :disabled="!(editForm.safetyConfig.tables || []).length"
@@ -362,6 +368,10 @@
               >{{ $t('agent.form.config') }}</span>
             </span>
           </p>
+        </div>
+        <!-- 知识图谱开关 -->
+        <div class="block prompt-box link-box" v-if="showGraphSwitch">
+            <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="$t('knowledgeManage.create.knowledgeGraph')" :graphSwitch="editForm.knowledgeConfig.useGraph"/>
         </div>
       </div>
       <div class="drawer-test">
@@ -416,6 +426,8 @@
     <ToolDeatail ref="toolDeatail" @updateDetail="updateDetail" />
     <!-- 提交至提示词 -->
     <createPrompt :isCustom="true" :type="promptType" ref="createPrompt" @reload="updatePrompt"/>
+    <!-- 提示词优化 -->
+    <PromptOptimize ref="promptOptimize" @promptSubmit="promptSubmit" />
     <!-- 元数据设置 -->
     <el-dialog
       :visible.sync="metaSetVisible"
@@ -476,9 +488,11 @@ import knowledgeSetDialog from "./knowledgeSetDialog";
 import { readWorkFlow } from "@/api/workflow";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
+import graphSwitch from "@/components/graphSwitch.vue"
 import promptTemplate from "./prompt/index.vue";
 import createPrompt from "@/components/createApp/createPrompt.vue"
 import knowledgeSelect from "@/components/knowledgeSelect.vue";
+import PromptOptimize from "@/components/promptOptimize.vue";
 export default {
   components: {
     LinkIcon,
@@ -493,7 +507,9 @@ export default {
     metaSet,
     ToolDeatail,
     promptTemplate,
-    createPrompt
+    createPrompt,
+    graphSwitch,
+    PromptOptimize
   },
   provide() {
     return {
@@ -581,6 +597,7 @@ export default {
           topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
           maxHistory: 0, //最长上下文
+          useGraph:false
         },
         recommendQuestion: [{ value: "" }],
         modelConfig: {
@@ -646,6 +663,11 @@ export default {
       },
     };
   },
+  computed:{
+    showGraphSwitch() {
+      return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
+    }
+  },
   mounted() {
     this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
@@ -675,11 +697,24 @@ export default {
   },
   methods: {
     ...mapActions("app", ["setMaxPicNum","clearMaxPicNum"]),
+    graphSwitchchange(val){
+      this.editForm.knowledgeConfig.useGraph = val;
+    },
     updatePrompt(){
         this.$refs.promptTemplate.getPromptTemplateList()
     },
     handleShowPrompt(){
-      this.$refs.createPrompt.openDialog();
+      this.$refs.createPrompt.openDialog({prompt: this.editForm.instructions});
+    },
+    showPromptOptimize() {
+      if (!this.editForm.instructions) {
+        this.$message.warning(this.$t('tempSquare.promptOptimizeHint'))
+        return
+      }
+      this.$refs.promptOptimize.openDialog({prompt: this.editForm.instructions})
+    },
+    promptSubmit(prompt) {
+      this.editForm.instructions = prompt
     },
     getPrompt(prompt){
       this.editForm.instructions = prompt;

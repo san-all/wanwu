@@ -1,31 +1,31 @@
 <template>
   <el-dialog
-    :title="$t('knowledgeManage.create.createChunk')"
+    :title="title"
     :visible.sync="dialogVisible"
-    width="40%"
+    width="50%"
     :before-close="handleClose"
   >
     <el-form
       :model="ruleForm"
       ref="ruleForm"
-      label-width="100px"
+      label-width="120px"
       class="demo-ruleForm"
     >
-      <el-form-item
+      <!-- <el-form-item
         class="itemCenter"
-        v-if="!isChildChunk"
       >
         <el-radio-group
           v-model="createType"
           @input="typeChange($event)"
+          v-if="type === 'add'"
         >
           <el-radio-button :label="'single'">{{$t('knowledgeManage.create.single')}}</el-radio-button>
           <el-radio-button :label="'file'">{{$t('knowledgeManage.create.file')}}</el-radio-button>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item
         :label="$t('knowledgeManage.create.file')"
-        v-if="createType === 'file' && !isChildChunk"
+        v-if="createType === 'file'"
         prop="fileUploadId"
         :rules="[{ required: true, message: $t('common.input.placeholder'), trigger: 'blur' }]"
       >
@@ -36,51 +36,32 @@
           :accept="accept"
         />
       </el-form-item>
-      <template v-if="createType === 'single' || isChildChunk">
+      <template v-if="createType === 'single'">
         <el-form-item
-          :label="$t('knowledgeManage.create.chunkContent')"
-          prop="content"
-          :rules="[{ required: true, message: $t('knowledgeManage.create.chunkContentPlaceholder'), trigger: 'blur' }]"
+          :label="$t('knowledgeManage.create.title')"
+          prop="title"
+          :rules="[{ required: true, message: $t('knowledgeManage.create.titlePlaceholder'), trigger: 'blur' }]"
         >
           <el-input
-            :placeholder="$t('knowledgeManage.create.chunkContentPlaceholder')"
-            v-model="ruleForm.content"
-            type="textarea"
-            :rows="4"
+            :placeholder="$t('knowledgeManage.create.titlePlaceholder')"
+            v-model="ruleForm.title"
+            maxlength="100"
+            show-word-limit
           ></el-input>
         </el-form-item>
         <el-form-item
-          :label="$t('knowledgeManage.create.chunkKeywords')"
-          prop="labels"
-          v-if="!isChildChunk"
+          :label="$t('knowledgeManage.create.content')"
+          prop="content"
+          :rules="[{ required: true, message: $t('knowledgeManage.create.contentPlaceholder'), trigger: 'blur' }]"
         >
-          <el-tag
-            :key="tag"
-            v-for="(tag,index) in ruleForm.labels"
-            closable
-            :disable-transitions="false"
-            @close="handleTagClose(index)"
-          >
-            {{tag}}
-          </el-tag>
           <el-input
-            class="input-new-tag"
-            v-if="inputVisible"
-            v-model="inputValue"
-            ref="saveTagInput"
-            size="small"
-            @keyup.enter.native="handleInputConfirm"
-            @blur="handleInputConfirm"
-          >
-          </el-input>
-          <el-button
-            v-else
-            class="button-new-tag"
-            size="small"
-            @click="showInput"
-          >+ {{$t('knowledgeManage.create.chunkKeywords')}}</el-button>
+            :placeholder="$t('knowledgeManage.create.contentPlaceholder')"
+            v-model="ruleForm.content"
+            type="textarea"
+            :rows="6"
+          ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('knowledgeManage.create.typeTitle')">
+        <el-form-item :label="$t('knowledgeManage.create.typeTitle')" v-if="type === 'add'">
           <el-checkbox-group v-model="checkType">
             <el-checkbox
               label="more"
@@ -104,8 +85,8 @@
   </el-dialog>
 </template>
 <script>
+import { createBatchCommunityReport,createCommunityReport,editCommunityReportList} from "@/api/knowledge";
 import fileUpload from "@/components/fileUpload";
-import {USER_API} from "@/utils/requestConstants"
 import {
   createSegment,
   createBatchSegment,
@@ -113,43 +94,33 @@ import {
 } from "@/api/knowledge";
 export default {
   components: { fileUpload },
-  props: {
-    parentId: {
-      type: String,
-      default: ""
-    }
-  },
   data() {
     return {
       btnLoading: false,
       accept: ".csv",
       checkType: [],
-      inputVisible: false,
-      inputValue: "",
       createType: "single",
       ruleForm: {
         content: "",
-        docId: "",
-        labels: [],
-        fileUploadId: "",
+        knowledgeId: "",
+        title: "",
+        fileUploadId:"",
+        contentId: ""
       },
+      type:'add',
       dialogVisible: false,
-      templateUrl: `${USER_API}/static/docs/segment.csv`,
-      isChildChunk: false,
+      templateUrl: "/user/api/v1/static/docs/segment.csv",
+      title: ""
     };
   },
   methods: {
     typeChange(val) {
-      if (this.isChildChunk) {
-        this.createType = "single";
-        return;
-      }
       if (val === "single") {
         this.ruleForm.fileUploadId = "";
-        this.$refs.fileUpload.clearFileList();
+        this.$refs.fileUpload && this.$refs.fileUpload.clearFileList();
       } else {
         this.clearForm();
-        this.$refs.ruleForm.clearValidate();
+        this.$refs.ruleForm && this.$refs.ruleForm.clearValidate();
       }
     },
     uploadFile(fileUploadId) {
@@ -158,32 +129,29 @@ export default {
     handleClose() {
       this.dialogVisible = false;
     },
-    showDiglog(docId, isChildChunk = false) {
-      this.dialogVisible = true;
-      this.isChildChunk = isChildChunk;
-      this.ruleForm.docId = docId;
-      this.clearForm();
-    },
-    showInput() {
-      this.inputVisible = true;
-      this.$nextTick((_) => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
-    },
-    handleTagClose(index) {
-      this.ruleForm.labels.splice(index, 1);
-    },
-    handleInputConfirm() {
-      if (this.inputValue) {
-        this.ruleForm.labels.push(this.inputValue);
-        this.inputVisible = false;
-        this.inputValue = "";
+    showDialog(knowledgeId, type = "", item = null) {
+      this.type = type;
+      if (type === 'edit') {
+        this.title = this.$t('knowledgeManage.communityReport.viewDetail');
+        this.dialogVisible = true;
+        this.ruleForm.knowledgeId = knowledgeId;
+        if (item) {
+          this.ruleForm.content = item.content || "";
+          this.ruleForm.title = item.title || "";
+          this.ruleForm.contentId = item.contentId || "";
+          this.createType = "single";
+        } else {
+          this.clearForm();
+        }
       } else {
-        this.$message.warning(this.$t('knowledgeManage.create.chunkKeywordsPlaceholder'));
+        this.title = this.$t('knowledgeManage.communityReport.addCommunityReport');
+        this.dialogVisible = true;
+        this.ruleForm.knowledgeId = knowledgeId;
+        this.clearForm();
       }
     },
     submit(formName) {
-      if (this.createType === "single" || this.isChildChunk) {
+      if (this.createType === "single") {
         this.handleSingle(formName);
       } else {
         this.handleFile();
@@ -193,49 +161,43 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.btnLoading = true;
-          if (this.isChildChunk) {
-            this.createChildChunk();
-          } else {
-            this.createParentChunk();
+          if(this.type === 'add'){
+            this.createCommunityReport()
+          }else{
+            this.editCommunityReportList()
           }
+          
         } else {
           return false;
         }
       });
     },
-    createParentChunk() {
-      const data = this.isChildChunk
-        ? { content: this.ruleForm.content, docId: this.ruleForm.docId }
-        : {
-            content: this.ruleForm.content,
-            docId: this.ruleForm.docId,
-            labels: this.ruleForm.labels,
-          };
-      createSegment(data)
-        .then((res) => {
-          if (res.code === 0) {
-            this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
-            if (!this.checkType.length) {
-              this.dialogVisible = false;
-              this.$emit("updateDataBatch");
-            } else {
-              this.clearForm();
-              this.$emit("updateData");
-            }
-            this.btnLoading = false;
-          }
-        })
-        .catch(() => {
-          this.btnLoading = false;
-        });
-    },
-    createChildChunk() {
-      const data = {
-        content: [this.ruleForm.content],
-        docId: this.ruleForm.docId,
-        parentId: this.parentId
+    editCommunityReportList(){
+       const data = {
+        content: this.ruleForm.content,
+        knowledgeId: this.ruleForm.knowledgeId,
+        title: this.ruleForm.title,
+        contentId: this.ruleForm.contentId
       };
-      createSegmentChild(data).then((res) => {
+      editCommunityReportList(data).then(res =>{
+        if(res.code === 0){
+          this.$message.success(this.$t('knowledgeManage.create.editSuccess'));
+          this.clearForm();
+          this.$emit("refreshData");
+          this.dialogVisible = false;
+          this.btnLoading = false;
+        }
+      }).catch(() => {
+        this.btnLoading = false;
+      })
+    },
+    createCommunityReport() {
+      const data = {
+        content: this.ruleForm.content,
+        knowledgeId: this.ruleForm.knowledgeId,
+        title: this.ruleForm.title
+      };
+      createCommunityReport(data).then((res) => {
         if (res.code === 0) {
             this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
             if (!this.checkType.length) {
@@ -243,7 +205,7 @@ export default {
             } else {
               this.clearForm();
             }
-            this.$emit("updateChildData");
+            this.$emit("refreshData");
             this.btnLoading = false;
           }
       }).catch(() => {
@@ -254,15 +216,15 @@ export default {
       this.btnLoading = true;
       const data = {
         fileUploadId: this.ruleForm.fileUploadId,
-        docId: this.ruleForm.docId,
+        knowledgeId: this.ruleForm.knowledgeId,
       };
-      createBatchSegment(data)
+      createBatchCommunityReport(data)
         .then((res) => {
           if (res.code === 0) {
             this.$message.success(this.$t('knowledgeManage.create.createSuccess'));
             this.dialogVisible = false;
             this.btnLoading = false;
-            this.$emit("updateDataBatch");
+            this.$emit("refreshData");
           }
         })
         .catch(() => {
@@ -271,9 +233,9 @@ export default {
     },
     clearForm() {
       this.ruleForm.content = "";
-      if (!this.isChildChunk) {
-        this.ruleForm.labels = [];
-      }
+      this.ruleForm.title = "";
+      this.ruleForm.fileUploadId = "";
+      this.ruleForm.contentId = "";
       this.checkType = [];
     },
   },

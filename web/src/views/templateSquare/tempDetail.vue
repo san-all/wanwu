@@ -13,6 +13,14 @@
         </p>
         <p v-else class="desc">{{detail.desc}}</p>
       </div>
+      <div>
+        <el-button type="primary" size="mini" @click="copyTemplate(detail)">
+          {{$t('tempSquare.copy')}}
+        </el-button>
+        <el-button type="primary" size="mini" @click="downloadTemplate(detail)">
+          {{$t('tempSquare.download')}}
+        </el-button>
+      </div>
     </div>
     <div class="tempSquare-main">
       <div class="left-info">
@@ -65,14 +73,17 @@
         </div>
       </div>
     </div>
+    <CreateWorkflow type="clone" ref="cloneWorkflowDialog" />
   </div>
 </template>
 <script>
 import { md } from '@/mixins/marksown-it'
-import { getWorkflowRecommendsList, getWorkflowTempInfo } from "@/api/templateSquare"
+import { downloadWorkflow, getWorkflowRecommendsList, getWorkflowTempInfo } from "@/api/templateSquare"
 import { WORKFLOW } from "./constants"
+import CreateWorkflow from "@/components/createApp/createWorkflow.vue"
 
 export default {
+  components: { CreateWorkflow },
   data() {
     return {
       basePath: this.$basePath,
@@ -127,6 +138,20 @@ export default {
         this.recommendList = res.data.list || []
       })
     },
+    copyTemplate(item) {
+      this.$refs.cloneWorkflowDialog.openDialog(item)
+    },
+    downloadTemplate(item) {
+      downloadWorkflow({ templateId : item.templateId }).then(response => {
+        const blob = new Blob([response], { type: response.type })
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a")
+        link.href = url
+        link.download = item.name + '.json'
+        link.click()
+        window.URL.revokeObjectURL(link.href)
+      })
+    },
     getPath() {
       return this.isPublic ? '/public/templateSquare' : '/templateSquare'
     },
@@ -175,7 +200,7 @@ export default {
     }
     .info{
       position: relative;
-      width: 1240px;
+      width: calc(100% - 200px);
       margin-left: 15px;
       .name{
         font-size: 16px;
