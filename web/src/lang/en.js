@@ -510,7 +510,7 @@ export default {
         promptDesc: '提示词模板描述',
         namePlaceholder: '输入提示词名称，仅支持中文、英文、数字、下划线、中划线、英文（.）',
         descPlaceholder: '输入提示词描述',
-        promptPlaceholder: '输入提示词',
+        promptPlaceholder: '请输入提示词模板内容，变量可用{}输入',
         promptText: '提示词',
         nameRules: '请填写提示词名称',
         descRules: '请填写提示词描述',
