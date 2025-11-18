@@ -14,7 +14,7 @@ func Schema2ProtocolTools(ctx context.Context, schema []byte) ([]*protocol.Tool,
 		return nil, err
 	}
 	var rets []*protocol.Tool
-	for _, pathItem := range doc.Paths.Map() {
+	for _, pathItem := range doc.Paths {
 		for _, operation := range pathItem.Operations() {
 			rets = append(rets, Operation2ProtocolTool(operation))
 		}
@@ -32,7 +32,7 @@ func Schema2ProtocolTool(ctx context.Context, schema []byte, operationID string)
 
 func Doc2ProtocolTools(doc *openapi3.T) ([]*protocol.Tool, error) {
 	var rets []*protocol.Tool
-	for _, pathItem := range doc.Paths.Map() {
+	for _, pathItem := range doc.Paths {
 		for _, operation := range pathItem.Operations() {
 			rets = append(rets, Operation2ProtocolTool(operation))
 		}
@@ -43,7 +43,7 @@ func Doc2ProtocolTools(doc *openapi3.T) ([]*protocol.Tool, error) {
 func Doc2ProtocolTool(doc *openapi3.T, operationID string) (*protocol.Tool, error) {
 	var exist bool
 	var ret *protocol.Tool
-	for _, pathItem := range doc.Paths.Map() {
+	for _, pathItem := range doc.Paths {
 		for _, operation := range pathItem.Operations() {
 			if operation.OperationID != operationID {
 				continue
@@ -189,25 +189,23 @@ func ParameterType2ProtocolDataType(param *openapi3.Parameter) protocol.DataType
 
 // SchemaType2ProtocolDataType 获取 schema 的类型
 func SchemaType2ProtocolDataType(schema *openapi3.Schema) protocol.DataType {
-	if schema.Type != nil {
+	if schema.Type != "" {
 		// 检查类型切片中的具体类型
-		if schema.Type.Is("object") {
+		switch schema.Type {
+		case openapi3.TypeObject:
 			return protocol.ObjectT
-		} else if schema.Type.Is("array") {
+		case openapi3.TypeArray:
 			return protocol.Array
-		} else if schema.Type.Is("string") {
+		case openapi3.TypeString:
 			return protocol.String
-		} else if schema.Type.Is("number") {
+		case openapi3.TypeNumber:
 			return protocol.Number
-		} else if schema.Type.Is("integer") {
+		case openapi3.TypeInteger:
 			return protocol.Integer
-		} else if schema.Type.Is("boolean") {
+		case openapi3.TypeBoolean:
 			return protocol.Boolean
-		}
-
-		// 如果有多个类型，返回第一个
-		if len(*schema.Type) > 0 {
-			return protocol.DataType((*schema.Type)[0])
+		default:
+			return protocol.Null
 		}
 	}
 

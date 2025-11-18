@@ -156,7 +156,7 @@ func openapiSchema2ToolActionInputsAndOutputs4Workflow(ctx context.Context, sche
 	}
 	var exist bool
 	var inputs, outputs []interface{}
-	for _, pathItem := range doc.Paths.Map() {
+	for _, pathItem := range doc.Paths {
 		for _, operation := range pathItem.Operations() {
 			if operation.OperationID != operationID {
 				continue
@@ -200,7 +200,7 @@ func openapiOperation2ToolActionOutputs4Workflow(operation *openapi3.Operation) 
 
 	var responseRef *openapi3.ResponseRef
 	// 优先查找 200 响应
-	for statusCode, currResponseRef := range operation.Responses.Map() {
+	for statusCode, currResponseRef := range operation.Responses {
 		if strings.HasPrefix(statusCode, "2") {
 			responseRef = currResponseRef
 			break
@@ -208,7 +208,7 @@ func openapiOperation2ToolActionOutputs4Workflow(operation *openapi3.Operation) 
 	}
 	// 如果没有2开头的响应，使用第一个可用的响应
 	if responseRef == nil {
-		for _, currResponseRef := range operation.Responses.Map() {
+		for _, currResponseRef := range operation.Responses {
 			responseRef = currResponseRef
 			break
 		}
@@ -321,25 +321,23 @@ func openapiParameterType4Workflow(param *openapi3.Parameter) string {
 
 // openaiSchemaType4Workflow 获取 schema 的类型
 func openaiSchemaType4Workflow(schema *openapi3.Schema) string {
-	if schema.Type != nil {
+	if schema.Type != "" {
 		// 检查类型切片中的具体类型
-		if schema.Type.Is("object") {
+		switch schema.Type {
+		case openapi3.TypeObject:
 			return "object"
-		} else if schema.Type.Is("array") {
+		case openapi3.TypeArray:
 			return "list"
-		} else if schema.Type.Is("string") {
+		case openapi3.TypeString:
 			return "string"
-		} else if schema.Type.Is("number") {
+		case openapi3.TypeNumber:
 			return "float"
-		} else if schema.Type.Is("integer") {
+		case openapi3.TypeInteger:
 			return "integer"
-		} else if schema.Type.Is("boolean") {
+		case openapi3.TypeBoolean:
 			return "boolean"
-		}
-
-		// 如果有多个类型，返回第一个
-		if len(*schema.Type) > 0 {
-			return string((*schema.Type)[0])
+		default:
+			return "null"
 		}
 	}
 

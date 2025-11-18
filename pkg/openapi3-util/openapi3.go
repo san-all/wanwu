@@ -44,7 +44,7 @@ func ValidateDoc(ctx context.Context, doc *openapi3.T) error {
 		return errors.New("schema servers empty")
 	}
 	// check operationId
-	for path, pathItem := range doc.Paths.Map() {
+	for path, pathItem := range doc.Paths {
 		for method, operation := range pathItem.Operations() {
 			if operation.OperationID == "" {
 				return fmt.Errorf("schema path(%v) method(%v) operationId empty", path, method)
@@ -65,7 +65,7 @@ func FilterSchemaOperations(ctx context.Context, data []byte, operationIDs []str
 func FilterDocOperations(doc *openapi3.T, operationIDs []string) *openapi3.T {
 	paths := doc.Paths
 	doc.Paths = nil
-	for path, pathItem := range paths.Map() {
+	for path, pathItem := range paths {
 		for method, operation := range pathItem.Operations() {
 			if slices.Contains(operationIDs, operation.OperationID) {
 				doc.AddOperation(path, method, operation)

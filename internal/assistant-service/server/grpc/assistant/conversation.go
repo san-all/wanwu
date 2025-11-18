@@ -899,7 +899,7 @@ func (s *Service) buildToolPluginListAlgParam(ctx context.Context, sseReq *confi
 				} else {
 					if len(doc.Servers) > 0 {
 						serverURL := doc.Servers[0].URL
-						for path := range doc.Paths.Map() {
+						for path := range doc.Paths {
 							sseReq.SearchUrl = serverURL + path
 							break
 						}

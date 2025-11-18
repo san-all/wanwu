@@ -35,7 +35,7 @@ func (tool *McpTool) Update(ctx context.Context, name, desc string) (*McpTool, e
 	paths := doc.Paths
 	doc.Paths = nil
 	var exist bool
-	for path, pathItem := range paths.Map() {
+	for path, pathItem := range paths {
 		for method, operation := range pathItem.Operations() {
 			if operation.OperationID == tool.tool.Name {
 				operation.OperationID = name
@@ -107,7 +107,7 @@ func genMcpToolHandler(doc *openapi3.T, auth *openapi3_util.Auth, operationID st
 
 		// operation
 		var operation *openapi3.Operation
-		for _, pathItem := range doc.Paths.Map() {
+		for _, pathItem := range doc.Paths {
 			for _, op := range pathItem.Operations() {
 				if op.OperationID == operationID {
 					operation = op

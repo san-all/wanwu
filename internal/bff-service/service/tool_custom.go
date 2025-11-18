@@ -151,7 +151,7 @@ func GetCustomToolActions(ctx *gin.Context, userID, orgID string, req request.Cu
 
 func openapiSchema2ToolList(doc *openapi3.T) []response.CustomToolActionInfo {
 	var list []response.CustomToolActionInfo
-	for path, pathItem := range doc.Paths.Map() {
+	for path, pathItem := range doc.Paths {
 		for method, operation := range pathItem.Operations() {
 			list = append(list, response.CustomToolActionInfo{
 				Name:   operation.OperationID,

@@ -59,7 +59,7 @@ func NewClientByDoc(doc *openapi3.T) *Client {
 func (c *Client) DoRequestByMethodPath(ctx context.Context, method, path string, params *RequestParams) (interface{}, error) {
 	var exist bool
 	contentType := "application/json"
-	for currPath, pathItem := range c.doc.Paths.Map() {
+	for currPath, pathItem := range c.doc.Paths {
 		if currPath != path {
 			continue
 		}
@@ -92,7 +92,7 @@ func (c *Client) DoRequestByMethodPath(ctx context.Context, method, path string,
 
 func (c *Client) DoRequestByOperationID(ctx context.Context, operationID string, params *RequestParams) (interface{}, error) {
 	var baseURL, method, path, contentType string
-	for currPath, pathItem := range c.doc.Paths.Map() {
+	for currPath, pathItem := range c.doc.Paths {
 		for currMethod, operation := range pathItem.Operations() {
 			if operation.OperationID == operationID {
 				method = currMethod
