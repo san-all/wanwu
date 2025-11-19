@@ -1499,9 +1499,6 @@ export default {
           overflow-y: auto;
           .action-list {
             width: 100%;
-            // display: grid;
-            // grid-template-columns: repeat(2, minmax(0, 1fr));
-            // gap: 10px;
           }
         }
       }

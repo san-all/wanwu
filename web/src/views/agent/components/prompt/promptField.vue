@@ -2,9 +2,20 @@
 <template>
   <div class="compare-container">
     <div class="compare-top">
-      <div class="block prompt-box drawer-info">
+      <div class="drawer-info">
         <div class="promptTitle">
-          <h3>{{ $t('agent.form.systemPrompt') }}</h3>
+          <div style="display: flex; align-items: center;">
+            <h3>{{ fieldIndex === 0 ? $t('agent.form.systemPrompt') : $t('tempSquare.comparePrompt')}}</h3>
+            <el-button :type="checkPrompt ? 'primary' : 'default'" size="mini" @click="handleSelectPrompt">
+              <span v-if="!checkPrompt">
+                <span>{{$t('tempSquare.select')}}</span>
+              </span>
+              <span v-else>
+                <i class="el-icon-check" style="margin-right:4px;"></i>
+                <span>{{$t('tempSquare.selected')}}</span>
+              </span>
+            </el-button>
+          </div>
           <div class="prompt-title-icon">
             <el-tooltip
               class="item"
@@ -25,12 +36,11 @@
             <el-tooltip
               class="item"
               effect="dark"
-              :content="$t('tempSquare.promptCompare')"
+              :content="$t('tempSquare.closePrompt')"
               placement="top-start"
+              v-if="fieldIndex > 0"
             >
-              <span class="tool-icon" @click="showPromptCompare">
-                <img :src="require('@/assets/imgs/temp-compare.png')" />
-              </span>
+              <span class="el-icon-close tool-icon" @click="handleClosePrompt"></span>
             </el-tooltip>
           </div>
         </div>
@@ -47,58 +57,132 @@
       </div>
     </div>
     <div class="compare-bottom">
-      <div class="compare-bottom-title">调试预览</div>
       <div class="compare-bottom-content">
         <div v-show="echo" class="session rl echo">
-            <Prologue  :editForm="editForm" @setProloguePrompt="setProloguePrompt" :isBigModel="true" />
+            <Prologue  :editForm="editForm" @setProloguePrompt="setProloguePrompt" :isBigModel="true" :sessionItemWidth="sessionItemWidth" />
         </div>
         <!--对话-->
         <div v-show="!echo" class="center-session">
             <SessionComponentSe
-                    ref="session-com"
+                    ref="sessionComLocal"
                     class="component"
                     :sessionStatus="sessionStatus"
                     @clearHistory="clearHistory"
                     @refresh="refresh"
                     :type="type"
                     @queryCopy="queryCopy"
-                    :defaultUrl="editForm.avatar.path"
+                    :defaultUrl="editForm && editForm.avatar&& editForm.avatar.path"
             />
-            </div>
+        </div>
         </div>
     </div>
+    <!-- 提示词优化 -->
+    <PromptOptimize ref="promptOptimize" @promptSubmit="promptSubmit" />
+    <!-- 提交至提示词 -->
+    <createPrompt :isCustom="true" :type="promptType" ref="createPrompt" />
   </div>
 </template>
 
 <script>
-import Prologue from '../Prologue.vue'
-import SessionComponentSe from '../SessionComponentSe.vue'
-
+import Prologue from '../Prologue.vue';
+import SessionComponentSe from '../SessionComponentSe.vue';
+import PromptOptimize from "@/components/promptOptimize.vue";
+import createPrompt from "@/components/createApp/createPrompt.vue";
+import sseMethodMixin from '@/mixins/sseMethod'
 export default {
-  name: 'PromptCompare',
+  name: 'PromptCompareField',
+  mixins: [sseMethodMixin],
+  props: {
+    fieldIndex: {
+      type: Number,
+      default: 0
+    },
+    editForm:{
+      typeof:Object,
+      default:null
+    }
+  },
   components: {
     Prologue,
-    SessionComponentSe
+    SessionComponentSe,
+    PromptOptimize,
+    createPrompt
+  },
+  watch:{
+    fieldIndex:{
+      handler(newVal){
+        if(newVal === 0){
+          this.systemPrompt = this.editForm.instructions;
+        }
+      },
+      immediate: true
+    }
   },
   data() {
     return {
+      checkPrompt: false,
+      promptType: 'create',
+      sessionItemWidth:'19vw',
       systemPrompt: '',
       echo: true,
-      editForm: {
-        avatar: { path: '' }
-      },
-      sessionStatus: 0,
-      type: 'agent'
+      sessionStatus: -1,
+      type: 'agentChat',
+      fieldId: 'prompt-field-' + this._uid
+    }
+  },
+  mounted() {
+    var currentSession = this.$refs.sessionComLocal
+    if (currentSession) {
+      this.$refs['session-com'] = currentSession
     }
   },
   methods: {
-    handleShowPrompt() {},
-    showPromptOptimize() {},
+    runPrompt(promptText) {
+      var sessionCom = this.$refs.sessionComLocal
+      if (!sessionCom || typeof sessionCom.getList !== 'function') return
+
+      var historyList = sessionCom.getList()
+      var lastIndex = Array.isArray(historyList) ? historyList.length : 0
+
+      this.setSseParams({
+        assistantId: this.editForm && this.editForm.assistantId,
+        conversationId: sessionCom.getConversationId ? sessionCom.getConversationId() : '',
+        fieldId: this.fieldId,
+        systemPrompt: this.systemPrompt
+      })
+
+      this.sendEventSource(promptText, '', lastIndex)
+    },
+    clearHistory() {
+      this.stopEventSource()
+      if (this.$refs.sessionComLocal && typeof this.$refs.sessionComLocal.clearData === 'function') {
+        this.$refs.sessionComLocal.clearData()
+      }
+    },
+    handleShowPrompt() {
+      this.$refs.createPrompt.openDialog({prompt: this.systemPrompt});
+    },
+    showPromptOptimize() {
+      if (!this.systemPrompt) {
+        this.$message.warning(this.$t('tempSquare.promptOptimizeHint'))
+        return
+      }
+      this.$refs.promptOptimize.openDialog({prompt: this.systemPrompt});
+    },
     showPromptCompare() {},
     setProloguePrompt() {},
     clearHistory() {},
     refresh() {},
-    queryCopy() {}
+    queryCopy() {},
+    handleClosePrompt() {
+      this.$emit('closePrompt',this.fieldIndex);
+    },
+     promptSubmit(prompt) {
+      this.systemPrompt= prompt;
+    },
+    handleSelectPrompt(){
+      this.checkPrompt = !this.checkPrompt;
+    }
   }
 }
 </script>
@@ -108,31 +192,31 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
   box-sizing: border-box;
+  background: #f2f7ff8f;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+}
+.compare-container:hover {
+  border: 1px solid $color;
 }
 
 .compare-top {
   flex: 2;
-  min-height: 20%;
 }
-
 .compare-bottom {
   flex: 8;
-  margin-top: 20px;
-  border-radius: 8px;
 }
-
 .compare-bottom-title {
   font-size: 16px;
   font-weight: 600;
-  padding: 12px 20px;
+  padding: 10px;
 }
 
 .compare-bottom-content {
-  height: calc(100% - 49px);
+  height:100%;
   overflow: auto;
-  padding: 16px;
+  padding:0 10px;
   box-sizing: border-box;
 }
 
@@ -140,12 +224,6 @@ export default {
 .compare-bottom-content .center-session {
   height: 100%;
 }
-
-.block {
-  border-radius: 8px;
-  padding: 10px 20px;
-}
-
 .drawer-info {
   height: 100%;
   display: flex;
@@ -160,6 +238,12 @@ export default {
   h3 {
     font-size: 16px;
     font-weight: 800;
+    margin-right: 6px;
+  }
+  /deep/.el-button--mini, .el-button--mini.is-round {
+    font-size: 12px;
+    height: 24px;
+    padding: 0 10px;
   }
 }
 
@@ -200,5 +284,6 @@ export default {
   border: 1px solid #d3d7dd !important;
   padding: 15px;
 }
+
 </style>
 

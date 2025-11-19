@@ -40,6 +40,8 @@ export default {
             access_token:'',
             runResponse: "",
             fileList: [],  // 文件列表
+            instanceSessionStatus: -1,
+            sessionComRef: null,
         };
     },
     created() {
@@ -182,7 +184,11 @@ export default {
             this.setStoreSessionStatus(status)
         },
         setSseParams(data) {
-            this.sseParams = data
+            // this.sseParams = data
+            this.sseParams = data ? Object.assign({}, data) : {}
+            if (data && data.sessionComRef) {
+                this.sessionComRef = data.sessionComRef
+            }
         },
         doragSend(){
             this.stopBtShow = true
@@ -350,6 +356,11 @@ export default {
         },
         sendEventSource(prompt, msgStr, lastIndex) {
             console.log('####  sendEventSource',new Date().getTime())
+            let sessionCom = this.sessionComRef || this.$refs['session-com']
+            if (!sessionCom) {
+                console.warn('[sseMethod] session-com ref missing')
+                return
+            }
             const userInfo = this.$store.state.user.userInfo || {}
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
@@ -371,8 +382,9 @@ export default {
                 pendingResponse:''
             }
             //正式环境传模型参数
-            this.$refs['session-com'].pushHistory(params)
-            
+            // this.$refs['session-com'].pushHistory(params)
+            sessionCom.pushHistory(params)
+
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
@@ -495,7 +507,8 @@ export default {
                                                     ...commonData,
                                                     "response":i18n.t('yuanjing.sensitiveTips')
                                                 }
-                                                this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                                                // this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                                                sessionCom.replaceLastData(lastIndex, fillData)
                                             }
                                             this.setStoreSessionStatus(-1)
                                         }
@@ -505,7 +518,8 @@ export default {
                                     })
 
                             this.$nextTick(()=>{
-                                this.$refs['session-com'].scrollBottom()
+                                // this.$refs['session-com'].scrollBottom()
+                                sessionCom.scrollBottom()
                             })
 
                         }else if(data.code === 7 || data.code === -1 || data.code === 1){
@@ -514,7 +528,8 @@ export default {
                                 ...commonData,
                                 "response": data.message                               
                             }
-                            this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                            // this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                            sessionCom.replaceLastData(lastIndex, fillData)
                         }
                     }
                 },

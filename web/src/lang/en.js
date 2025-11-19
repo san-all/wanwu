@@ -542,7 +542,13 @@ export default {
         promptOptimizeHint: '请填写提示词后，再进行提示词优化',
         optimize: '优化',
         replace: '替换',
-        promptCompare: '提示词对比'
+        promptCompare: '提示词对比',
+        addPrompt: '增加提示词',
+        closePrompt: '关闭提示词',
+        selected:'已选择',
+        select:'选这个',
+        promptCompareLimit: '最多可添加4个提示词',
+        comparePrompt:'对比提示词'
     },
 
     // 工作流/对话流
@@ -860,12 +866,17 @@ export default {
             segmentTotalNum:"社区报告数量",
             communityReport:"社区报告",
             uploadTime:"生成时间",
-            segmentType:"状态",
+            segmentType:"社区报告生成状态",
+            lastImportStatus:"批量新增社区报告状态",
             generate:"生成",
             addCommunityReport:"新增社区报告",
             deleteSuccess:"删除成功",
             generateSuccess:"已开始生成",
-            viewDetail:"详情查看"
+            viewDetail:"详情查看",
+            taskPending:"任务待处理",
+            taskProcessing:"任务导入中",
+            taskFinished:"任务完成",
+            taskFailed:"任务失败",
         },
         meta:{
             batchEdit:'批量编辑元数据值',

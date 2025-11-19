@@ -2,11 +2,11 @@
 <template>
     <div class="history-box">
         <div class="session-answer" >
-            <div :class="['session-item','rl']">
-                <img class="logo" :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
+            <div :class="['session-item','rl']" :style="{ width: sessionItemWidth?sessionItemWidth:'600px' }">
+                <img class="logo" :src="editForm && editForm.avatar && editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
                 <div class="answer-content">
-                    <p class="name">{{editForm.name || '无信息'}}</p>
-                    <p class="systemPrompt">{{editForm.prologue || ''}}</p>
+                    <p class="name">{{editForm && editForm.name || '无信息'}}</p>
+                    <p class="systemPrompt">{{editForm && editForm.prologue || ''}}</p>
                     <div class="recommend">
                         <template v-if="recommendQuestion.length > 0">
                             <p class="recommend-p" 
@@ -27,7 +27,33 @@
 </template>
 <script>
     export default {
-        props:['basicForm','expandForm','isBigModel',"editForm"],
+        props:{
+            basicForm: {
+                type: Object,
+                default: () => ({})
+            },
+            expandForm: {
+                type: Object,
+                default: () => ({})
+            },
+            isBigModel: {
+                type: Boolean,
+                default: false
+            },
+            sessionItemWidth: {
+                type: [String, Number],
+                default: '600px'
+            },
+            editForm: {
+                type: Object,
+                default: () => ({
+                    avatar: { path: '' },
+                    name: '',
+                    prologue: '',
+                    recommendQuestion: []
+                })
+            }
+        },
         data(){
             return{
                 basePath: this.$basePath,

@@ -24,26 +24,8 @@ export default {
       const wrap = this.$el && this.$el.querySelector ? this.$el.querySelector(containerSelector) : null
       if (!wrap) return () => {}
 
-      let dragCounter = 0
-
-      const addDroppingClass = () => {
-        if (dragCounter === 0) {
-          wrap.classList.add('is-dropping')
-        }
-        dragCounter++
-      }
-
-      const removeDroppingClass = () => {
-        dragCounter--
-        if (dragCounter === 0) {
-          wrap.classList.remove('is-dropping')
-        }
-      }
-
-      const prevent = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }
+      const prevent = (e) => { e.preventDefault(); e.stopPropagation(); wrap.classList.add('is-dropping'); }
+      const leave = () => { wrap.classList.remove('is-dropping');}
       
       // 判断文件是否为图片类型
       const isImageFile = (f) => {
@@ -54,14 +36,12 @@ export default {
       }
       
       const onDrop = (e) => {
-        prevent(e)
+        e.preventDefault();
         try {
           const dt = e && e.dataTransfer
           const fileList = (dt && dt.files) ? dt.files : []
           const rawFiles = Array.prototype.slice.call(fileList)
-          if (!rawFiles.length) {
-            return
-          }
+          if (!rawFiles.length) return
 
           // 安全限制：数量/大小/类型白名单
           const maxImageFiles = Number(opt.maxImageFiles || opt.maxFiles || 3) // 图片类型文件的最大数量
@@ -157,9 +137,7 @@ export default {
             }
           }
 
-          if (!safeFiles.length) {
-            return
-          }
+          if (!safeFiles.length) return
 
           // 覆盖前释放旧的 ObjectURL，避免内存泄漏
           try {
@@ -172,42 +150,23 @@ export default {
             }
           } catch(err) {}
 
-          // 调用 onFiles 回调
           if (typeof onFiles === 'function') {
-            try {
-              onFiles(safeFiles, { event: e, wrap })
-            } catch (err) {
-              console.error('onFiles callback error:', err)
-            }
+            onFiles(safeFiles, { event: e, wrap })
           }
-        } catch (err) {
-          console.error('onDrop error:', err)
         } finally {
-          dragCounter = 0
-          wrap.classList.remove('is-dropping')
+          leave()
         }
+
       }
 
-      const handleDragEnter = (e) => {
-        prevent(e)
-        addDroppingClass()
-      }
-
-      const handleDragLeave = (e) => {
-        prevent(e)
-        removeDroppingClass()
-      }
-
-      wrap.addEventListener('dragenter', handleDragEnter)
-      wrap.addEventListener('dragover', prevent)
-      wrap.addEventListener('dragleave', handleDragLeave)
+      wrap.addEventListener('dragenter', prevent)
+      wrap.addEventListener('leave',leave)
       wrap.addEventListener('drop', onDrop)
 
       const cleanup = () => {
-        wrap.removeEventListener('dragenter', handleDragEnter)
-        wrap.removeEventListener('dragover', prevent)
-        wrap.removeEventListener('dragleave', handleDragLeave)
-        wrap.removeEventListener('drop', onDrop)
+        wrap.removeEventListener('dragenter')
+        wrap.removeEventListener('leave')
+        wrap.removeEventListener('drop')
       }
 
       this.$once('hook:beforeDestroy', () => {
