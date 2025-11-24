@@ -1,0 +1,19 @@
+{
+  "name": "wanwu",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">\r   <img src=\"https://github.com/user-attachments/assets/6ceb4269-a861-4545-84db-bad322592156\" style=\"width:45%; height:auto;\" />\r </div><br>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.ai-yuanjing.cn/ai-platform-private/ai-agent-productivity-platform/wanwu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

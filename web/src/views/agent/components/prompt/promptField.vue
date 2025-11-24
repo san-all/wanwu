@@ -1,18 +1,27 @@
-
 <template>
   <div class="compare-container">
     <div class="compare-top">
       <div class="drawer-info">
         <div class="promptTitle">
-          <div style="display: flex; align-items: center;">
-            <h3>{{ fieldIndex === 0 ? $t('agent.form.systemPrompt') : $t('tempSquare.comparePrompt')}}</h3>
-            <el-button :type="checkPrompt ? 'primary' : 'default'" size="mini" @click="handleSelectPrompt">
-              <span v-if="!checkPrompt">
-                <span>{{$t('tempSquare.select')}}</span>
+          <div style="display: flex; align-items: center">
+            <h3>
+              {{
+                fieldIndex === 0
+                  ? $t("agent.form.systemPrompt")
+                  : $t("tempSquare.comparePrompt")
+              }}
+            </h3>
+            <el-button
+              :type="isSelected ? 'primary' : 'default'"
+              size="mini"
+              @click="handleSelectPrompt"
+            >
+              <span v-if="!isSelected">
+                <span>{{ $t("tempSquare.select") }}</span>
               </span>
               <span v-else>
-                <i class="el-icon-check" style="margin-right:4px;"></i>
-                <span>{{$t('tempSquare.selected')}}</span>
+                <i class="el-icon-check" style="margin-right: 4px"></i>
+                <span>{{ $t("tempSquare.selected") }}</span>
               </span>
             </el-button>
           </div>
@@ -23,7 +32,10 @@
               :content="$t('agent.form.submitToPrompt')"
               placement="top-start"
             >
-              <span class="el-icon-folder-add tool-icon" @click="handleShowPrompt"></span>
+              <span
+                class="el-icon-folder-add tool-icon"
+                @click="handleShowPrompt"
+              ></span>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -31,7 +43,10 @@
               :content="$t('tempSquare.promptOptimize')"
               placement="top-start"
             >
-              <span class="el-icon-s-help tool-icon" @click="showPromptOptimize"></span>
+              <span
+                class="el-icon-s-help tool-icon"
+                @click="showPromptOptimize"
+              ></span>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -40,7 +55,10 @@
               placement="top-start"
               v-if="fieldIndex > 0"
             >
-              <span class="el-icon-close tool-icon" @click="handleClosePrompt"></span>
+              <span
+                class="el-icon-close tool-icon"
+                @click="handleClosePrompt"
+              ></span>
             </el-tooltip>
           </div>
         </div>
@@ -59,22 +77,27 @@
     <div class="compare-bottom">
       <div class="compare-bottom-content">
         <div v-show="echo" class="session rl echo">
-            <Prologue  :editForm="editForm" @setProloguePrompt="setProloguePrompt" :isBigModel="true" :sessionItemWidth="sessionItemWidth" />
+          <Prologue
+            :editForm="editForm"
+            :isBigModel="true"
+            :sessionItemWidth="sessionItemWidth"
+            :showRecommendQuestion="showRecommendQuestion"
+          />
         </div>
         <!--对话-->
         <div v-show="!echo" class="center-session">
-            <SessionComponentSe
-                    ref="sessionComLocal"
-                    class="component"
-                    :sessionStatus="sessionStatus"
-                    @clearHistory="clearHistory"
-                    @refresh="refresh"
-                    :type="type"
-                    @queryCopy="queryCopy"
-                    :defaultUrl="editForm && editForm.avatar&& editForm.avatar.path"
-            />
+          <SessionComponentSe
+            ref="sessionComLocal"
+            class="component"
+            :sessionStatus="instanceSessionStatus"
+            @clearHistory="clearHistory"
+            @queryCopy="queryCopy"
+            @refresh="refresh"
+            :type="type"
+            :defaultUrl="editForm && editForm.avatar && editForm.avatar.path"
+          />
         </div>
-        </div>
+      </div>
     </div>
     <!-- 提示词优化 -->
     <PromptOptimize ref="promptOptimize" @promptSubmit="promptSubmit" />
@@ -84,107 +107,147 @@
 </template>
 
 <script>
-import Prologue from '../Prologue.vue';
-import SessionComponentSe from '../SessionComponentSe.vue';
+import Prologue from "../Prologue.vue";
+import SessionComponentSe from "../SessionComponentSe.vue";
 import PromptOptimize from "@/components/promptOptimize.vue";
 import createPrompt from "@/components/createApp/createPrompt.vue";
-import sseMethodMixin from '@/mixins/sseMethod'
+import sseMethodMixin from "@/mixins/sseMethod";
 export default {
-  name: 'PromptCompareField',
+  name: "PromptCompareField",
   mixins: [sseMethodMixin],
+  inject: {
+    getEditableRef: {
+      default: () => null,
+    },
+  },
   props: {
     fieldIndex: {
       type: Number,
-      default: 0
+      default: 0,
     },
-    editForm:{
-      typeof:Object,
-      default:null
-    }
+    editForm: {
+      typeof: Object,
+      default: null,
+    },
+    editForm: {
+      type: Object,
+      default: null,
+    },
+    isSelected: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     Prologue,
     SessionComponentSe,
     PromptOptimize,
-    createPrompt
+    createPrompt,
   },
-  watch:{
-    fieldIndex:{
-      handler(newVal){
-        if(newVal === 0){
+  watch: {
+    fieldIndex: {
+      handler(newVal) {
+        if (newVal === 0 && this.editForm && this.editForm.instructions) {
           this.systemPrompt = this.editForm.instructions;
         }
       },
-      immediate: true
-    }
+      immediate: true,
+    },
+    editForm: {
+      handler(newVal) {
+        if (this.fieldIndex === 0 && newVal && newVal.instructions) {
+          this.systemPrompt = newVal.instructions;
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
   },
   data() {
     return {
-      checkPrompt: false,
-      promptType: 'create',
-      sessionItemWidth:'19vw',
-      systemPrompt: '',
+      showRecommendQuestion: false,
+      promptType: "create",
+      sessionItemWidth: "19vw",
+      systemPrompt: "",
       echo: true,
-      sessionStatus: -1,
-      type: 'agentChat',
-      fieldId: 'prompt-field-' + this._uid
-    }
+      type: "agentChat",
+      fieldId: "prompt-field-" + this._uid, //区分提示词对比每个字段的会话id
+    };
   },
   mounted() {
-    var currentSession = this.$refs.sessionComLocal
+    const currentSession = this.$refs.sessionComLocal;
     if (currentSession) {
-      this.$refs['session-com'] = currentSession
+      this.$refs["session-com"] = currentSession;
     }
   },
   methods: {
-    runPrompt(promptText) {
-      var sessionCom = this.$refs.sessionComLocal
-      if (!sessionCom || typeof sessionCom.getList !== 'function') return
+    preSend(promptText, fileList, file_info) {
+      let sessionCom = this.$refs.sessionComLocal;
+      if (!sessionCom || typeof sessionCom.getList !== "function") return;
 
-      var historyList = sessionCom.getList()
-      var lastIndex = Array.isArray(historyList) ? historyList.length : 0
-
+      let historyList = sessionCom.getList();
+      let lastIndex = Array.isArray(historyList) ? historyList.length : 0;
+      this.fileList =
+        fileList ||
+        (this.getEditableRef && this.getEditableRef().getFileList());
+      let fileInfo =
+        (this.getEditableRef && this.getEditableRef().getFileIdList()) ||
+        file_info;
+      this.isTestChat = true;
       this.setSseParams({
         assistantId: this.editForm && this.editForm.assistantId,
-        conversationId: sessionCom.getConversationId ? sessionCom.getConversationId() : '',
-        fieldId: this.fieldId,
-        systemPrompt: this.systemPrompt
-      })
-
-      this.sendEventSource(promptText, '', lastIndex)
+        conversationId: "",
+        fileInfo: fileInfo,
+        systemPrompt: this.systemPrompt,
+      });
+      this.echo = false;
+      this.sendEventSource(promptText, "", lastIndex);
     },
     clearHistory() {
-      this.stopEventSource()
-      if (this.$refs.sessionComLocal && typeof this.$refs.sessionComLocal.clearData === 'function') {
-        this.$refs.sessionComLocal.clearData()
+      this.stopEventSource();
+      if (
+        this.$refs.sessionComLocal &&
+        typeof this.$refs.sessionComLocal.clearData === "function"
+      ) {
+        this.$refs.sessionComLocal.clearData();
       }
     },
     handleShowPrompt() {
-      this.$refs.createPrompt.openDialog({prompt: this.systemPrompt});
+      this.$refs.createPrompt.openDialog({ prompt: this.systemPrompt });
     },
     showPromptOptimize() {
       if (!this.systemPrompt) {
-        this.$message.warning(this.$t('tempSquare.promptOptimizeHint'))
-        return
+        this.$message.warning(this.$t("tempSquare.promptOptimizeHint"));
+        return;
       }
-      this.$refs.promptOptimize.openDialog({prompt: this.systemPrompt});
+      this.$refs.promptOptimize.openDialog({ prompt: this.systemPrompt });
     },
-    showPromptCompare() {},
-    setProloguePrompt() {},
-    clearHistory() {},
-    refresh() {},
-    queryCopy() {},
     handleClosePrompt() {
-      this.$emit('closePrompt',this.fieldIndex);
+      this.$emit("closePrompt", this.fieldIndex);
     },
-     promptSubmit(prompt) {
-      this.systemPrompt= prompt;
+    promptSubmit(prompt) {
+      this.systemPrompt = prompt;
     },
-    handleSelectPrompt(){
-      this.checkPrompt = !this.checkPrompt;
-    }
-  }
-}
+    handleSelectPrompt() {
+      this.$emit("selectField", this.fieldIndex);
+      this.copy(this.systemPrompt) && this.copycb();
+    },
+    copy(text) {
+      text = text.replaceAll("<br/>", "\n");
+      let textareaEl = document.createElement("textarea");
+      textareaEl.setAttribute("readonly", "readonly");
+      textareaEl.value = text;
+      document.body.appendChild(textareaEl);
+      textareaEl.select();
+      let res = document.execCommand("copy");
+      document.body.removeChild(textareaEl);
+      return res;
+    },
+    copycb() {
+      this.$message.success(this.$t("agent.copyTips"));
+    },
+  },
+};
 </script>
 
 <style scoped lang="scss">
@@ -196,6 +259,8 @@ export default {
   background: #f2f7ff8f;
   border: 1px solid #eaeaea;
   border-radius: 8px;
+  min-height: 0; //防止容器高度塌陷
+  overflow: hidden;
 }
 .compare-container:hover {
   border: 1px solid $color;
@@ -206,6 +271,8 @@ export default {
 }
 .compare-bottom {
   flex: 8;
+  position: relative;
+  overflow: hidden;
 }
 .compare-bottom-title {
   font-size: 16px;
@@ -214,15 +281,22 @@ export default {
 }
 
 .compare-bottom-content {
-  height:100%;
-  overflow: auto;
-  padding:0 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 
 .compare-bottom-content .session,
 .compare-bottom-content .center-session {
   height: 100%;
+  overflow: hidden; // ✅ 防止内容溢出
 }
 .drawer-info {
   height: 100%;
@@ -240,7 +314,8 @@ export default {
     font-weight: 800;
     margin-right: 6px;
   }
-  /deep/.el-button--mini, .el-button--mini.is-round {
+  /deep/.el-button--mini,
+  .el-button--mini.is-round {
     font-size: 12px;
     height: 24px;
     padding: 0 10px;
@@ -284,6 +359,5 @@ export default {
   border: 1px solid #d3d7dd !important;
   padding: 15px;
 }
-
 </style>
 
