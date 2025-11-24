@@ -308,12 +308,10 @@
           <!--仅图片时只有 重新生成-->
           <div class="answer-operation">
             <div class="opera-left">
-              <span
-                v-if="i === session_data.history.length - 1"
-                class="restart"
-              >
-                <i class="el-icon-refresh" @click="refresh">
-                  &nbsp;{{ $t("agent.refresh") }}
+              <span v-if="i === session_data.history.length - 1" class="restart"
+                ><i class="el-icon-refresh" @click="refresh">
+                  &nbsp;
+                  {{ $t("agent.refresh") }}
                 </i>
               </span>
             </div>
