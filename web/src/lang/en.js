@@ -961,6 +961,7 @@ export default {
       uploadTips1: "批量导入的问答对内容都将被处理成纯文本形式",
       exportRecord: "导出记录",
       exportData: "导出数据",
+      linkQaDatabase: "关联问答库",
     },
     qaExport: {
       title: "导出记录",
@@ -1443,7 +1444,19 @@ export default {
       create: "创建敏感词",
     },
   },
+  rag: {
+    form: {
+      apiRootUrl: "API根地址",
+      apiKey: "API密钥",
+    },
+  },
   app: {
+    modelTips: "暂不支持选择图文问答类模型",
+    publishType: {
+      private: "私密发布为应用：仅自己可见",
+      organization: "公开发布为应用：组织内可见",
+      public: "公开发布为应用：全局可见",
+    },
     chiChat: {
       title: "闲聊模式",
       tips: "开启闲聊模式，用户可进行大模型闲聊；禁用闲聊模式则只支持对知识库、问答库内涉及的内容进行问答",

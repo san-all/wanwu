@@ -14,51 +14,55 @@
             />
           </div>
           <div class="basicInfo-desc">
-            <span class="basicInfo-title">{{ editForm.name || "无信息" }}</span>
+            <span class="basicInfo-title">{{ editForm.name || "" }}</span>
             <span
               class="el-icon-edit-outline editIcon"
               @click="editAgent"
             ></span>
             <LinkIcon type="rag" />
-            <p>{{ editForm.desc || "无信息" }}</p>
+            <p>{{ editForm.desc || "" }}</p>
           </div>
         </div>
       </div>
       <div class="header-right">
         <div class="header-api">
-          <el-tag effect="plain" class="root-url">API根地址</el-tag>
+          <el-tag effect="plain" class="root-url">{{
+            $t("rag.form.apiRootUrl")
+          }}</el-tag>
           {{ apiURL }}
         </div>
         <el-button @click="openApiDialog" plain class="apikeyBtn" size="small">
           <img :src="require('@/assets/imgs/apikey.png')" />
-          API密钥
+          {{ $t("rag.form.apiKey") }}
         </el-button>
         <el-button
           size="small"
           type="primary"
           @click="handlePublish"
           style="padding: 13px 12px"
-          >发布<span class="el-icon-arrow-down" style="margin-left: 5px"></span
-        ></el-button>
+        >
+          {{ $t("common.button.publish") }}
+          <span class="el-icon-arrow-down" style="margin-left: 5px"></span>
+        </el-button>
         <div class="popover-operation" v-if="showOperation">
           <div>
             <el-radio :label="'private'" v-model="scope">
-              私密发布为应用：仅自己可见
+              {{ $t("rag.publishType.private") }}
             </el-radio>
           </div>
           <div>
             <el-radio :label="'organization'" v-model="scope">
-              公开发布为应用：组织内可见
+              {{ $t("rag.publishType.organization") }}
             </el-radio>
           </div>
           <div>
             <el-radio :label="'public'" v-model="scope">
-              公开发布为应用：全局可见
+              {{ $t("rag.publishType.public") }}
             </el-radio>
           </div>
           <div class="saveBtn">
             <el-button size="mini" type="primary" @click="savePublish">
-              保 存
+              {{ $t("common.button.save") }}
             </el-button>
           </div>
         </div>
@@ -74,8 +78,8 @@
                   :src="require('@/assets/imgs/require.png')"
                   class="required-label"
                 />
-                模型选择
-                <span class="model-tips">[ 暂不支持选择图文问答类模型 ]</span>
+                {{ $t("agent.form.modelSelect") }}
+                <span class="model-tips">[ {{ $t("rag.modelTips") }} ]</span>
               </span>
               <span
                 class="el-icon-s-operation operation"
@@ -85,9 +89,11 @@
             <div class="rl">
               <el-select
                 v-model="editForm.modelParams"
-                placeholder="可输入模型名称搜索"
+                :placeholder="
+                  $t('knowledgeManage.create.modelSearchPlaceholder')
+                "
                 @visible-change="visibleChange"
-                loading-text="模型加载中..."
+                :loading-text="$t('knowledgeManage.create.modelLoading')"
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
@@ -125,12 +131,12 @@
                   :src="require('@/assets/imgs/require.png')"
                   class="required-label"
                 />
-                关联知识库
+                {{ $t("agent.form.linkKnowledge") }}
               </span>
               <span>
                 <span class="common-add" @click="showKnowledgeDiglog">
                   <span class="el-icon-plus"></span>
-                  <span class="handleBtn">添加</span>
+                  <span class="handleBtn">{{ $t("knowledgeSelect.add") }}</span>
                 </span>
               </span>
             </p>
@@ -149,7 +155,7 @@
                       <el-tooltip
                         class="item"
                         effect="dark"
-                        content="元数据过滤"
+                        :content="$t('agent.form.metaDataFilter')"
                         placement="top-start"
                       >
                         <span
@@ -176,7 +182,7 @@
                 :src="require('@/assets/imgs/require.png')"
                 class="required-label"
               />
-              检索方式配置
+              {{ $t("searchConfig.title") }}
             </span>
           </p>
           <div class="rl">
@@ -192,11 +198,11 @@
         <div class="block prompt-box safety-box">
           <p class="block-title tool-title">
             <span class="block-title-text">
-              安全护栏配置
+              {{ $t("agent.form.safetyConfig") }}
               <el-tooltip
                 class="item"
                 effect="dark"
-                content="实时拦截高风险内容的输入和输出，保障内容安全合规。"
+                :content="$t('agent.form.safetyConfigTips')"
                 placement="top"
               >
                 <span class="el-icon-question question-tips"></span>
@@ -205,12 +211,15 @@
             <span class="common-add">
               <span @click="showSafety">
                 <span class="el-icon-s-operation"></span>
-                <span class="handleBtn" style="margin-right: 10px">配置</span>
+                <span class="handleBtn" style="margin-right: 10px">
+                  {{ $t("agent.form.config") }}
+                </span>
               </span>
               <el-switch
                 v-model="editForm.safetyConfig.enable"
                 :disabled="!(editForm.safetyConfig.tables || []).length"
-              ></el-switch>
+              >
+              </el-switch>
             </span>
           </p>
         </div>
@@ -261,11 +270,8 @@
     >
       <template #title>
         <div class="metaHeader">
-          <h3>配置元数据过滤</h3>
-          <span
-            >[
-            通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span
-          >
+          <h3>{{ $t("agent.form.configMetaDataFilter") }}</h3>
+          <span>[ {{ $t("agent.form.metaDataFilterDesc") }}]</span>
         </div>
       </template>
       <metaSet
@@ -274,8 +280,12 @@
         :currentMetaData="currentMetaData"
       />
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleMetaClose">取 消</el-button>
-        <el-button type="primary" @click="submitMeta">确 定</el-button>
+        <el-button @click="handleMetaClose">
+          {{ $t("common.button.cancel") }}
+        </el-button>
+        <el-button type="primary" @click="submitMeta">
+          {{ $t("common.button.confirm") }}
+        </el-button>
       </span>
     </el-dialog>
   </div>
@@ -455,7 +465,9 @@ export default {
           metaData["metaDataFilterParams"]["metaFilterParams"]
         )
       ) {
-        this.$message.warning("存在未填信息,请补充");
+        this.$message.warning(
+          this.$t("knowledgeManage.meta.metaInfoIncomplete")
+        );
         return;
       }
       this.$set(this.editForm.knowledgebases, this.knowledgeIndex, {
@@ -542,7 +554,6 @@ export default {
 
             this.editForm.knowledgeConfig.rerankModelId =
               res.data.rerankConfig.modelId;
-            // 使用nextTick确保所有数据设置完成后再重置标志位
             this.$nextTick(() => {
               this.isSettingFromDetail = false;
             });
@@ -569,15 +580,15 @@ export default {
         this.editForm.knowledgeConfig;
       const isMixPriorityMatch = matchType === "mix" && priorityMatch;
       if (this.editForm.modelParams === "") {
-        this.$message.warning("请选择模型！");
+        this.$message.warning(this.$t("agent.form.selectModel"));
         return false;
       }
       if (!isMixPriorityMatch && !rerankModelId) {
-        this.$message.warning("请选rerank择模型！");
+        this.$message.warning(this.$t("app.selectRerank"));
         return false;
       }
       if (this.editForm.knowledgebases.length === 0) {
-        this.$message.warning("请选择关联知识库！");
+        this.$message.warning(this.$t("app.selectKnowledge"));
         return false;
       }
       const data = {
@@ -644,7 +655,6 @@ export default {
 
       this.isUpdating = true;
       try {
-        //知识库数据
         //模型数据
         const modeInfo = this.modleOptions.find(
           (item) => item.modelId === this.editForm.modelParams
@@ -689,7 +699,7 @@ export default {
           this.getDetail(); //获取详情
         }
       } catch (error) {
-        console.error("更新配置失败:", error);
+        console.error(error);
       } finally {
         this.isUpdating = false;
       }
