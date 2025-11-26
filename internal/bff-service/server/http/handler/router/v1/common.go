@@ -66,6 +66,4 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl/list", http.MethodGet, v1.GetAppUrlList, "获取应用Url列表")
 	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl/status", http.MethodPut, v1.AppUrlStatusSwitch, "启用/停用应用Url")
 
-	// Oauth
-	mid.Sub("common").Reg(apiV1, "/oauth/code/authorize", http.MethodGet, v1.OAuthAuthorize, "获取授权码")
 }
