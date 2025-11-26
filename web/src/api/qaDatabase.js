@@ -50,7 +50,7 @@ export const addQaPair = (data) => {
 export const delQaPair = (data) => {
   return service({
     url: `${USER_API}/knowledge/qa/pair`,
-    method: "post",
+    method: "delete",
     data,
   });
 };

@@ -3,7 +3,6 @@
     <div class="form-header">
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
-        <!-- <span class="header-left-title">文本问答编辑</span> -->
         <div class="basicInfo">
           <div class="img">
             <img
@@ -96,7 +95,7 @@
                 value-key="modelId"
               >
                 <el-option
-                  v-for="(item, index) in modleOptions"
+                  v-for="item in modleOptions"
                   :key="item.modelId"
                   :label="item.displayName"
                   :value="item.modelId"
@@ -215,6 +214,12 @@
             </span>
           </p>
         </div>
+        <!-- 闲聊模式 -->
+        <ChiChat
+          ref="chiChat"
+          @chiswitchChange="chiSwitchChange"
+          :isEnabled="editForm.knowledgeConfig.chiChat"
+        />
       </div>
       <div class="drawer-test">
         <Chat :chatType="'test'" :editForm="editForm" />
@@ -288,6 +293,7 @@ import { getRerankList, selectModelList } from "@/api/modelAccess";
 import { getRagInfo, updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from "@/components/searchConfig.vue";
+import ChiChat from "@/components/app/chiChat.vue";
 import LinkIcon from "@/components/linkIcon.vue";
 import knowledgeSelect from "@/components/knowledgeSelect.vue";
 export default {
@@ -302,6 +308,7 @@ export default {
     searchConfig,
     knowledgeSelect,
     metaSet,
+    ChiChat,
   },
   data() {
     return {
@@ -339,6 +346,7 @@ export default {
           threshold: 0.4, //过滤分数阈值
           maxHistory: 0, //
           useGraph: false,
+          chiChat: false,
         },
         safetyConfig: {
           enable: false,
@@ -437,6 +445,9 @@ export default {
     }
   },
   methods: {
+    chiSwitchChange(value) {
+      this.editForm.knowledgeConfig.chiChat = value;
+    },
     submitMeta() {
       const metaData = this.$refs.metaSet.getMetaData();
       if (
