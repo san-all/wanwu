@@ -189,14 +189,20 @@ def build_single_condition(condition):
 
 def build_conditions_group(group):
     """构建条件组查询"""
-    kb_name = group["filtering_kb_name"]
+    base_name = []
+    if "filtering_kb_name" in group:
+        base_name = group["filtering_kb_name"]
+
+    if "filtering_qa_base_name" in group:
+        base_name = group["filtering_qa_base_name"]
+
     logical_op = group["logical_operator"].lower()
     conditions = group["conditions"]
 
     query = {
         "bool": {
             "must": [
-                {"term": {"kb_name": kb_name}}
+                {"term": {"kb_name": base_name}}
             ]
         }
     }
