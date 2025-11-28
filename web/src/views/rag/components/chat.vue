@@ -16,6 +16,7 @@
                             @clearHistory="clearHistory"
                             @refresh="refresh"
                             @queryCopy="queryCopy"
+                            @handleRecommendedQuestion="handleRecommendedQuestion"
                             :defaultUrl="editForm.avatar.path"
                     />
                 </div>
@@ -122,6 +123,10 @@
             // this.getConversationList()
         },
         methods: {
+            handleRecommendedQuestion(question){
+                this.inputVal = question
+                this.preSend(question)
+            },
             getModelType(type){
                 const dataInfo = this.commonInfo.data.useModel;
                 if(type ==='deepseek'){
@@ -263,12 +268,12 @@
             },
             verifiyFormParams(){
                 if (this.chatType === 'chat') return true;
-                const { matchType, priorityMatch, rerankModelId } = this.editForm.knowledgeConfig;
+                const { matchType, priorityMatch, rerankModelId } = this.editForm.knowledgeBaseConfig.config;
                 const isMixPriorityMatch = matchType === 'mix' && priorityMatch;
                 const conditions = [
-                    { check: !this.editForm.modelParams, message: '请选择模型' },
-                    { check: !isMixPriorityMatch && !rerankModelId, message: '请选择rerank模型' },
-                    { check: this.editForm.knowledgebases.length === 0, message: '请选择知识库' }
+                    { check: !this.editForm.modelParams, message: this.$t('knowledgeManage.create.selectModel') },
+                    { check: !isMixPriorityMatch && !rerankModelId, message:  this.$t('knowledgeManage.hitTest.selectRerankModel')},
+                    { check: this.editForm.qaKnowledgeBaseConfig.knowledgebases.length === 0 &&this.editForm.knowledgeBaseConfig.knowledgebases.length === 0, message: this.$t('app.selectKnowledge') }
                 ];
                 for (const condition of conditions) {
                     if (condition.check) {

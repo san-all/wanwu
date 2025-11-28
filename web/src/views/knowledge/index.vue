@@ -104,11 +104,23 @@ export default {
       category: 0,
     };
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.handleRouteFrom(from);
+    });
+  },
   mounted() {
     this.getTableData();
     this.getList();
   },
   methods: {
+    handleRouteFrom(from){
+      if(from.path.includes('/qa/docList')){
+        this.category = 1
+      }else{
+        this.category = 0
+      }
+    },
     tabClick(status) {
       this.category = status;
       this.getTableData();

@@ -75,7 +75,8 @@ export default {
     knowledge: "知识库",
     account: "账户",
     setting: "设置",
-    settingTip: "系统管理员账户不可新增用户或角色。请切换至具体子组织，进行相应操作。",
+    settingTip:
+      "系统管理员账户不可新增用户或角色。请切换至具体子组织，进行相应操作。",
     userInfo: "个人信息",
     org: "组织管理",
     modelAccess: "模型管理",
@@ -145,8 +146,8 @@ export default {
       search: "查询",
       reset: "重置",
       import: "导入",
-      export: "导出",
       transform: "转化为",
+      export: "导出",
       view: "查看",
       cancelPublish: "取消发布",
       add: "创建",
@@ -172,19 +173,23 @@ export default {
       remarkLimit: "100字以内",
       roleName: "支持1-64位的中英文、数字或下划线(_)、(.)",
       roleNameLimit: "1-64个字符",
-      userName: "支持中英文、数字、下划线(_)、(.)，2-20个字符，不能以下划线为开头",
+      userName:
+        "支持中英文、数字、下划线(_)、(.)，2-20个字符，不能以下划线为开头",
       userNameLimit: "2-20个字符",
       companyLimit: "50字以内",
       emailError: "邮箱格式不正确",
       presetModelName: "不允许以中划线开头，仅允许英文、数字和中划线",
-      versionNumber: "请输入有效的数值，只能包含数字和一个点，且不能以点开头或结尾",
+      versionNumber:
+        "请输入有效的数值，只能包含数字和一个点，且不能以点开头或结尾",
       presetLimit: "长度在2-20字符",
       tableNameLimit: "不超过15个字符",
       tableName: "敏感词表须有汉字、英文、数字组成",
       tableRemarkLimit: "表备注须在50字以内",
-      modelName: "支持中英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头",
+      modelName:
+        "支持中英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头",
       modelNameLimit: "2-50个字符",
-      modelId: "支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头",
+      modelId:
+        "支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头",
       version: "支持英文、数字、(.)",
       inferUrl: "Base Url，例如：",
       apiKey: "输入APIKey, 例如：",
@@ -472,7 +477,8 @@ export default {
       apiKey: "API Key",
       inferUrl: "推理URL",
       modelType: "模型类型",
-      embeddingTip: "您所申请的token默认会受调用次数限制(1分钟调用5次) 知识库会自动重试直至文档解析完成，由此会导致文档解析耗时较长请耐心等待，如要提升文档解析效率可申请联系管理员申请不限流的token",
+      embeddingTip:
+        "您所申请的token默认会受调用次数限制(1分钟调用5次) 知识库会自动重试直至文档解析完成，由此会导致文档解析耗时较长请耐心等待，如要提升文档解析效率可申请联系管理员申请不限流的token",
       apiType: "API类型",
       publisher: "供应商",
       publishTime: "模型发布时间",
@@ -530,7 +536,8 @@ export default {
     promptName: "提示词模板名称",
     promptNameRules: "名称须在30字符以内",
     promptDesc: "提示词模板描述",
-    namePlaceholder: "输入提示词名称，仅支持中文、英文、数字、下划线、中划线、英文（.）",
+    namePlaceholder:
+      "输入提示词名称，仅支持中文、英文、数字、下划线、中划线、英文（.）",
     descPlaceholder: "输入提示词描述",
     promptPlaceholder: "请输入提示词模板内容，变量可用{}输入",
     promptText: "提示词",
@@ -558,7 +565,8 @@ export default {
   // 工作流/对话流
   list: {
     chatCreate: "对话流创建",
-    chatNamePlaceholder: "输入对话流名称，仅支持字母、数字和下划线，并以字母开头",
+    chatNamePlaceholder:
+      "输入对话流名称，仅支持字母、数字和下划线，并以字母开头",
     noChatName: "请输入对话流名称",
     chatNameLimit: "名称须在30字符以内",
     noChatDesc: "请输入对话流描述",
@@ -588,7 +596,8 @@ export default {
     delete: "删除",
     view: "查看自定义",
     copyDemo: "复制样例并查看",
-    cancelHint: "取消发布后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回",
+    cancelHint:
+      "取消发布后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回",
     deleteChatTips: "确认删除该对话流吗？",
     deleteTips:
       "删除后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回，是否确认删除？",
@@ -631,7 +640,8 @@ export default {
     searchPlaceholder: "按照知识库名称搜索",
     searchPlaceholderQa: "按照问答库名称搜索",
     docPlaceholder: "按照文件名称搜索",
-    createQaDatabase: "新建问答对",
+    questionPlaceholder: "按照问题搜索",
+    createQaDatabase: "新建问答库",
     desc: "描述",
     title: "文档知识库",
     tips: "您可单独或批量上传以下格式的文档:txt、pdf、docx、doc、xlsx、xls、zip、tar.gz、csv、pptx、html",
@@ -684,9 +694,11 @@ export default {
     operateSuccess: "操作成功",
     deleteTips: "确定要删除此条数据吗?",
     tip: "提示",
-    refreshTips: "您导入的文件正在异步处理中，请耐心等待，您可以尝试，刷新列表获取导入结果。",
+    refreshTips:
+      "您导入的文件正在异步处理中，请耐心等待，您可以尝试，刷新列表获取导入结果。",
     editKnowledge: "编辑知识库",
-    delKnowledgeTips: "若此知识库已被智能体、文本问答或工作流使用，删除知识库将导致该功能不可用",
+    delKnowledgeTips:
+      "若此知识库已被智能体、文本问答或工作流使用，删除知识库将导致该功能不可用",
     noStatus: "无状态信息",
     categoryNameRules: "命名只能包含小写英文、中文、数字、特殊符号-_",
     chunkTypeConfigTips:
@@ -698,7 +710,8 @@ export default {
     splitMaxTips: "可填写范围最小为200 tokens，最大为4000 tokens",
     overLapNum: "可重叠值",
     overLapNumTips: "请输入可重叠值",
-    inputErrorTips: "知识库名称格式错误,只能包含小写英文、中文、数字、特殊符号-_",
+    inputErrorTips:
+      "知识库名称格式错误,只能包含小写英文、中文、数字、特殊符号-_",
     zh_exclamationMark: "中文叹号",
     zh_period: "中文句号",
     zh_questionMark: "中文问号",
@@ -737,7 +750,8 @@ export default {
     uploadFileNum: "上传文件数",
     successNum: "个 / 成功个数",
     number: "个",
-    uploadTips: " *当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分",
+    uploadTips:
+      " *当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分",
     uploadTips1:
       "*支持上传pdf/docx/doc/txt/xlsx/xls/zip/tar.gz/csv/pptx/html格式。文件大小限制最大为700MB。",
     uploadTips2:
@@ -761,7 +775,8 @@ export default {
     refreshAnalysis: "重新解析",
     analysisTips: "请先解析url",
     urlTest: "请输入合法url!",
-    clickUploadTips: "*批量上传支持.xlsx格式，仅可上传1个。文档最多可添加100条url，文件不超过15mb",
+    clickUploadTips:
+      "*批量上传支持.xlsx格式，仅可上传1个。文档最多可添加100条url，文件不超过15mb",
     notReshContent: "*当前内容不自动更新",
     total: "总",
     Piece: "条",
@@ -839,7 +854,8 @@ export default {
       OCRModel: "OCR模型",
       OCRModelDesc: "若需使用，请前往模型管理-联通元景-添加ocr模型",
       documentAnalysis: "文档解析服务",
-      documentAnalysisDesc: "若需使用，请前往模型管理-联通元景-添加文档解析服务",
+      documentAnalysisDesc:
+        "若需使用，请前往模型管理-联通元景-添加文档解析服务",
       read: "可读",
       edit: "可编辑",
       admin: "管理员",
@@ -892,6 +908,7 @@ export default {
     },
     meta: {
       batchEdit: "批量编辑元数据值",
+      editMetaData: "编辑元数据值",
       edit: "编辑",
       documentNum: "个文档",
       createMetaData: "创建元数据值",
@@ -925,7 +942,7 @@ export default {
       communityReport: "社区报告",
       commonSegment: "通用分段",
       parentSonSegment: "父子分段",
-      childSegmentCount: "个子分段",
+      childSegmentCount: "{count}个子分段",
       hitChildSegment: "命中{count}个子分段",
       hitScore: "命中得分",
       noData: "暂无数据",
@@ -1030,11 +1047,14 @@ export default {
     score: "Score阈值",
     scoreHint: "检索结果的相似度阈值，低于该值的结果将被过滤。",
     vector: "向量检索",
-    vectorHint: "通过向量相似度找到语义相近、表达多样的文本片段，适用于理解和召回语义相关信息。",
+    vectorHint:
+      "通过向量相似度找到语义相近、表达多样的文本片段，适用于理解和召回语义相关信息。",
     fullText: "全文检索",
-    fullTextHint: "基于关键词匹配，能够高效查询包含指定词汇的文本片段，适用于精确查找",
+    fullTextHint:
+      "基于关键词匹配，能够高效查询包含指定词汇的文本片段，适用于精确查找",
     mixed: "混合检索",
-    mixedHint: "结合向量和关键词检索，融合语义理解与关键词匹配，兼顾相关性和准确性，提升检索效果。",
+    mixedHint:
+      "结合向量和关键词检索，融合语义理解与关键词匹配，兼顾相关性和准确性，提升检索效果。",
     weight: "权重设置",
     weightHint:
       "权重设置功能用于调整不同检索方式的影响力。通过设置权重，可以控制语义相似度和关键词匹配在最终排序中的占比。",
@@ -1091,7 +1111,8 @@ export default {
       name: "服务名称",
       desc: "服务描述",
       count: "已绑定 {count} 个工具",
-      deleteHint: "确定要删除 <span style='font-weight: bold;'>{name}</span> 该服务吗？",
+      deleteHint:
+        "确定要删除 <span style='font-weight: bold;'>{name}</span> 该服务吗？",
       bind: {
         title: "绑定应用",
         search: "搜索应用",
@@ -1168,7 +1189,8 @@ export default {
       apiAuth: "API身份认证",
       apiAuthPlaceholder: "请完善API身份认证信息",
       schema: "选择样例",
-      schemaPlaceholder: "请输入对应API的openapi3.0结构，可以选择示例了解详情。",
+      schemaPlaceholder:
+        "请输入对应API的openapi3.0结构，可以选择示例了解详情。",
       example: "样例导入",
       api: "可用API",
       apiPlaceholder: "请选择API",
@@ -1208,14 +1230,16 @@ export default {
           title: "在 Cursor 中安装",
           step1: "1. 点击Cursor右上角'设置'，进入左侧菜单中的'MCP'选项",
           step2: "2. 点击页面右上方的'+添加'按钮, 自动打开mcp.json配置文件",
-          step3: "3. 在文件中粘贴MCP配置并保存（在合适位置插入，无需删除已有内容）",
+          step3:
+            "3. 在文件中粘贴MCP配置并保存（在合适位置插入，无需删除已有内容）",
           step4: "4. MCP设置界面显示绿色原点即可使用",
         },
         claude: {
           title: "在 Claude 中安装",
           step1: "1. 在Claude页面左上角打开'设置'，进入'Developer'",
           step2: "2. 点击'Edit Config' 定位claude_desktop_config.json配置文件",
-          step3: "3. 在json文件中粘贴MCP配置并保存（在合适位置插入，无需删除已有内容）",
+          step3:
+            "3. 在json文件中粘贴MCP配置并保存（在合适位置插入，无需删除已有内容）",
         },
         other: "其他MCP服务查看",
       },
@@ -1283,11 +1307,13 @@ export default {
       publishType2: "公开发布为应用：全局可见",
       systemPrompt: "系统提示词",
       submitToPrompt: "提交至提示词",
-      promptTips: "描述你想创建的应用，详细描述应用的详细功能及作用，以及对该应用生成结果的要求",
+      promptTips:
+        "描述你想创建的应用，详细描述应用的详细功能及作用，以及对该应用生成结果的要求",
       agentConfig: "智能体配置",
       modelSelect: "模型选择",
       modelSearchPlaceholder: "可输入模型名称搜索",
-      visionModelTips: "*您选择的是图文问答类模型，此类模型暂时无法调用知识库、联网检索及工具",
+      visionModelTips:
+        "*您选择的是图文问答类模型，此类模型暂时无法调用知识库、联网检索及工具",
       prologue: "开场白",
       prologuePlaceholder: "请输入开场白",
       recommendQuestion: "推荐问题",
@@ -1300,7 +1326,10 @@ export default {
       vision: "视觉",
       visionTips: "允许用户上传图片，并进行图文问答。",
       configMetaDataFilter: "配置元数据过滤",
-      metaDataFilterDesc: "[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]",
+      metaDataFilterDesc:
+        "[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]",
+      metaDataQaFilterDesc:
+        "[ 通过设置的元数据，对问答库内信息进行更加细化的筛选与检索控制。]",
       incompleteInfo: "存在未填信息,请补充",
       selectModel: "请选择模型！",
       inputPrologue: "请输入开场白！",
@@ -1314,7 +1343,8 @@ export default {
     changeImg: "点击换图",
     agentName: "智能体名称",
     agentDesc: "智能体描述",
-    nameplaceholder: " 输入智能体名称 ，仅支持中文、英文、数字、下划线、中划线、英文（.）",
+    nameplaceholder:
+      " 输入智能体名称 ，仅支持中文、英文、数字、下划线、中划线、英文（.）",
     descplaceholder: "输入智能体描述，将展示给智能体用户",
     pluginNameRules: " 智能体名称须在30字符以内",
     descRules: "智能体描述限制600字符以内",
@@ -1328,7 +1358,8 @@ export default {
     changeImg: "点击换图",
     agentName: "文本问答名称",
     agentDesc: "文本问答描述",
-    nameplaceholder: "输入文本问答名称 ，仅支持中文、英文、数字、下划线、中划线、英文（.）",
+    nameplaceholder:
+      "输入文本问答名称 ，仅支持中文、英文、数字、下划线、中划线、英文（.）",
     descplaceholder: "输入文本描述，将展示给文本问答用户 ",
     pluginNameRules: " 文本问答名称须在30字符以内",
     nameRules: "请填写文本问答名称",
@@ -1438,6 +1469,17 @@ export default {
     modelTips: "暂不支持选择图文问答类模型",
     selectRerank: "请选rerank择模型！",
     selectKnowledge: "请选择关联知识库！",
+    recallParameterSet:'召回参数配置',
+    linkQaDatabase:'关联问答库',
+    selectQAdatabase:'选择问答库',
+    qaSearchPlaceholder:'输入问答库名称搜索',
+    qaSearching:'问答库搜索中...',
+    knowledgeSearch:'知识库搜索中...',
+    noResponse:'无响应数据',
+    stopStream:'本次回答已被终止',
+    selectKnowledge:'请选择知识库',
+    recommendedQuestion: "推荐问题:",
+    qaUplodFileTips:"文件上传成功，请手动刷新问答库列表",
     publishType: {
       private: "私密发布为应用：仅自己可见",
       organization: "公开发布为应用：组织内可见",
@@ -1445,7 +1487,7 @@ export default {
     },
     chiChat: {
       title: "闲聊模式",
-      tips: "开启闲聊模式，用户可进行大模型闲聊；禁用闲聊模式则只支持对知识库、问答库内涉及的内容进行问答",
+      tips: "开启闲聊模式，用户可进行大模型闲聊;禁用闲聊模式则只支持对知识库、问答库内涉及的内容进行问答。若只关联问答库，暂不支持开启闲聊模式",
     },
   },
 };

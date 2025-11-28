@@ -32,7 +32,7 @@
                 </el-select>
                 <search-input
                   class="cover-input-icon"
-                  :placeholder="$t('knowledgeManage.docPlaceholder')"
+                  :placeholder="$t('knowledgeManage.questionPlaceholder')"
                   ref="searchInput"
                   @handleSearch="handleSearch"
                 />
@@ -101,7 +101,7 @@
                 <el-table-column
                   type="selection"
                   reserve-selection
-                  v-if="hasManagePerm"
+                  v-show="hasManagePerm"
                   width="55"
                 >
                 </el-table-column>
@@ -115,7 +115,6 @@
                       placement="bottom-start"
                       :content="scope.row.question"
                       trigger="hover"
-                      width="300"
                     >
                       <span slot="reference">
                         {{
@@ -131,10 +130,27 @@
                   prop="answer"
                   :label="$t('knowledgeManage.qaDatabase.answer')"
                 >
+                <template slot-scope="scope">
+                    <el-popover
+                      placement="bottom-start"
+                      :content="scope.row.answer"
+                      trigger="hover"
+                      width="300"
+                    >
+                      <span slot="reference">
+                        {{
+                          scope.row.answer.length > 20
+                            ? scope.row.answer.slice(0, 20) + "..."
+                            : scope.row.answer
+                        }}
+                      </span>
+                    </el-popover>
+                  </template>
                 </el-table-column>
                 <el-table-column
                   prop="metaDataList"
                   :label="$t('knowledgeManage.qaDatabase.metaData')"
+                  v-show="hasManagePerm"
                 >
                   <template slot-scope="scope">
                     <span>
@@ -154,7 +170,7 @@
                 <el-table-column
                   prop="switch"
                   :label="$t('user.table.status')"
-                  width="150"
+                  v-show="hasManagePerm"
                 >
                   <template slot-scope="scope">
                     <el-switch
@@ -168,7 +184,6 @@
                 <el-table-column
                   prop="status"
                   :label="$t('knowledgeManage.importStatus')"
-                  width="200"
                 >
                   <template slot-scope="scope">
                     <span>
@@ -185,12 +200,13 @@
                 <el-table-column
                   prop="uploadTime"
                   :label="$t('knowledgeManage.importTime')"
-                  width="200"
+                  width="150"
                 >
                 </el-table-column>
                 <el-table-column
                   :label="$t('knowledgeManage.operate')"
-                  width="260"
+                  width="200"
+                  v-show="hasManagePerm"
                 >
                   <template slot-scope="scope">
                     <el-button
@@ -221,7 +237,6 @@
                         scope.row.status &&
                         [0, 1, 3].includes(Number(scope.row.status))
                       "
-                      v-if="hasManagePerm"
                       :type="
                         scope.row &&
                         scope.row.status &&

@@ -207,6 +207,7 @@ export default {
           topK: 5, //topK 获取最高的几行
           maxHistory: 0, //最长上下文
           useGraph: false, //是否使用图谱
+          chiChat:false,//是否开启闲聊模式
         },
       },
       initialEditForm: null,
@@ -332,9 +333,6 @@ export default {
       item.mixTypeValue = n.value;
       const { knowledgeMatchParams } = this.formInline;
       knowledgeMatchParams.priorityMatch = n.value === "weight" ? 1 : 0;
-      // if(n.value === 'weight'){
-      //   knowledgeMatchParams.rerankModelId = '';
-      // }
     },
     showRerank(n) {
       return (
