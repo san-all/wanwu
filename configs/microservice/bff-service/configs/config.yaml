@@ -232,6 +232,7 @@ operate:
 
 agent:
   host: agent-wanwu
+  use_new_agent: true
   upload_minio:
     port: 15001
     uri: /upload

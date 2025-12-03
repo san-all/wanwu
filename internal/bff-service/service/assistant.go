@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"sort"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -717,6 +718,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ToolInfos:           assistantToolInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
+		NewAgent:            config.Cfg().Agent.UseNewAgent,
 	}
 	if sensitiveWordTable != nil {
 		var sensitiveTableList []request.SensitiveTable

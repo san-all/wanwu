@@ -3,6 +3,8 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"google.golang.org/grpc"
 	"io"
 	"strings"
 
@@ -61,7 +63,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
 	}
-	stream, err := assistant.AssistantConversionStream(ctx.Request.Context(), &assistant_service.AssistantConversionStreamReq{
+	agentReq := &assistant_service.AssistantConversionStreamReq{
 		AssistantId:    req.AssistantId,
 		ConversationId: req.ConversationId,
 		FileInfo:       transFileInfo(req.FileInfo),
@@ -72,7 +74,14 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			UserId: userId,
 			OrgId:  orgId,
 		},
-	})
+	}
+	var stream grpc.ServerStreamingClient[assistant_service.AssistantConversionStreamResp]
+	newAgent := config.Cfg().Agent.UseNewAgent
+	if newAgent {
+		stream, err = assistant.AssistantConversionStreamNew(ctx.Request.Context(), agentReq)
+	} else {
+		stream, err = assistant.AssistantConversionStream(ctx.Request.Context(), agentReq)
+	}
 	if err != nil {
 		return nil, err
 	}
