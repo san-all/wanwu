@@ -3,6 +3,9 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/UnicomAI/wanwu/internal/agent-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/agent-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -11,8 +14,6 @@ import (
 	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/schema"
 	"github.com/gin-gonic/gin"
-	"io"
-	"strings"
 )
 
 // AgentMessage 智能体消息处理

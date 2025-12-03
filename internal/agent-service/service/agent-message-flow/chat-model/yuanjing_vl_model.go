@@ -7,6 +7,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"regexp"
+	"time"
+
 	agent_http_client "github.com/UnicomAI/wanwu/internal/agent-service/pkg/http"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -15,10 +20,6 @@ import (
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/schema"
 	"github.com/meguminnnnnnnnn/go-openai"
-	"io"
-	"net/http"
-	"regexp"
-	"time"
 )
 
 const (

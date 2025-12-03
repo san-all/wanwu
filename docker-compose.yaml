@@ -493,18 +493,17 @@ services:
       start_period: 10s
 
   agent-service:
+    depends_on:
+      minio:
+        condition: service_healthy
     restart: always
-    image: ${WANWU_GO_IMAGE}
+    image: ${WANWU_BACKEND_IMAGE}
     container_name: agent-service
     networks:
       - ${WANWU_DOCKER_NETWORK}
-    ports:
-      - 8990:8990
+    # ports:
+    #   - 8990:8990
     volumes:
-      - /etc/localtime:/etc/localtime
-      - ./bin/${WANWU_ARCH}/agent-service:/app/bin/agent-service
-      - ./configs/microservice/agent-service/configs:/app/configs/microservice/agent-service/configs
-      - ./configs/microservice/agent-service/tool-template:/app/configs/microservice/agent-service/tool-template
       - ${WANWU_PROJECT_DIR}/agent-service/log:/app/log
     environment:
       MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
@@ -512,6 +511,12 @@ services:
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
     working_dir: /app
     command: ./bin/agent-service
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8990"]
+      interval: 15s
+      timeout: 5s
+      retries: 99
+      start_period: 10s
 
   operate-service:
     restart: always

@@ -214,18 +214,18 @@ stop-rag-wanwu:
 		--env-file .env \
 		down rag
 
-# --- agent ---
-#run-agent:
-#	docker compose -f docker-compose-develop.yaml \
-#		--env-file .env.image.${WANWU_ARCH} \
-#		--env-file .env \
-#		up -d agent
+# --- agent-wanwu ---
+run-agent-wanwu:
+	docker compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d agent
 
-#stop-agent:
-#	docker compose -f docker-compose-develop.yaml \
-#		--env-file .env.image.${WANWU_ARCH} \
-#		--env-file .env \
-#		down agent
+stop-agent-wanwu:
+	docker compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down agent
 
 # --- agentscope ---
 # run-agentscope: # 启动agentscope后自动重启下nginx

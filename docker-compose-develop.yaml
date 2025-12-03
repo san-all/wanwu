@@ -281,7 +281,6 @@ services:
     working_dir: /app
     command: ./bin/agent-service
 
-
   workflow:
     restart: always
     image: ${WANWU_WORKFLOW_BASE_IMAGE}

@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/UnicomAI/wanwu/internal/agent-service/model/request"
-	"github.com/cloudwego/eino/schema"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/UnicomAI/wanwu/internal/agent-service/model/request"
+	"github.com/cloudwego/eino/schema"
 )
 
 const (
