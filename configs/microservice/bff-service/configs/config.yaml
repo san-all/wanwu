@@ -231,6 +231,7 @@ operate:
   host: operate-service:9797
 
 agent:
+  use_new_agent: 1
   host: agent-wanwu
   upload_minio:
     port: 15001

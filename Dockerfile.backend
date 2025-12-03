@@ -51,6 +51,10 @@ EXPOSE 9640
 COPY --from=builder /app/bin/$WANWU_ARCH/assistant-service ./bin/assistant-service
 EXPOSE 8890
 
+# agent-servie
+COPY --from=builder /app/bin/$WANWU_ARCH/agent-service ./bin/agent-service
+EXPOSE 8990
+
 # app-servie
 COPY --from=builder /app/bin/$WANWU_ARCH/app-service ./bin/app-service
 EXPOSE 9988

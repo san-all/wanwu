@@ -201,6 +201,7 @@ type AgentScopeWorkFlowServiceConfig struct {
 }
 
 type AgentServiceConfig struct {
+	UseNewAgent    int       `json:"use_new_agent" mapstructure:"use_new_agent"`
 	Host           string    `json:"host" mapstructure:"host"`
 	UploadMinioUri UriConfig `json:"upload_minio" mapstructure:"upload_minio"`
 }
