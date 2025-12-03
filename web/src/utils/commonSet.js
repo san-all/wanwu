@@ -5,18 +5,18 @@ export const WORKFLOW = 'workflow'
 export const RAG = 'rag'
 export const AGENT = 'agent'
 export const AppType = {
-    [WORKFLOW]: i18n.t('appSpace.workflow'),
-    [CHAT]: i18n.t('appSpace.chat'),
-    [RAG]: i18n.t('appSpace.rag'),
-    [AGENT]: i18n.t('appSpace.agent'),
-    agentTemplate: i18n.t('appSpace.agentTemp'),
+  [WORKFLOW]: i18n.t('appSpace.workflow'),
+  [CHAT]: i18n.t('appSpace.chat'),
+  [RAG]: i18n.t('appSpace.rag'),
+  [AGENT]: i18n.t('appSpace.agent'),
+  agentTemplate: i18n.t('appSpace.agentTemp'),
 }
 export const SafetyType = {
-    Political: i18n.t('common.safetyType.political'),
-    Revile: i18n.t('common.safetyType.revile'),
-    Pornography: i18n.t('common.safetyType.pornography'),
-    ViolentTerror: i18n.t('common.safetyType.violentTerror'),
-    Illegal: i18n.t('common.safetyType.illegal'),
-    InformationSecurity: i18n.t('common.safetyType.informationSecurity'),
-    Other: i18n.t('common.safetyType.other'),
+  Political: i18n.t('common.safetyType.political'),
+  Revile: i18n.t('common.safetyType.revile'),
+  Pornography: i18n.t('common.safetyType.pornography'),
+  ViolentTerror: i18n.t('common.safetyType.violentTerror'),
+  Illegal: i18n.t('common.safetyType.illegal'),
+  InformationSecurity: i18n.t('common.safetyType.informationSecurity'),
+  Other: i18n.t('common.safetyType.other'),
 }
