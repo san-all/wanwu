@@ -50,9 +50,9 @@
             @keydown="textareaKeydown($event)"
             contenteditable="true"
           ></div>
-          <span class="editable--placeholder" v-if="!promptValue">{{
-            placeholder
-          }}</span>
+          <span class="editable--placeholder" v-if="!promptValue">
+            {{ placeholder }}
+          </span>
           <i
             v-if="promptValue"
             class="el-icon-close editable--close"
@@ -64,8 +64,9 @@
               :class="{ btnActive: isActive, btnAnactive: !isActive }"
               @click="linkSearch"
               v-if="showModelSelect && !isPower && isLink"
-              >{{ $t("editavleDiv.connectInternect") }}</el-button
             >
+              {{ $t("editavleDiv.connectInternect") }}
+            </el-button>
             <!-- <img class="editable--send" :src="require('@/assets/imgs/send.png')" @click="preSend" /> -->
             <el-button type="primary" class="editable--send" @click="preSend"
               ><span>{{ $t("agent.send") }}</span>
@@ -99,15 +100,14 @@
               style="font-size: 15px"
               slot="reference"
               @click="setRandomReminder(n)"
-              >{{ n.title }}</span
             >
+              {{ n.title }}
+            </span>
           </el-popover>
         </div>
-        <span class="refresh" @click="getReminderList"
-          ><i class="el-icon-loading" v-show="refreshLoading"></i>&nbsp;{{
-            $t("agent.next")
-          }}</span
-        >
+        <span class="refresh" @click="getReminderList">
+          <i class="el-icon-loading" v-show="refreshLoading"></i>&nbsp;{{ $t("agent.next") }}
+        </span>
       </div>
     </transition>
 

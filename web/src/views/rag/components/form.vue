@@ -116,8 +116,9 @@
                         v-for="(tag, tagIdx) in item.tags"
                         :key="tagIdx"
                         class="model-select-tag"
-                        >{{ tag.text }}</span
                       >
+                        {{ tag.text }}
+                      </span>
                     </div>
                   </div>
                 </el-option>

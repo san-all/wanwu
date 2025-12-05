@@ -66,20 +66,18 @@
                   style="width: 360px; margin: 0 auto"
                 ></el-progress>
                 <p>
-                  {{ $t("common.fileUpload.limitTips")
-                  }}<span style="color: red">
-                    {{ $t("common.fileUpload.click") }} </span
-                  >{{ $t("common.fileUpload.refreshTips") }}
+                  {{ $t("common.fileUpload.limitTips") }}
+                  <span style="color: red">
+                    {{ $t("common.fileUpload.click") }}
+                  </span>
+                  {{ $t("common.fileUpload.refreshTips") }}
                 </p>
               </div>
             </div>
             <div v-else>
               <i class="el-icon-upload"></i>
               <p>
-                {{
-                  $t("common.fileUpload.uploadText") +
-                  $t("common.fileUpload.uploadClick")
-                }}
+                {{ $t("common.fileUpload.uploadText") + $t("common.fileUpload.uploadClick") }}
               </p>
               <div class="tips">
                 <p>
@@ -96,8 +94,9 @@
             type="primary"
             :disabled="!fileUrl || !(file && file.percentage === 100)"
             @click="doBatchUpload"
-            >{{ $t("common.fileUpload.submitBtn") }}</el-button
           >
+            {{ $t("common.fileUpload.submitBtn") }}
+          </el-button>
         </div>
       </div>
     </el-dialog>
