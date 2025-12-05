@@ -100,8 +100,8 @@ export default {
         handleDelete(row){
             this.$confirm('确定要删除当前APIkey吗？',this.$t('knowledgeManage.tip'),
                 {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
+                confirmButtonText: this.$t('common.confirm.confirm'),
+                cancelButtonText: this.$t('common.confirm.cancel'),
                 type: "warning"
                 }
             )
