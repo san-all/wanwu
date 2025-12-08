@@ -1409,6 +1409,7 @@ export default {
       selectModel: "请选择模型！",
       inputPrologue: "请输入开场白！",
       deleteSuccess: "删除成功",
+      modelNotSupport: "模型不可用,请选择模型"
     },
   },
   agentDiglog: {

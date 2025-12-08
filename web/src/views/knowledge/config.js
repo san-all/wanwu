@@ -173,6 +173,20 @@ export const DROPDOWN_GROUPS = [
       },
       { command: "fileUpload", label: i18n.t("knowledgeManage.fileUpload") }
     ]
+  },
+  {
+    label: i18n.t("knowledgeManage.hitTest.graph"),
+    icon: "el-icon-arrow-down",
+    items: [
+      {
+        command: "goKnowledgeGraph",
+        label: i18n.t("knowledgeManage.hitTest.graph")
+      },
+      {
+        command: "goCommunityReport",
+        label: i18n.t("knowledgeManage.hitTest.communityReport")
+      }
+    ]
   }
 ]
 

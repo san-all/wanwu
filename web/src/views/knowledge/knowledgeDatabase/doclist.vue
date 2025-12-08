@@ -51,40 +51,30 @@
                   @click="reload"
                 >
                 </el-button>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  @click="
-                    $router.push(
-                      `/knowledge/graphMap/${docQuery.knowledgeId}?name=${knowledgeName}`
-                    )
-                  "
-                  v-if="showGraphReport"
+
+                <el-dropdown
+                  v-for="(group, index) in graphDropdownGroups"
+                  :key="group.label"
+                  @command="handleCommand"
+                  :style="{ margin: index === 0 ? '0 10px' : '' }"
                 >
-                  {{ $t("knowledgeManage.hitTest.graph") }}
-                </el-button>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  @click="
-                    $router.push(
-                      `/knowledge/communityReport?knowledgeId=${docQuery.knowledgeId} &name=${knowledgeName}`
-                    )
-                  "
-                  v-if="showGraphReport"
-                >
-                  <span>
-                    {{ $t("knowledgeManage.hitTest.communityReport") }}
-                  </span>
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    :content="$t('knowledgeManage.docList.communityReportTips')"
-                    placement="top"
-                  >
-                    <i class="el-icon-question" style="margin-left: 2px"></i>
-                  </el-tooltip>
-                </el-button>
+                  <el-button size="mini" type="primary">
+                    {{ group.label }}
+                    <i :class="['el-icon--right', group.icon]"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <template v-if="showGraphReport">
+                      <el-dropdown-item
+                        v-for="item in group.items"
+                        :key="item.command"
+                        :command="item.command"
+                      >
+                        {{ item.label }}
+                      </el-dropdown-item>
+                    </template>
+                  </el-dropdown-menu>
+                </el-dropdown>
+
                 <el-button
                   size="mini"
                   type="primary"
@@ -456,6 +446,7 @@ export default {
       showGraphReport: false,
       knowledgeGraphStatus: KNOWLEDGE_GRAPH_STATUS,
       dropdownGroups: DROPDOWN_GROUPS.slice(0, 1),
+      graphDropdownGroups: DROPDOWN_GROUPS.slice(2),
       POWER_TYPE_EDIT,
       POWER_TYPE_ADMIN,
       POWER_TYPE_SYSTEM_ADMIN,
@@ -531,8 +522,20 @@ export default {
       const actions = {
         exportData: this.exportData,
         exportRecord: this.exportRecord,
+        goKnowledgeGraph: this.goKnowledgeGraph,
+        goCommunityReport: this.goCommunityReport,
       }
       ;(actions[command] || this.exportData)()
+    },
+    goKnowledgeGraph(){
+      this.$router.push(
+        `/knowledge/graphMap/${this.docQuery.knowledgeId}?name=${this.knowledgeName}`
+      )
+    },
+    goCommunityReport(){
+      this. $router.push(
+        `/knowledge/communityReport?knowledgeId=${this.docQuery.knowledgeId} &name=${this.knowledgeName}`
+      )
     },
     exportData(docIdList) {
       if (!this.docQuery.knowledgeId) {
