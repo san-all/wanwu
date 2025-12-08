@@ -1,7 +1,7 @@
 import service from "@/utils/request";
 import { KNOWLEDGE_API } from "@/utils/requestConstants";
 //新增文档知识分类
-export const createDoc = data => {
+export const createDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doccategory`,
     method: 'post',
@@ -10,7 +10,7 @@ export const createDoc = data => {
 };
 
 //修改文档知识分类
-export const editDoc = data => {
+export const editDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doccategory`,
     method: 'put',
@@ -19,7 +19,7 @@ export const editDoc = data => {
 };
 
 //删除文档知识分类
-export const removeDoc = data => {
+export const removeDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doccategory`,
     method: 'delete',
@@ -28,7 +28,7 @@ export const removeDoc = data => {
 };
 
 //获取文档列表
-export const getList = data => {
+export const getList = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/list`,
     method: 'post',
@@ -36,7 +36,7 @@ export const getList = data => {
   })
 };
 //编辑文档
-export const modifyDoc = data => {
+export const modifyDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc`,
     method: 'put',
@@ -44,7 +44,7 @@ export const modifyDoc = data => {
   })
 };
 //删除文档
-export const deleteDoc = data => {
+export const deleteDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc`,
     method: 'delete',
@@ -62,7 +62,7 @@ export const importDoc = (data, source) => {
   })
 };
 //保存上传文档
-export const saveImportDoc = data => {
+export const saveImportDoc = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/save`,
     method: 'put',
@@ -70,14 +70,14 @@ export const saveImportDoc = data => {
   })
 };
 //获取文档下载链接
-export const getDocLink = id => {
+export const getDocLink = (id) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/download_url?id=${id}`,
     method: 'get',
   })
 };
 //命中测试
-export const test = data => {
+export const test = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/chunk/evaluate`,
     method: 'post',
@@ -85,7 +85,7 @@ export const test = data => {
   })
 };
 //上传文件删除无效数据
-export const deleteInvalid = data => {
+export const deleteInvalid = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/invalid`,
     method: 'delete',
@@ -93,7 +93,7 @@ export const deleteInvalid = data => {
   })
 };
 //从url上传
-export const setUploadURL = data => {
+export const setUploadURL = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/importUrl`,
     method: 'post',
@@ -101,7 +101,7 @@ export const setUploadURL = data => {
   })
 };
 // 解析url
-export const analyzeURL = data => {
+export const analyzeURL = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/analysisUrl`,
     method: 'post',
@@ -139,14 +139,14 @@ export const batchurl = (data, source) => {
     headers: { "Content-Type": "multipart/form-data" },
   })
 };
-export const batchUrlTaskStatus = data => {
+export const batchUrlTaskStatus = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/batchUrlTaskStatus`,
     method: 'get',
     params: data,
   })
 };
-export const importBatchUrl = data => {
+export const importBatchUrl = (data) => {
   return service({
     url: `${KNOWLEDGE_API}/ux/doc/importBatchUrl`,
     method: 'get',
@@ -163,7 +163,7 @@ export const BatchUrlDemo = () => {
 //new 获取知识库列表
 import { USER_API } from "@/utils/requestConstants";
 
-export const getKnowledgeList = data => {
+export const getKnowledgeList = (data) => {
   return service({
     url: `${USER_API}/knowledge/select`,
     method: 'post',
@@ -177,35 +177,35 @@ export const getKnowledgeList = data => {
 //         params
 //     })
 // };
-export const delKnowledgeItem = data => {
+export const delKnowledgeItem = (data) => {
   return service({
     url: `${USER_API}/knowledge`,
     method: 'delete',
     data,
   })
 };
-export const createKnowledgeItem = data => {
+export const createKnowledgeItem = (data) => {
   return service({
     url: `${USER_API}/knowledge`,
     method: 'post',
     data,
   })
 };
-export const editKnowledgeItem = data => {
+export const editKnowledgeItem = (data) => {
   return service({
     url: `${USER_API}/knowledge`,
     method: 'put',
     data,
   })
 };
-export const getDocList = params => {
+export const getDocList = (params) => {
   return service({
     url: `${USER_API}/knowledge/doc/list`,
     method: 'get',
     params,
   })
 };
-export const delDocItem = data => {
+export const delDocItem = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc`,
     method: 'delete',
@@ -213,7 +213,7 @@ export const delDocItem = data => {
   })
 };
 // 知识库文档导出
-export const exportDoc = data => {
+export const exportDoc = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/export`,
     method: 'post',
@@ -221,14 +221,14 @@ export const exportDoc = data => {
   })
 };
 // 上传文件提示接口
-export const uploadFileTips = params => {
+export const uploadFileTips = (params) => {
   return service({
     url: `${USER_API}/knowledge/doc/import/tip`,
     method: 'get',
     params,
   })
 };
-export const getSectionList = params => {
+export const getSectionList = (params) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/list`,
     method: 'get',
@@ -236,14 +236,14 @@ export const getSectionList = params => {
   })
 };
 //更新文档切片标签
-export const sectionLabels = data => {
+export const sectionLabels = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/labels`,
     method: 'post',
     data,
   })
 };
-export const setSectionStatus = data => {
+export const setSectionStatus = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/status/update`,
     method: 'post',
@@ -251,7 +251,7 @@ export const setSectionStatus = data => {
   })
 };
 
-export const setAnalysis = data => {
+export const setAnalysis = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/url/analysis`,
     method: 'post',
@@ -259,7 +259,7 @@ export const setAnalysis = data => {
   })
 };
 
-export const docImport = data => {
+export const docImport = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/import`,
     method: 'post',
@@ -268,7 +268,7 @@ export const docImport = data => {
 };
 
 //删除知识库标签
-export const delTag = data => {
+export const delTag = (data) => {
   return service({
     url: `${USER_API}/knowledge/tag`,
     method: 'delete',
@@ -276,7 +276,7 @@ export const delTag = data => {
   })
 };
 //查询知识库标签列表
-export const tagList = params => {
+export const tagList = (params) => {
   return service({
     url: `${USER_API}/knowledge/tag`,
     method: 'get',
@@ -284,7 +284,7 @@ export const tagList = params => {
   })
 };
 //创建知识库标签
-export const createTag = data => {
+export const createTag = (data) => {
   return service({
     url: `${USER_API}/knowledge/tag`,
     method: 'post',
@@ -292,7 +292,7 @@ export const createTag = data => {
   })
 };
 //修改知识库标签
-export const editTag = data => {
+export const editTag = (data) => {
   return service({
     url: `${USER_API}/knowledge/tag`,
     method: 'put',
@@ -300,7 +300,7 @@ export const editTag = data => {
   })
 };
 //绑定修改知识库标签
-export const bindTag = data => {
+export const bindTag = (data) => {
   return service({
     url: `${USER_API}/knowledge/tag/bind`,
     method: 'post',
@@ -309,7 +309,7 @@ export const bindTag = data => {
 };
 
 //查询标签绑定知识库数量
-export const bindTagCount = params => {
+export const bindTagCount = (params) => {
   return service({
     url: `${USER_API}/knowledge/tag/bind/count`,
     method: 'get',
@@ -318,7 +318,7 @@ export const bindTagCount = params => {
 };
 
 //命中测试接口
-export const hitTest = data => {
+export const hitTest = (data) => {
   return service({
     url: `${USER_API}/knowledge/hit`,
     method: 'post',
@@ -331,70 +331,70 @@ export const ocrSelectList = () => {
     method: 'get',
   })
 };
-export const updateDocMeta = data => {
+export const updateDocMeta = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/meta`,
     method: 'post',
     data,
   })
 };
-export const delSplitter = data => {
+export const delSplitter = (data) => {
   return service({
     url: `${USER_API}/knowledge/splitter`,
     method: 'delete',
     data,
   })
 };
-export const getSplitter = data => {
+export const getSplitter = (data) => {
   return service({
     url: `${USER_API}/knowledge/splitter`,
     method: 'get',
     params: data,
   })
 };
-export const createSplitter = data => {
+export const createSplitter = (data) => {
   return service({
     url: `${USER_API}/knowledge/splitter`,
     method: 'post',
     data,
   })
 };
-export const editSplitter = data => {
+export const editSplitter = (data) => {
   return service({
     url: `${USER_API}/knowledge/splitter`,
     method: 'put',
     data,
   })
 };
-export const createSegment = data => {
+export const createSegment = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/create`,
     method: 'post',
     data,
   })
 };
-export const createBatchSegment = data => {
+export const createBatchSegment = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/batch/create`,
     method: 'post',
     data,
   })
 };
-export const delSegment = data => {
+export const delSegment = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/delete`,
     method: 'delete',
     data,
   })
 };
-export const editSegment = data => {
+export const editSegment = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/update`,
     method: 'post',
     data,
   })
 };
-export const metaSelect = params => {
+export const metaSelect = (params) => {
   return service({
     url: `${USER_API}/knowledge/meta/select`,
     method: 'get',
@@ -407,7 +407,7 @@ export const parserSelect = () => {
     method: 'get',
   })
 };
-export const getSegmentChild = params => {
+export const getSegmentChild = (params) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/child/list`,
     method: 'get',
@@ -415,21 +415,21 @@ export const getSegmentChild = params => {
   })
 };
 
-export const createSegmentChild = data => {
+export const createSegmentChild = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/child/create`,
     method: 'post',
     data,
   })
 };
-export const delSegmentChild = data => {
+export const delSegmentChild = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/child/delete`,
     method: 'delete',
     data,
   })
 };
-export const updateSegmentChild = data => {
+export const updateSegmentChild = (data) => {
   return service({
     url: `${USER_API}/knowledge/doc/segment/child/update`,
     method: 'post',
@@ -437,7 +437,7 @@ export const updateSegmentChild = data => {
   })
 };
 // 获取知识库组织列表
-export const getOrgList = data => {
+export const getOrgList = (data)=> {
   return service({
     url: `${USER_API}/knowledge/org`,
     method: 'get',
@@ -445,7 +445,7 @@ export const getOrgList = data => {
   })
 };
 // 获取知识库组织列表
-export const getOrgUser = data => {
+export const getOrgUser = (data) => {
   return service({
     url: `${USER_API}/knowledge/user/no/permit`,
     method: 'get',
@@ -453,7 +453,7 @@ export const getOrgUser = data => {
   })
 };
 // 获取知识库用户权限列表
-export const getUserPower = data => {
+export const getUserPower = (data) => {
   return service({
     url: `${USER_API}/knowledge/user`,
     method: 'get',
@@ -461,7 +461,7 @@ export const getUserPower = data => {
   })
 };
 // 新增知识库用户权限
-export const addUserPower = data => {
+export const addUserPower = (data) => {
   return service({
     url: `${USER_API}/knowledge/user/add`,
     method: 'post',
@@ -469,7 +469,7 @@ export const addUserPower = data => {
   })
 };
 // 转让知识库管理权限
-export const transferUserPower = data => {
+export const transferUserPower = (data) => {
   return service({
     url: `${USER_API}/knowledge/user/admin/transfer`,
     method: 'post',
@@ -477,7 +477,7 @@ export const transferUserPower = data => {
   })
 };
 // 修改知识库用户权限
-export const editUserPower = data => {
+export const editUserPower = (data) => {
   return service({
     url: `${USER_API}/knowledge/user/edit`,
     method: 'post',
@@ -485,7 +485,7 @@ export const editUserPower = data => {
   })
 };
 // 删除知识库用户权限
-export const delUserPower = data => {
+export const delUserPower = (data) => {
   return service({
     url: `${USER_API}/knowledge/user/delete`,
     method: 'delete',
@@ -493,7 +493,7 @@ export const delUserPower = data => {
   })
 };
 //更新文档元数据
-export const updateMetaData = data => {
+export const updateMetaData = (data) => {
   return service({
     url: `${USER_API}/knowledge/meta/value/update`,
     method: 'post',
@@ -502,7 +502,7 @@ export const updateMetaData = data => {
 };
 
 //获取文档元数据列表
-export const getDocMetaList = data => {
+export const getDocMetaList = (data) => {
   return service({
     url: `${USER_API}/knowledge/meta/value/list`,
     method: 'post',
@@ -511,7 +511,7 @@ export const getDocMetaList = data => {
 };
 
 //获取知识图谱详情
-export const getGraphDetail = data => {
+export const getGraphDetail = (data) => {
   return service({
     url: `${USER_API}/knowledge/graph`,
     method: 'get',
@@ -520,7 +520,7 @@ export const getGraphDetail = data => {
 };
 
 //单条新增社区报告
-export const createCommunityReport = data => {
+export const createCommunityReport = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/add`,
     method: 'post',
@@ -528,7 +528,7 @@ export const createCommunityReport = data => {
   })
 };
 //批量新增社区报告
-export const createBatchCommunityReport = data => {
+export const createBatchCommunityReport = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/batch/add`,
     method: 'post',
@@ -536,7 +536,7 @@ export const createBatchCommunityReport = data => {
   })
 };
 //删除社区报告
-export const delCommunityReport = data => {
+export const delCommunityReport = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/delete`,
     method: 'delete',
@@ -544,7 +544,7 @@ export const delCommunityReport = data => {
   })
 };
 //生成社区报告
-export const generateCommunityReport = data => {
+export const generateCommunityReport = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/generate`,
     method: 'post',
@@ -552,7 +552,7 @@ export const generateCommunityReport = data => {
   })
 };
 //获取社区报告
-export const getCommunityReportList = data => {
+export const getCommunityReportList = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/list`,
     method: 'get',
@@ -560,7 +560,7 @@ export const getCommunityReportList = data => {
   })
 };
 //编辑社区报告
-export const editCommunityReportList = data => {
+export const editCommunityReportList = (data) => {
   return service({
     url: `${USER_API}/knowledge/report/update`,
     method: 'post',
