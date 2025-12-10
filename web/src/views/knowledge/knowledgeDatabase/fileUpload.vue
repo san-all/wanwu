@@ -46,7 +46,7 @@
                 action=""
                 :show-file-list="false"
                 :auto-upload="false"
-                multiple
+                :multiple="fileType !== 'fileUrl'"
                 accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html,.md,.ofd,.wps"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
