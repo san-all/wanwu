@@ -2720,6 +2720,14 @@ const docTemplate = `{
                 "fileUrl"
             ],
             "properties": {
+                "addPrefix": {
+                    "description": "是否添加 data:xxx;base64, 前缀",
+                    "type": "boolean"
+                },
+                "customPrefix": {
+                    "description": "自定义前缀（如 \"data:video/mp4;base64,\"）",
+                    "type": "string"
+                },
                 "fileUrl": {
                     "description": "文件URL",
                     "type": "string"
@@ -3105,11 +3113,15 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "file",
-                "fileName"
+                "fileExt"
             ],
             "properties": {
                 "file": {
                     "description": "base64格式",
+                    "type": "string"
+                },
+                "fileExt": {
+                    "description": "文件后缀名，如 \"png\", \"pdf\"",
                     "type": "string"
                 },
                 "fileName": {

@@ -29,8 +29,7 @@ func (r *CreateWorkflowByTemplateReq) Check() error {
 }
 
 type WorkflowUploadFileReq struct {
-	File     *multipart.FileHeader `form:"file" json:"file" validate:"required"` // 二进制格式
-	FileName string                `form:"fileName" json:"fileName" validate:"required"`
+	File *multipart.FileHeader `form:"file" json:"file" validate:"required"` // 二进制格式
 }
 
 func (u *WorkflowUploadFileReq) Check() error {
@@ -39,7 +38,8 @@ func (u *WorkflowUploadFileReq) Check() error {
 
 type WorkflowUploadFileByBase64Req struct {
 	File     string `form:"file" json:"file" validate:"required"` // base64格式
-	FileName string `form:"fileName" json:"fileName" validate:"required"`
+	FileName string `form:"fileName" json:"fileName"`
+	FileExt  string `form:"fileExt" json:"fileExt"` // 文件后缀名，如 "png", "pdf"
 }
 
 func (u *WorkflowUploadFileByBase64Req) Check() error {
