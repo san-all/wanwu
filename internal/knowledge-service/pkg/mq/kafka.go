@@ -68,7 +68,7 @@ func initKafkaAdmin() (sarama.ClusterAdmin, error) {
 func initKafka(kafkaAdmin sarama.ClusterAdmin) (sarama.SyncProducer, error) {
 	log.Infof("开始初始化Kafka配置")
 	defaultPartitionNum := config.GetConfig().Kafka.DefaultPartitionNum
-	var defaultTopic = config.GetConfig().Kafka.Topic
+	var defaultTopic = config.GetConfig().Topic.Topic
 	kafkaConfig := sarama.NewConfig()
 	kafkaConfig.ClientID = util.UUID()
 	kafkaConfig.Version = sarama.MaxVersion
@@ -137,7 +137,7 @@ func initKafka(kafkaAdmin sarama.ClusterAdmin) (sarama.SyncProducer, error) {
 	return producer, nil
 }
 
-func SendMessage(msg interface{}, topic string) error {
+func sendMessageToKafka(msg interface{}, topic string) error {
 	if msg == nil {
 		return errors.New("message is nil")
 	}
