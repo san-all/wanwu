@@ -714,7 +714,7 @@ export default {
         if (res.code === 0) {
           this.ruleForm = deepMerge(this.ruleForm, res.data);
           this.ruleFormBackup = JSON.parse(JSON.stringify(this.ruleForm));
-          this.ruleForm.docAnalyzer = [...this.ruleForm.docAnalyzer]
+          this.ruleForm.docAnalyzer = [...this.ruleForm.docAnalyzer];
           this.getModelOptions();
         }
       });
@@ -788,10 +788,7 @@ export default {
       this.$nextTick(() => {
         const { splitter, subSplitter } = this.ruleForm.docSegment;
         const filterByType = values =>
-          this.splitOptions.filter(
-            item =>
-              values.includes(item.splitterValue) && item.type === 'preset',
-          );
+          this.splitOptions.filter(item => values.includes(item.splitterValue));
         this.checkSplitter = {
           splitter: filterByType(splitter),
           subSplitter: filterByType(subSplitter),
@@ -890,7 +887,7 @@ export default {
     },
     showSplitterSet(type) {
       this.segmentType = type;
-      this.$refs.splitterDialog.showDiaglog(
+      this.$refs.splitterDialog.showDialog(
         this.checkSplitter[this.segmentType],
       );
     },
