@@ -31,6 +31,12 @@ func (c RedisClient) LoadType() string {
 }
 
 func (c RedisClient) Load() error {
+	if !config.GetConfig().Redis.Enabled {
+		log.Infof("Redis is not enabled, skip init")
+		return nil
+	}
+
+	log.Infof("Redis is enabled, start init")
 	client, err := initRedisClient()
 	if err != nil {
 		return err
@@ -53,6 +59,10 @@ func (c RedisClient) Load() error {
 }
 
 func (c RedisClient) Stop() error {
+	if !config.GetConfig().Redis.Enabled {
+		return nil
+	}
+
 	stopTrimTask()
 
 	if redisClient.Client != nil {

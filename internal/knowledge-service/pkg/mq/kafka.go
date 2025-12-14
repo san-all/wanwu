@@ -28,6 +28,12 @@ func (c Kafka) LoadType() string {
 }
 
 func (c Kafka) Load() error {
+	if !config.GetConfig().Kafka.Enabled {
+		log.Infof("Kafka is not enabled, skip init")
+		return nil
+	}
+
+	log.Infof("Kafka is enabled, start init")
 	admin, err := initKafkaAdmin()
 	if err != nil {
 		return err
