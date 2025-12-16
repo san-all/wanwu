@@ -796,7 +796,38 @@ export default {
       this.exportData(this.selectedDocIds);
     },
     handleBatchConfig() {
-      this.handleConfig(this.selectedDocIds);
+      const unprocessedDocs = this.selectedTableData.filter(
+        doc => doc.status !== KNOWLEDGE_STATUS_FINISH,
+      );
+      const allowedDocs = this.selectedTableData.filter(
+        doc => doc.status === KNOWLEDGE_STATUS_FINISH,
+      );
+
+      if (unprocessedDocs.length > 0) {
+        let message = this.$t('knowledgeManage.batchConfigTips', {
+          total: this.selectedTableData.length,
+          unprocessedNum: unprocessedDocs.length,
+        });
+        if (allowedDocs.length > 0) {
+          message += this.$t('knowledgeManage.continueTips');
+          this.$confirm(message, this.$t('knowledgeManage.tip'), {
+            confirmButtonText: this.$t('common.button.confirm'),
+            cancelButtonText: this.$t('common.button.cancel'),
+            type: 'warning',
+          })
+            .then(() => {
+              this.handleConfig(allowedDocs.map(doc => doc.docId));
+            })
+            .catch(() => {});
+        } else {
+          this.$alert(message, this.$t('knowledgeManage.tip'), {
+            confirmButtonText: this.$t('common.button.confirm'),
+            type: 'warning',
+          });
+        }
+      } else {
+        this.handleConfig(this.selectedDocIds);
+      }
     },
     async getTableData(data) {
       this.tableLoading = true;
