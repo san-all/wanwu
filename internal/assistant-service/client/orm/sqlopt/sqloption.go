@@ -135,3 +135,12 @@ func WithCustomPromptLikeName(name string) SQLOption {
 		return db.Where("name LIKE ?", "%"+name+"%")
 	})
 }
+
+func WithVersion(version string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if version != "" {
+			return db.Where("version = ?", version)
+		}
+		return db
+	})
+}
