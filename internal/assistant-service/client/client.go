@@ -19,6 +19,13 @@ type IClient interface {
 	CheckSameAssistantName(ctx context.Context, userID, orgID, name, assistantID string) *err_code.Status
 	CopyAssistant(ctx context.Context, assistant *model.Assistant, workflows []*model.AssistantWorkflow, mcps []*model.AssistantMCP, customTools []*model.AssistantTool) (uint32, *err_code.Status)
 
+	//================AssistantSnapshot================
+	CreateAssistantSnapshot(ctx context.Context, assistantSnapshot *model.AssistantSnapshot) (uint32, *err_code.Status)
+	UpdateAssistantSnapshot(ctx context.Context, assistantID uint32, desc string, userID, orgID string) *err_code.Status
+	GetAssistantSnapshotList(ctx context.Context, assistantID uint32, userID, orgID string) ([]*model.AssistantSnapshot, *err_code.Status)
+	GetAssistantSnapshot(ctx context.Context, assistantID uint32, version string, userID, orgID string) (*model.AssistantSnapshot, *err_code.Status)
+	RollbackAssistantSnapshot(ctx context.Context, assistant *model.Assistant, tools []*model.AssistantTool, mcps []*model.AssistantMCP, workflows []*model.AssistantWorkflow, userID, orgID string) *err_code.Status
+
 	//================AssistantWorkflow================
 	CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status
 	DeleteAssistantWorkflow(ctx context.Context, assistantId uint32, workflowId string) *err_code.Status
