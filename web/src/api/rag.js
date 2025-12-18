@@ -43,10 +43,3 @@ export const delRag = data => {
     data,
   });
 };
-export const ragChat = data => {
-  return service({
-    url: `${USER_API}/rag/chat`,
-    method: 'post',
-    data,
-  });
-};
