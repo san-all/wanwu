@@ -478,7 +478,7 @@ export default {
       getRagInfo({ ragId: this.editForm.appId })
         .then(res => {
           if (res.code === 0) {
-            this.publishType = res.data.publishType;
+            this.publishType = res.data.appPublishConfig.publishType;
             this.editForm.avatar = res.data.avatar;
             this.editForm.name = res.data.name;
             this.editForm.desc = res.data.desc;
