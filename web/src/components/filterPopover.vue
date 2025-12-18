@@ -5,7 +5,6 @@
       placement="bottom-start"
       trigger="hover"
       popper-class="filter-popover-popper"
-      @show="onPopoverShow"
       @hide="onPopoverHide"
     >
       <!-- 弹出内容区域 -->

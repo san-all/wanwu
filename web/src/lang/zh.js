@@ -241,6 +241,8 @@ export default {
       createErr: '创建失败',
       publish: '发布成功',
       publishErr: '发布失败',
+      retry: '重试成功',
+      retryErr: '重试失败',
     },
     safetyType: {
       political: '涉政',

@@ -2,7 +2,9 @@
   <div class="weburl-container">
     <div class="weburl-title">
       <span class="el-icon-arrow-left goback" @click="goback"></span>
-      <span class="weburl-title-text">{{ name }} - 发布配置</span>
+      <span class="weburl-title-text">
+        {{ name }} - {{ $t('agent.form.publishConfig') }}
+      </span>
     </div>
     <CommonLayout
       :showAside="true"

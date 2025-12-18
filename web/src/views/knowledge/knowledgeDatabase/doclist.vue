@@ -214,6 +214,12 @@
                         style="margin-left: 5px; color: #e6a23c"
                       ></span>
                     </el-tooltip>
+                    <i
+                      class="el-icon-refresh"
+                      style="margin-left: 5px; color: #409eff"
+                      @click="handleRetry(scope.row)"
+                      v-if="scope.row.status === KNOWLEDGE_STATUS_FAIL"
+                    ></i>
                   </template>
                 </el-table-column>
                 <el-table-column v-if="graphSwitch" prop="graphStatus">
@@ -389,6 +395,7 @@ import {
   uploadFileTips,
   updateDocMeta,
   exportDoc,
+  docReImport,
 } from '@/api/knowledge';
 import { mapGetters } from 'vuex';
 import {
@@ -712,30 +719,15 @@ export default {
       this.docQuery.metaValue = val;
       this.getTableData(this.docQuery);
     },
-    submitDocname(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.modifyDoc({
-            id: this.currentDocdata.id,
-            docName: this.ruleForm.docName,
-          });
+    handleRetry(data) {
+      docReImport({
+        docIdList: [data.docId],
+        knowledgeId: this.docQuery.knowledgeId,
+      }).then(res => {
+        if (res.code === 0) {
+          this.$message.success(this.$t('common.info.retry'));
         }
       });
-    },
-    async modifyDoc(data) {
-      this.loading = true;
-      const res = await modifyDoc(data);
-      if (res.code === 0) {
-        this.$message.success(this.$t('knowledgeManage.operateSuccess'));
-        this.docListVisible = false;
-        this.getTableData(this.docQuery);
-      }
-      this.loading = false;
-    },
-    handleEdit(data) {
-      this.ruleForm.docName = data.docName;
-      this.docListVisible = true;
-      this.currentDocdata = data;
     },
     async handleDelete(docIdList) {
       this.loading = true;

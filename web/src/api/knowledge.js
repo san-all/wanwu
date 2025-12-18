@@ -267,6 +267,14 @@ export const docImport = data => {
   });
 };
 
+export const docReImport = data => {
+  return service({
+    url: `${USER_API}/knowledge/doc/reimport`,
+    method: 'post',
+    data,
+  });
+};
+
 export const getDocConfig = params => {
   return service({
     url: `${USER_API}/knowledge/doc/config`,

@@ -25,15 +25,14 @@
         </div>
       </div>
       <div class="header-right">
-        <div class="header-api">
-          <el-tag effect="plain" class="root-url">
-            {{ $t('rag.form.apiRootUrl') }}
-          </el-tag>
-          {{ apiURL }}
-        </div>
-        <el-button @click="openApiDialog" plain class="apikeyBtn" size="small">
-          <img :src="require('@/assets/imgs/apikey.png')" />
-          {{ $t('rag.form.apiKey') }}
+        <el-button
+          size="small"
+          type="primary"
+          style="padding: 13px 12px"
+          @click="handlePublishSet"
+        >
+          <span class="el-icon-setting"></span>
+          {{ $t('agent.form.publishConfig') }}
         </el-button>
         <el-button
           size="small"
@@ -494,6 +493,16 @@ export default {
         if (res.code === 0) {
           this.rerankOptions = res.data.list || [];
         }
+      });
+    },
+    handlePublishSet() {
+      this.$router.push({
+        path: `/rag/publishSet`,
+        query: {
+          appId: this.editForm.appId,
+          appType: 'rag',
+          name: this.editForm.name,
+        },
       });
     },
     handlePublish() {
