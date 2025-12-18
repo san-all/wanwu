@@ -35,6 +35,7 @@
       </div>
       <div class="header-right">
         <el-button
+          v-if="publishType"
           size="small"
           type="primary"
           style="padding: 13px 12px"
@@ -648,8 +649,8 @@ export default {
       allTools: [], //所有的工具
       workflowList: [],
       modelParams: {},
-      platform: this.$platform,
       isPublish: false,
+      publishType: '',
       modleOptions: [],
       selectKnowledge: [],
       knowledgeData: [],
@@ -1122,6 +1123,7 @@ export default {
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
+        this.publishType = data.publishType;
         //兼容后端知识库数据返回null
         if (
           res.data.knowledgeBaseConfig &&

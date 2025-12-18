@@ -133,7 +133,7 @@
               <!--<el-dropdown-item command="cancelPublish" v-if="n.publishType">
                 {{ $t('common.button.cancelPublish') }}
               </el-dropdown-item>-->
-              <el-dropdown-item command="publishSet">
+              <el-dropdown-item command="publishSet" v-if="n.publishType">
                 {{ $t('appSpace.publishSet') }}
               </el-dropdown-item>
               <el-dropdown-item

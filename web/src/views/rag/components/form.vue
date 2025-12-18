@@ -26,6 +26,7 @@
       </div>
       <div class="header-right">
         <el-button
+          v-if="publishType"
           size="small"
           type="primary"
           style="padding: 13px 12px"
@@ -302,8 +303,8 @@ export default {
       workFlowInfos: [],
       workflowList: [],
       modelParams: '',
-      platform: this.$platform,
       isPublish: false,
+      publishType: '',
       modleOptions: [],
       selectKnowledge: [],
       loadingPercent: 10,
@@ -423,6 +424,7 @@ export default {
       getRagInfo({ ragId: this.editForm.appId })
         .then(res => {
           if (res.code === 0) {
+            this.publishType = res.data.publishType;
             this.editForm.avatar = res.data.avatar;
             this.editForm.name = res.data.name;
             this.editForm.desc = res.data.desc;
