@@ -793,7 +793,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ToolInfos:           assistantToolInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
-		NewAgent:            config.Cfg().Agent.UseNewAgent == 1,
+		NewAgent:            config.Cfg().Agent.UseOldAgent != 1,
 		PublishType:         appInfo.GetPublishType(),
 	}
 

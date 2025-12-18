@@ -89,7 +89,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		Draft: !needLatestPublished,
 	}
 	var stream grpc.ServerStreamingClient[assistant_service.AssistantConversionStreamResp]
-	newAgent := config.Cfg().Agent.UseNewAgent == 1
+	newAgent := config.Cfg().Agent.UseOldAgent != 1
 	if newAgent {
 		stream, err = assistant.AssistantConversionStreamNew(ctx.Request.Context(), agentReq)
 	} else {
