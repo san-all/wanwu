@@ -603,7 +603,7 @@ export default {
         visionConfig,
       };
     },
-    useToolNum(){
+    useToolNum() {
       return this.allTools.filter(item => item.enable).length;
     }
   },
