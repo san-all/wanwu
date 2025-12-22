@@ -270,7 +270,7 @@ export default {
       this.dialogVisible = false;
     },
     isExploreShowTool(n) {
-      return !this.isShowTool && [WORKFLOW, CHAT].includes(n.appType);
+      return this.appFrom === 'explore' && [WORKFLOW, CHAT].includes(n.appType);
     },
     isCanClick(n) {
       return true;
@@ -358,7 +358,11 @@ export default {
       }
     },
     workflowExport(row) {
-      exportWorkflow({ workflow_id: row.appId }, row.appType).then(response => {
+      exportWorkflow(
+        { workflow_id: row.appId },
+        row.appType,
+        this.appFrom !== 'explore',
+      ).then(response => {
         const blob = new Blob([response], { type: response.type });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
