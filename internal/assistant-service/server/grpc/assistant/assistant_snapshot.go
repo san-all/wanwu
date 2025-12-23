@@ -129,7 +129,7 @@ func (s *Service) AssistantSnapshotLatest(ctx context.Context, req *assistant_se
 	}, nil
 }
 func (s *Service) AssistantSnapshotInfo(ctx context.Context, req *assistant_service.AssistantSnapshotInfoReq) (*assistant_service.AssistantInfo, error) {
-	snapshotInfo, status := s.cli.GetAssistantSnapshot(ctx, util.MustU32(req.AssistantId), "")
+	snapshotInfo, status := s.cli.GetAssistantSnapshot(ctx, util.MustU32(req.AssistantId), req.Version)
 
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
@@ -283,6 +283,7 @@ func (s *Service) AssistantSnapshotInfo(ctx context.Context, req *assistant_serv
 		ToolInfos:           toolInfos,
 		CreatTime:           snapshotAssistant.CreatedAt,
 		UpdateTime:          snapshotAssistant.UpdatedAt,
+		UUID:                snapshotAssistant.UUID,
 	}, nil
 }
 

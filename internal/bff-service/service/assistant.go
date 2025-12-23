@@ -778,6 +778,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
+		UUID:                resp.UUID,
 		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief, constant.AppTypeAgent),
 		Prologue:            resp.Prologue,
 		Instructions:        resp.Instructions,
