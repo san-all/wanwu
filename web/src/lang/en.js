@@ -216,6 +216,7 @@ export default {
       success: '内容已复制到粘贴板',
       copyText: '副本',
     },
+    required: '必填',
     noData: '暂无数据',
     noBindEmail: '暂无邮箱',
     loading: '正在加载数据...',
