@@ -134,7 +134,8 @@ message AssistantSnapshotRollbackReq {
 
 message AssistantSnapshotInfoReq {
   string assistantId = 1;
-  Identity identity = 2;
+  string version = 2;
+  Identity identity = 3;
 }
 
 message AssistantUpdateReq {
@@ -241,6 +242,7 @@ message AssistantInfo {
   int64 updateTime = 17;
   AssistantSafetyConfig safetyConfig = 18;
   AssistantVisionConfig visionConfig = 19;
+  string UUID = 20;
 }
 
 

@@ -19,7 +19,7 @@ func (c *Client) CreateAssistantSnapshot(ctx context.Context, assistantSnapshot 
 			sqlopt.WithVersion(assistantSnapshot.Version),
 			sqlopt.DataPerm(assistantSnapshot.UserId, assistantSnapshot.OrgId),
 		).Apply(tx).First(&model.AssistantSnapshot{}).Error; err == nil {
-			return toErrStatus("assistant_snapshot", fmt.Sprintf("assistant snapshot version already exists: %v", err))
+			return toErrStatus("assistant_snapshot", "assistant snapshot version already exists")
 		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return toErrStatus("assistant_snapshot", fmt.Sprintf("assistant snapshot query failed: %v", err))
 		}
