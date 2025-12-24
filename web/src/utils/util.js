@@ -187,7 +187,7 @@ export const formatTools = tools => {
         name: key,
         requiredBadge:
           n.inputSchema.required && n.inputSchema.required.includes(key)
-            ? '必填'
+            ? i18n.t('common.required')
             : '',
         type: properties[key].type,
         description: properties[key].description,
