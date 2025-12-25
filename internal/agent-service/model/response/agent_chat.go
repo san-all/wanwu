@@ -35,6 +35,9 @@ type AgentChatRespContext struct {
 	ReplaceContent     strings.Builder // 替换内容，如果出现相同内则则进行替换
 	ReplaceContentStr  string          // 替换内容，如果出现相同内则则进行替换
 	ReplaceContentDone bool            //替换内容准备完成
+
+	ToolParamsStartCount int //工具参数开始的数量
+	ToolParamsEndCount   int //工具参数结束的数量
 }
 
 func NewAgentChatRespContext() *AgentChatRespContext {
@@ -131,7 +134,10 @@ func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRes
 					respContext.ToolIndex = *tool.Index
 				} else if *tool.Index != respContext.ToolIndex { //模型触发并发请求工具的bad case
 					respContext.ToolIndex = *tool.Index
-					retList = append(retList, toolParamsEndFormat)
+					if respContext.ToolParamsStartCount > respContext.ToolParamsEndCount {
+						respContext.ToolParamsEndCount = respContext.ToolParamsEndCount + 1
+						retList = append(retList, toolParamsEndFormat)
+					}
 				}
 				if len(tool.Function.Name) > 0 {
 					toolName := fmt.Sprintf(toolStartTitleFormat, tool.Function.Name)
@@ -139,6 +145,7 @@ func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRes
 				}
 
 				if isNewTool(tool, respContext) {
+					respContext.ToolParamsStartCount = respContext.ToolParamsStartCount + 1
 					retList = append(retList, toolStartTitle)
 					retList = append(retList, toolParamsStartFormat)
 					respContext.ToolCountMap[tool.ID] = 1
@@ -148,6 +155,7 @@ func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRes
 
 		return retList
 	} else if toolParamsEnd(chatMessage) {
+		respContext.ToolParamsEndCount = respContext.ToolParamsEndCount + 1
 		return []string{toolParamsEndFormat}
 	} else if toolEnd(chatMessage) {
 		respContext.ToolEnd = true
