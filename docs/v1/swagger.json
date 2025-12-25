@@ -1103,6 +1103,11 @@
                         "name": "ragId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1358,6 +1363,11 @@
                         "name": "ragId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1722,10 +1732,14 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "智能体id",
                         "name": "assistantId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2191,10 +2205,14 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "智能体id",
                         "name": "assistantId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -14094,6 +14112,9 @@
             "properties": {
                 "assistantId": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -16771,6 +16792,9 @@
             "properties": {
                 "ragId": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -17839,6 +17863,10 @@
                 },
                 "updatedAt": {
                     "description": "更新时间",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "智能体UUID",
                     "type": "string"
                 },
                 "visionConfig": {

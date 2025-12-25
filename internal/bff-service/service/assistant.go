@@ -88,6 +88,7 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if needLatestPublished {
 		resp, err = assistant.AssistantSnapshotInfo(ctx.Request.Context(), &assistant_service.AssistantSnapshotInfoReq{
 			AssistantId: req.AssistantId,
+			Version:     req.Version,
 		})
 	} else {
 		resp, err = assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
@@ -778,7 +779,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
-		UUID:                resp.UUID,
+		UUID:                resp.Uuid,
 		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief, constant.AppTypeAgent),
 		Prologue:            resp.Prologue,
 		Instructions:        resp.Instructions,

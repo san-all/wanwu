@@ -78,8 +78,8 @@ func AssistantConfigUpdate(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			assistantId	query		string	true	"智能体id"
-//	@Success		200			{object}	response.Response{data=response.Assistant}
+//	@Param			data	query		request.AssistantIdRequest	true	"获取智能体信息的请求参数"
+//	@Success		200		{object}	response.Response{data=response.Assistant}
 //	@Router			/assistant [get]
 func GetPublishedAssistantInfo(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
@@ -99,8 +99,8 @@ func GetPublishedAssistantInfo(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			assistantId	query		string	true	"智能体id"
-//	@Success		200			{object}	response.Response{data=response.Assistant}
+//	@Param			data	query		request.AssistantIdRequest	true	"获取智能体信息的请求参数"
+//	@Success		200		{object}	response.Response{data=response.Assistant}
 //	@Router			/assistant/draft [get]
 func GetDraftAssistantInfo(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)

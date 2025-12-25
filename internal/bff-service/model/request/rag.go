@@ -28,7 +28,8 @@ type History struct {
 }
 
 type RagReq struct {
-	RagID string `form:"ragId" json:"ragId" validate:"required"`
+	RagID   string `form:"ragId" json:"ragId" validate:"required"`
+	Version string `form:"version" json:"version"`
 }
 
 func (r RagBrief) Check() error {

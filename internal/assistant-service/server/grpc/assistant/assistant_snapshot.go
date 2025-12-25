@@ -283,7 +283,7 @@ func (s *Service) AssistantSnapshotInfo(ctx context.Context, req *assistant_serv
 		ToolInfos:           toolInfos,
 		CreatTime:           snapshotAssistant.CreatedAt,
 		UpdateTime:          snapshotAssistant.UpdatedAt,
-		UUID:                snapshotAssistant.UUID,
+		Uuid:                snapshotAssistant.UUID,
 	}, nil
 }
 

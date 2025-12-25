@@ -371,7 +371,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 			UserId: assistant.UserId,
 			OrgId:  assistant.OrgId,
 		},
-		UUID: assistant.UUID,
+		Uuid: assistant.UUID,
 		AssistantBrief: &common.AppBriefConfig{
 			Name:       assistant.Name,
 			AvatarPath: assistant.AvatarPath,

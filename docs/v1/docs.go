@@ -1110,6 +1110,11 @@ const docTemplate = `{
                         "name": "ragId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1365,6 +1370,11 @@ const docTemplate = `{
                         "name": "ragId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1729,10 +1739,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "智能体id",
                         "name": "assistantId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2198,10 +2212,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "智能体id",
                         "name": "assistantId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "version",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -14101,6 +14119,9 @@ const docTemplate = `{
             "properties": {
                 "assistantId": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -16778,6 +16799,9 @@ const docTemplate = `{
             "properties": {
                 "ragId": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -17846,6 +17870,10 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "description": "更新时间",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "智能体UUID",
                     "type": "string"
                 },
                 "visionConfig": {

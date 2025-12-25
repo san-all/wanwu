@@ -1133,6 +1133,8 @@ definitions:
     properties:
       assistantId:
         type: string
+      version:
+        type: string
     required:
     - assistantId
     type: object
@@ -2953,6 +2955,8 @@ definitions:
     properties:
       ragId:
         type: string
+      version:
+        type: string
     required:
     - ragId
     type: object
@@ -3689,6 +3693,9 @@ definitions:
         type: array
       updatedAt:
         description: 更新时间
+        type: string
+      uuid:
+        description: 智能体UUID
         type: string
       visionConfig:
         allOf:
@@ -7044,6 +7051,9 @@ paths:
         name: ragId
         required: true
         type: string
+      - in: query
+        name: version
+        type: string
       produces:
       - application/json
       responses:
@@ -7169,6 +7179,9 @@ paths:
       - in: query
         name: ragId
         required: true
+        type: string
+      - in: query
+        name: version
         type: string
       produces:
       - application/json
@@ -7377,10 +7390,12 @@ paths:
       - application/json
       description: 查看已发布智能体详情
       parameters:
-      - description: 智能体id
-        in: query
+      - in: query
         name: assistantId
         required: true
+        type: string
+      - in: query
+        name: version
         type: string
       produces:
       - application/json
@@ -7651,10 +7666,12 @@ paths:
       - application/json
       description: 查看草稿智能体详情
       parameters:
-      - description: 智能体id
-        in: query
+      - in: query
         name: assistantId
         required: true
+        type: string
+      - in: query
+        name: version
         type: string
       produces:
       - application/json

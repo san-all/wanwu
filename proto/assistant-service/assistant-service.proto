@@ -242,7 +242,7 @@ message AssistantInfo {
   int64 updateTime = 17;
   AssistantSafetyConfig safetyConfig = 18;
   AssistantVisionConfig visionConfig = 19;
-  string UUID = 20;
+  string uuid = 20;
 }
 
 

@@ -188,6 +188,7 @@ func GetRag(ctx *gin.Context, req request.RagReq, needLatestPublished bool) (*re
 	resp, err := rag.GetRagDetail(ctx.Request.Context(), &rag_service.RagDetailReq{
 		RagId:   req.RagID,
 		Publish: util.IfElse(needLatestPublished, int32(1), int32(0)),
+		Version: req.Version,
 	})
 	if err != nil {
 		return nil, err
