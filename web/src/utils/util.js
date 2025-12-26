@@ -2,6 +2,7 @@ import router from '@/router/index';
 import { menuList } from '@/views/layout/menu';
 import { checkPerm, PERMS } from '@/router/permission';
 import { i18n } from '@/lang';
+import { Message } from 'element-ui';
 import { basePath } from '@/utils/config';
 
 export function guid() {
@@ -100,6 +101,21 @@ export const replaceIcon = logoPath => {
 
 export const replaceTitle = title => {
   document.title = title || i18n.t('header.title');
+};
+
+export const copy = text => {
+  let textareaEl = document.createElement('textarea');
+  textareaEl.setAttribute('readonly', 'readonly'); // 防止手机上弹出软键盘
+  textareaEl.value = text;
+  document.body.appendChild(textareaEl);
+  textareaEl.select();
+  const res = document.execCommand('copy');
+  document.body.removeChild(textareaEl);
+  return res;
+};
+
+export const copyCb = () => {
+  Message.success(i18n.t('common.copy.success'));
 };
 
 export const getInitTimeRange = () => {

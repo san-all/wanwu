@@ -33,17 +33,39 @@
             prop="desc"
             :label="$t('apiKeyManage.table.desc')"
             align="left"
-          />
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.desc || '--' }}</span>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="key"
             :label="$t('apiKeyManage.table.apiKey')"
             align="left"
-          />
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.key.slice(0, 6) + '******' }}</span>
+              <i
+                class="el-icon-copy-document copy-icon"
+                :title="$t('appManage.button.copy')"
+                @click="
+                  () => {
+                    copy(scope.row.key) && copyCb();
+                  }
+                "
+              ></i>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="expiredAt"
             :label="$t('apiKeyManage.table.expiredAt')"
             align="left"
-          />
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.expiredAt || '--' }}</span>
+            </template>
+          </el-table-column>
+          >
           <el-table-column
             prop="createdAt"
             :label="$t('apiKeyManage.table.createdAt')"
@@ -113,6 +135,7 @@ import {
   changeApiKeyStatus,
   deleteApiKey,
 } from '@/api/apiKeyManagement';
+import { copy, copyCb } from '@/utils/util';
 export default {
   components: { Pagination, CreateApiKeyDialog },
   data() {
@@ -126,6 +149,8 @@ export default {
     this.getTableData();
   },
   methods: {
+    copy,
+    copyCb,
     reloadData() {
       this.getTableData({ pageNo: 1 });
     },
