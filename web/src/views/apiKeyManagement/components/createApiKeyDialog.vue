@@ -126,7 +126,7 @@ export default {
             : await createApiKey(params);
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'));
-            this.dialogVisible = false;
+            this.handleClose();
             this.$emit('reloadData', this.isEdit ? {} : { pageNo: 1 });
           }
         } finally {
