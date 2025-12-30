@@ -81,14 +81,6 @@ func (s *Service) ChangeModelStatus(ctx context.Context, req *model_service.Mode
 	return nil, nil
 }
 
-func (s *Service) GetModelById(ctx context.Context, req *model_service.GetModelByIdReq) (*model_service.ModelInfo, error) {
-	modelInfo, err := s.cli.GetModelById(ctx, util.MustU32(req.ModelId))
-	if err != nil {
-		return nil, errStatus(errs.Code_ModelGetModelById, err)
-	}
-	return toModelInfo(modelInfo), nil
-}
-
 func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
 	return &model_service.ModelInfo{
 		ModelId:        util.Int2Str(modelInfo.ID),
@@ -171,26 +163,6 @@ func (s *Service) ListTypeModels(ctx context.Context, req *model_service.ListTyp
 		return nil, errStatus(errs.Code_ModelListTypeModels, err)
 	}
 	return toModelInfos(modelInfos), nil
-}
-
-func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
-	return &model_service.ModelInfo{
-		ModelId:        util.Int2Str(modelInfo.ID),
-		Uuid:           modelInfo.UUID,
-		Provider:       modelInfo.Provider,
-		ModelType:      modelInfo.ModelType,
-		Model:          modelInfo.Model,
-		DisplayName:    modelInfo.DisplayName,
-		ModelIconPath:  modelInfo.ModelIconPath,
-		IsActive:       modelInfo.IsActive,
-		PublishDate:    modelInfo.PublishDate,
-		ProviderConfig: modelInfo.ProviderConfig,
-		UserId:         modelInfo.UserID,
-		OrgId:          modelInfo.OrgID,
-		CreatedAt:      modelInfo.CreatedAt,
-		UpdatedAt:      modelInfo.UpdatedAt,
-		ModelDesc:      modelInfo.ModelDesc,
-	}
 }
 
 func toModelInfos(modelInfos []*model.ModelImported) *model_service.ModelInfos {

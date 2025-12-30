@@ -66,7 +66,7 @@ func (s *Service) GetDocList(ctx context.Context, req *knowledgebase_doc_service
 
 	//按文档名字查询列表
 	list, total, err := orm.GetDocList(ctx, "", "", req.KnowledgeId,
-		req.DocName, req.DocTag, util.BuildDocReqStatusList(int(req.Status)), docIdList, req.PageSize, req.PageNum)
+		req.DocName, req.DocTag, util.BuildDocReqStatusList(req.Status), util.BuildDocReqGraphStatusList(req.GraphStatus), docIdList, req.PageSize, req.PageNum)
 	if err != nil {
 		log.Errorf("获取知识库列表失败(%v)  参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
@@ -86,10 +86,18 @@ func (s *Service) GetDocList(ctx context.Context, req *knowledgebase_doc_service
 func (s *Service) GetDocDetail(ctx context.Context, req *knowledgebase_doc_service.GetDocDetailReq) (*knowledgebase_doc_service.DocInfo, error) {
 	doc, err := orm.GetDocDetail(ctx, req.UserId, req.OrgId, req.DocId)
 	if err != nil {
-		log.Errorf("获取知识库列表失败(%v)  参数(%v)", err, req)
-		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
+		log.Errorf("获取知识库文档详情失败(%v)  参数(%v)", err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSearchFail)
 	}
-	return buildDocInfo(doc, make(map[string]*model.SegmentConfig)), nil
+	var importTask *model.KnowledgeImportTask
+	if req.NeedConfig {
+		importTask, err = orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
+		if err != nil {
+			log.Errorf("获取知识库文档详情失败(%v)  参数(%v)", err, req)
+			return nil, util.ErrCode(errs.Code_KnowledgeDocSearchFail)
+		}
+	}
+	return buildDocInfo(doc, make(map[string]*model.SegmentConfig), importTask), nil
 }
 
 func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.ImportDocReq) (*emptypb.Empty, error) {
@@ -376,7 +384,7 @@ func buildAddMetaList(req *knowledgebase_doc_service.UpdateDocMetaDataReq) []*mo
 		if reqMeta.Option == MetaOptionAdd {
 			addList = append(addList, &model.KnowledgeDocMeta{
 				KnowledgeId: req.KnowledgeId,
-				MetaId:      generator.GetGenerator().NewID(),
+				MetaId:      wanwu_util.NewID(),
 				Key:         reqMeta.Key,
 				ValueType:   reqMeta.ValueType,
 				Rule:        "",
@@ -606,7 +614,7 @@ func buildDocListResp(list []*model.KnowledgeDoc, importTaskList []*model.Knowle
 			if item.GraphStatus == model.GraphSuccess {
 				showGraphReport = true
 			}
-			retList = append(retList, buildDocInfo(item, segmentConfigMap))
+			retList = append(retList, buildDocInfo(item, segmentConfigMap, nil))
 		}
 	}
 	return &knowledgebase_doc_service.GetDocListResp{
@@ -778,7 +786,7 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 		DocAnalyzer:   string(analyzer),
 		CreatedAt:     time.Now().UnixMilli(),
 		UpdatedAt:     time.Now().UnixMilli(),
-		DocInfo:       db.LongText(docImportInfo),
+		DocInfo:       db2.LongText(docImportInfo),
 		OcrModelId:    req.OcrModelId,
 		DocPreProcess: string(preprocess),
 		MetaData:      docImportMetaData,
@@ -835,7 +843,7 @@ func buildReImportTask(req *knowledgebase_doc_service.UpdateDocImportConfigReq, 
 		DocAnalyzer:   string(analyzer),
 		CreatedAt:     time.Now().UnixMilli(),
 		UpdatedAt:     time.Now().UnixMilli(),
-		DocInfo:       string(docImportInfo),
+		DocInfo:       db2.LongText(docImportInfo),
 		OcrModelId:    docImportReq.OcrModelId,
 		DocPreProcess: string(preprocess),
 		MetaData:      "",
@@ -869,7 +877,7 @@ func buildReimportTask(req *knowledgebase_doc_service.ReImportDocReq, task *mode
 		DocAnalyzer:   task.DocAnalyzer,
 		CreatedAt:     time.Now().UnixMilli(),
 		UpdatedAt:     time.Now().UnixMilli(),
-		DocInfo:       string(docImportInfo),
+		DocInfo:       db2.LongText(docImportInfo),
 		OcrModelId:    task.OcrModelId,
 		DocPreProcess: task.DocPreProcess,
 		MetaData:      "",
@@ -1159,7 +1167,7 @@ func buildKnowledgeInfo(ctx context.Context, docId string) (*model.KnowledgeBase
 	}
 
 	//构造知识库图谱
-	knowledgeGraph := orm.BuildKnowledgeGraph(knowledge.KnowledgeGraph)
+	knowledgeGraph := orm.BuildKnowledgeGraph(string(knowledge.KnowledgeGraph))
 	return knowledge, doc, knowledgeGraph, nil
 }
 

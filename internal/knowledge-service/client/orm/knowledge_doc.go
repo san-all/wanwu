@@ -377,7 +377,7 @@ func ReImportKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTa
 			return nil
 		}
 		//构造知识库图谱
-		knowledgeGraph := BuildKnowledgeGraph(knowledge.KnowledgeGraph)
+		knowledgeGraph := BuildKnowledgeGraph(string(knowledge.KnowledgeGraph))
 		//2.rag文档导入
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
 			DocId:                 doc.DocId,

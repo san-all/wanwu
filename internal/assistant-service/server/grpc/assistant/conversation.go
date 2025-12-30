@@ -209,7 +209,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		if status != nil {
 			log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
 			SSEError(stream, "智能体信息获取失败")
-			saveConversation(ctx, req, "智能体信息获取失败", "")
+			s.saveConversation(ctx, req, "智能体信息获取失败", "")
 			return errStatus(errs.Code_AssistantConversationErr, status)
 		}
 	} else {
@@ -217,13 +217,13 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		if status != nil {
 			log.Errorf("Assistant服务获取智能体快照失败，assistantId: %s, error: %v", req.AssistantId, status)
 			SSEError(stream, "智能体快照获取失败")
-			saveConversation(ctx, req, "智能体快照获取失败", "")
+			s.saveConversation(ctx, req, "智能体快照获取失败", "")
 			return errStatus(errs.Code_AssistantConversationErr, status)
 		}
 
 		if err := jsonToStruct(assistantSnapshot.AssistantInfo, &assistant); err != nil {
 			SSEError(stream, "智能体信息获取失败")
-			saveConversation(ctx, req, "智能体信息获取失败", "")
+			s.saveConversation(ctx, req, "智能体信息获取失败", "")
 			return errStatus(errs.Code_AssistantErr, toErrStatus("assistant_snapshot", err.Error()))
 		}
 	}

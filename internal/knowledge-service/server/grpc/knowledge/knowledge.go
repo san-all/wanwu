@@ -15,7 +15,6 @@ import (
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	rag_service "github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -743,7 +742,7 @@ func checkRepeatedMetaKey(metaList []*model.KnowledgeDocMeta) []*model.Knowledge
 func buildKnowledgeInfo(knowledge *model.KnowledgeBase) *knowledgebase_service.KnowledgeInfo {
 	embeddingModelInfo := &knowledgebase_service.EmbeddingModelInfo{}
 	_ = json.Unmarshal([]byte(knowledge.EmbeddingModel), embeddingModelInfo)
-	graph := orm.BuildKnowledgeGraph(knowledge.KnowledgeGraph)
+	graph := orm.BuildKnowledgeGraph(string(knowledge.KnowledgeGraph))
 	docCount := knowledge.DocCount
 	if docCount < 0 {
 		docCount = 0
