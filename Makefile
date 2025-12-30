@@ -1,4 +1,4 @@
-WANWU_VERSION := v0.3.0
+WANWU_VERSION := v0.3.3
 
 LDFLAGS := -X main.buildTime=$(shell date +%Y-%m-%d,%H:%M:%S) \
 			-X main.buildVersion=${WANWU_VERSION} \

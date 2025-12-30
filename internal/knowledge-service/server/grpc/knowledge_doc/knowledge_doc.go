@@ -114,6 +114,63 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 	return &emptypb.Empty{}, nil
 }
 
+// UpdateDocImportConfig 更新文档导入配置
+func (s *Service) UpdateDocImportConfig(ctx context.Context, req *knowledgebase_doc_service.UpdateDocImportConfigReq) (*emptypb.Empty, error) {
+	//1.文档状态校验
+	if err := checkDocFinishStatus(ctx, req); err != nil {
+		return nil, err
+	}
+	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, "", "")
+	if err != nil {
+		return nil, err
+	}
+	//2.文档状态更新成待处理
+	err = orm.BatchUpdateDocStatus(ctx, req.DocIdList, model.DocInit)
+	if err != nil {
+		log.Errorf("update doc status %v", err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateConfigFail)
+	}
+	//3.批量处理文档导入配置
+	batchProcessDocConfig(req, knowledge)
+	return &emptypb.Empty{}, nil
+}
+
+// ReImportDoc 重新解析文档
+func (s *Service) ReImportDoc(ctx context.Context, req *knowledgebase_doc_service.ReImportDocReq) (*emptypb.Empty, error) {
+	//1.文档详情查询
+	docInfos, err := orm.SelectDocByDocIdList(ctx, req.DocIdList, "", "")
+	if err != nil {
+		log.Errorf("get doc info %v", err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSearchFail)
+	}
+	//2.文档校验
+	docIdList, err := checkDocFile(ctx, req, docInfos)
+	if err != nil {
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSearchFail)
+	}
+	req.DocIdList = docIdList
+	docInfoMap := buildDocInfoMap(docInfos)
+	// 3.导入任务详情查询
+	knowledge, err := orm.SelectKnowledgeById(ctx, req.KnowledgeId, "", "")
+	if err != nil {
+		return nil, err
+	}
+	tasks, err := orm.SelectKnowledgeImportTaskByIdList(ctx, buildImportTaskIdList(docInfos))
+	if err != nil {
+		return nil, err
+	}
+	docTaskMap := buildDocTaskMap(tasks)
+	//4.文档状态更新成待处理
+	err = orm.BatchUpdateDocStatus(ctx, req.DocIdList, model.DocInit)
+	if err != nil {
+		log.Errorf("update doc status %v", err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
+	}
+	//5.批量导入文档
+	batchReimportDoc(req, docTaskMap, knowledge, docInfoMap)
+	return &emptypb.Empty{}, nil
+}
+
 func (s *Service) ExportDoc(ctx context.Context, req *knowledgebase_doc_service.ExportDocReq) (*emptypb.Empty, error) {
 	task, err := buildDocExportTask(req)
 	if err != nil {

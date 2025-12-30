@@ -81,25 +81,6 @@ func (s *Service) ChangeModelStatus(ctx context.Context, req *model_service.Mode
 	return nil, nil
 }
 
-func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
-	return &model_service.ModelInfo{
-		ModelId:        util.Int2Str(modelInfo.ID),
-		Provider:       modelInfo.Provider,
-		ModelType:      modelInfo.ModelType,
-		Model:          modelInfo.Model,
-		DisplayName:    modelInfo.DisplayName,
-		ModelIconPath:  modelInfo.ModelIconPath,
-		IsActive:       modelInfo.IsActive,
-		PublishDate:    modelInfo.PublishDate,
-		ProviderConfig: string(modelInfo.ProviderConfig),
-		UserId:         modelInfo.UserID,
-		OrgId:          modelInfo.OrgID,
-		CreatedAt:      modelInfo.CreatedAt,
-		UpdatedAt:      modelInfo.UpdatedAt,
-		ModelDesc:      string(modelInfo.ModelDesc),
-	}
-}
-
 func (s *Service) GetModelByIds(ctx context.Context, req *model_service.GetModelByIdsReq) (*model_service.ModelInfos, error) {
 	var modelIDs []uint32
 	for _, modelID := range req.ModelIds {
@@ -163,6 +144,26 @@ func (s *Service) ListTypeModels(ctx context.Context, req *model_service.ListTyp
 		return nil, errStatus(errs.Code_ModelListTypeModels, err)
 	}
 	return toModelInfos(modelInfos), nil
+}
+
+func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
+	return &model_service.ModelInfo{
+		ModelId:        util.Int2Str(modelInfo.ID),
+		Uuid:           modelInfo.UUID,
+		Provider:       modelInfo.Provider,
+		ModelType:      modelInfo.ModelType,
+		Model:          modelInfo.Model,
+		DisplayName:    modelInfo.DisplayName,
+		ModelIconPath:  modelInfo.ModelIconPath,
+		IsActive:       modelInfo.IsActive,
+		PublishDate:    modelInfo.PublishDate,
+		ProviderConfig: string(modelInfo.ProviderConfig),
+		UserId:         modelInfo.UserID,
+		OrgId:          modelInfo.OrgID,
+		CreatedAt:      modelInfo.CreatedAt,
+		UpdatedAt:      modelInfo.UpdatedAt,
+		ModelDesc:      string(modelInfo.ModelDesc),
+	}
 }
 
 func toModelInfos(modelInfos []*model.ModelImported) *model_service.ModelInfos {
