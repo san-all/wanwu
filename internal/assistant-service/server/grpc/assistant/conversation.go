@@ -19,6 +19,7 @@ import (
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	"github.com/UnicomAI/wanwu/api/proto/common"
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
@@ -200,12 +201,31 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		return err
 	}
 
-	assistant, status := s.cli.GetAssistant(ctx, uint32(assistantID), "", "")
-	if status != nil {
-		log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
-		SSEError(stream, "智能体信息获取失败")
-		s.saveConversation(ctx, req, "智能体信息获取失败", "")
-		return errStatus(errs.Code_AssistantConversationErr, status)
+	var assistant *model.Assistant
+	var assistantSnapshot *model.AssistantSnapshot
+	var status *err_code.Status
+	if req.Draft {
+		assistant, status = s.cli.GetAssistant(ctx, uint32(assistantID), "", "")
+		if status != nil {
+			log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
+			SSEError(stream, "智能体信息获取失败")
+			saveConversation(ctx, req, "智能体信息获取失败", "")
+			return errStatus(errs.Code_AssistantConversationErr, status)
+		}
+	} else {
+		assistantSnapshot, status = s.cli.GetAssistantSnapshot(ctx, uint32(assistantID), "")
+		if status != nil {
+			log.Errorf("Assistant服务获取智能体快照失败，assistantId: %s, error: %v", req.AssistantId, status)
+			SSEError(stream, "智能体快照获取失败")
+			saveConversation(ctx, req, "智能体快照获取失败", "")
+			return errStatus(errs.Code_AssistantConversationErr, status)
+		}
+
+		if err := jsonToStruct(assistantSnapshot.AssistantInfo, &assistant); err != nil {
+			SSEError(stream, "智能体信息获取失败")
+			saveConversation(ctx, req, "智能体信息获取失败", "")
+			return errStatus(errs.Code_AssistantErr, toErrStatus("assistant_snapshot", err.Error()))
+		}
 	}
 
 	log.Debugf("Assistant服务获取到智能体信息，assistantId: %s, 名称: %s, Scope: %d, userId: %s, orgId: %s",
@@ -252,14 +272,14 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	}
 
 	// plugin参数配置
-	if err := s.setToolAndWorkflowParams(ctx, sseReq, req.AssistantId, req.Identity); err != nil {
+	if err := s.setToolAndWorkflowParams(ctx, sseReq, req.AssistantId, req.Identity, req.Draft, assistantSnapshot); err != nil {
 		SSEError(stream, "智能体plugin配置错误")
 		s.saveConversation(ctx, req, "智能体plugin配置错误", "")
 		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "plugin配置错误")
 	}
 
 	// MCP 信息参数配置
-	if err = s.setMCPParams(ctx, sseReq, assistant); err != nil {
+	if err = s.setMCPParams(ctx, sseReq, assistant, req.Draft, assistantSnapshot); err != nil {
 		SSEError(stream, "智能体MCP配置解析失败")
 		s.saveConversation(ctx, req, "智能体MCP配置解析失败", "")
 		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "MCP配置解析失败")
@@ -464,20 +484,33 @@ func (s *Service) AssistantConversionStreamNew(req *assistant_service.AssistantC
 	}()
 
 	// 根据智能体id查询智能体信息
-	assistantID, err := strconv.ParseUint(req.AssistantId, 10, 32)
-	if err != nil {
-		log.Errorf("Assistant服务智能体ID转换失败，assistantId: %s, error: %v", req.AssistantId, err)
-		return err
-	}
+	assistantID := util.MustU32(req.AssistantId)
+	var assistant *model.Assistant
+	var assistantSnapshot *model.AssistantSnapshot
+	var status *err_code.Status
+	if req.Draft {
+		assistant, status = s.cli.GetAssistant(ctx, assistantID, "", "")
+		if status != nil {
+			log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
+			SSEError(stream, "智能体信息获取失败")
+			s.saveConversation(ctx, req, "智能体信息获取失败", "")
+			return errStatus(errs.Code_AssistantConversationErr, status)
+		}
+	} else {
+		assistantSnapshot, status = s.cli.GetAssistantSnapshot(ctx, assistantID, "")
+		if status != nil {
+			log.Errorf("Assistant服务获取智能体快照失败，assistantId: %s, error: %v", req.AssistantId, status)
+			SSEError(stream, "智能体快照获取失败")
+			s.saveConversation(ctx, req, "智能体快照获取失败", "")
+			return errStatus(errs.Code_AssistantConversationErr, status)
+		}
 
-	assistant, status := s.cli.GetAssistant(ctx, uint32(assistantID), "", "")
-	if status != nil {
-		log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
-		SSEError(stream, "智能体信息获取失败")
-		s.saveConversation(ctx, req, "智能体信息获取失败", "")
-		return errStatus(errs.Code_AssistantConversationErr, status)
+		if err := jsonToStruct(assistantSnapshot.AssistantInfo, &assistant); err != nil {
+			SSEError(stream, "智能体信息获取失败")
+			s.saveConversation(ctx, req, "智能体信息获取失败", "")
+			return errStatus(errs.Code_AssistantErr, toErrStatus("assistant_snapshot", err.Error()))
+		}
 	}
-
 	log.Debugf("Assistant服务获取到智能体信息，assistantId: %s, 名称: %s, Scope: %d, userId: %s, orgId: %s",
 		req.AssistantId, assistant.Name, assistant.Scope, assistant.UserId, assistant.OrgId)
 
@@ -504,7 +537,7 @@ func (s *Service) AssistantConversionStreamNew(req *assistant_service.AssistantC
 	sseReq.UploadFileUrl = extractFileUrls(req.FileInfo)
 
 	// 模型参数配置
-	_, err = s.setModelConfigParams(sseReq, assistant)
+	_, err := s.setModelConfigParams(sseReq, assistant)
 	if err != nil {
 		SSEError(stream, "智能体模型配置解析失败")
 		s.saveConversation(ctx, req, "智能体模型配置解析失败", "")
@@ -519,14 +552,14 @@ func (s *Service) AssistantConversionStreamNew(req *assistant_service.AssistantC
 	}
 
 	// plugin参数配置
-	if err := s.setToolAndWorkflowParamsNew(ctx, sseReq, req.AssistantId, req.Identity); err != nil {
+	if err := s.setToolAndWorkflowParamsNew(ctx, sseReq, req.AssistantId, req.Identity, req.Draft, assistantSnapshot); err != nil {
 		SSEError(stream, "智能体plugin配置错误")
 		s.saveConversation(ctx, req, "智能体plugin配置错误", "")
 		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "plugin配置错误")
 	}
 
 	// MCP 信息参数配置
-	if err = s.setMCPParams(ctx, sseReq, assistant); err != nil {
+	if err = s.setMCPParams(ctx, sseReq, assistant, req.Draft, assistantSnapshot); err != nil {
 		SSEError(stream, "智能体MCP配置解析失败")
 		s.saveConversation(ctx, req, "智能体MCP配置解析失败", "")
 		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "MCP配置解析失败")
@@ -773,13 +806,13 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 }
 
 // 设置工具（自定义工具、内置工具与工作流）
-func (s *Service) setToolAndWorkflowParams(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity) error {
-	toolPluginList, err := s.buildToolPluginListAlgParam(ctx, sseReq, assistantId, identity)
+func (s *Service) setToolAndWorkflowParams(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity, draft bool, assistantSnapshot *model.AssistantSnapshot) error {
+	toolPluginList, err := s.buildToolPluginListAlgParam(ctx, sseReq, assistantId, identity, draft, assistantSnapshot)
 	if err != nil {
 		return fmt.Errorf("智能体tool配置错误: %w", err)
 	}
 
-	workflowPluginList, err := s.buildWorkflowPluginListAlgParam(ctx, assistantId)
+	workflowPluginList, err := s.buildWorkflowPluginListAlgParam(ctx, assistantId, draft, assistantSnapshot)
 	if err != nil {
 		return fmt.Errorf("智能体workflow配置错误: %w", err)
 	}
@@ -791,13 +824,13 @@ func (s *Service) setToolAndWorkflowParams(ctx context.Context, sseReq *config.A
 	return nil
 }
 
-func (s *Service) setToolAndWorkflowParamsNew(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity) error {
-	toolPluginList, err := s.buildToolPluginListAlgParamNew(ctx, sseReq, assistantId, identity)
+func (s *Service) setToolAndWorkflowParamsNew(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity, draft bool, assistantSnapshot *model.AssistantSnapshot) error {
+	toolPluginList, err := s.buildToolPluginListAlgParamNew(ctx, sseReq, assistantId, identity, draft, assistantSnapshot)
 	if err != nil {
 		return fmt.Errorf("智能体tool配置错误: %w", err)
 	}
 
-	workflowPluginList, err := s.buildWorkflowPluginListAlgParam(ctx, assistantId)
+	workflowPluginList, err := s.buildWorkflowPluginListAlgParam(ctx, assistantId, draft, assistantSnapshot)
 	if err != nil {
 		return fmt.Errorf("智能体workflow配置错误: %w", err)
 	}
@@ -810,11 +843,24 @@ func (s *Service) setToolAndWorkflowParamsNew(ctx context.Context, sseReq *confi
 }
 
 // 设置MCP参数
-func (s *Service) setMCPParams(ctx context.Context, sseReq *config.AgentSSERequest, assistant *model.Assistant) error {
-	mcpInfos, err := s.cli.GetAssistantMCPList(ctx, assistant.ID)
-	if err != nil {
-		return fmt.Errorf("Assistant服务获取MCP信息失败，assistantId: %d, error: %v", assistant.ID, err)
+func (s *Service) setMCPParams(ctx context.Context, sseReq *config.AgentSSERequest, assistant *model.Assistant, draft bool, assistantSnapshot *model.AssistantSnapshot) error {
+	var mcpInfos []*model.AssistantMCP
+	var err *err_code.Status
+
+	if draft {
+		mcpInfos, err = s.cli.GetAssistantMCPList(ctx, assistant.ID)
+		if err != nil {
+			return fmt.Errorf("Assistant服务获取MCP信息失败，assistantId: %d, error: %v", assistant.ID, err)
+		}
+	} else {
+		if assistantSnapshot != nil {
+			err := json.Unmarshal([]byte(assistantSnapshot.AssistantMCPConfig), &mcpInfos)
+			if err != nil {
+				return fmt.Errorf("Assistant服务获取MCP信息失败，assistantId: %d, error: %v", assistant.ID, err)
+			}
+		}
 	}
+
 	mcpTools := make(map[string]config.MCPToolInfo)
 	for _, mcp := range mcpInfos {
 		if !mcp.Enable {
@@ -1063,11 +1109,22 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func (s *Service) buildWorkflowPluginListAlgParam(ctx context.Context, assistantId string) (pluginList []config.PluginListAlgRequest, err error) {
-	workflows, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, pkgUtil.MustU32(assistantId))
-	if status != nil {
-		return nil, errStatus(errs.Code_AssistantConversationErr, status)
+func (s *Service) buildWorkflowPluginListAlgParam(ctx context.Context, assistantId string, draft bool, assistantSnapshot *model.AssistantSnapshot) (pluginList []config.PluginListAlgRequest, err error) {
+	var workflows []*model.AssistantWorkflow
+	var status *err_code.Status
+	if draft {
+		workflows, status = s.cli.GetAssistantWorkflowsByAssistantID(ctx, pkgUtil.MustU32(assistantId))
+		if status != nil {
+			return nil, errStatus(errs.Code_AssistantConversationErr, status)
+		}
+	} else {
+		if assistantSnapshot.AssistantWorkflowConfig != "" {
+			if err = json.Unmarshal([]byte(assistantSnapshot.AssistantWorkflowConfig), &workflows); err != nil {
+				return nil, errStatus(errs.Code_AssistantConversationErr, toErrStatus("assistant_conversation_err", err.Error()))
+			}
+		}
 	}
+
 	// workflow ids
 	var workflowIDs []string
 	for _, workflow := range workflows {
@@ -1113,12 +1170,26 @@ func (s *Service) buildWorkflowPluginListAlgParam(ctx context.Context, assistant
 	return pluginList, nil
 }
 
-func (s *Service) buildToolPluginListAlgParam(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity) (pluginList []config.PluginListAlgRequest, err error) {
-	// 转换assistantId
-	assistantIdConv := pkgUtil.MustU32(assistantId)
-	resp, status := s.cli.GetAssistantToolList(ctx, assistantIdConv)
-	if status != nil {
-		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
+func (s *Service) buildToolPluginListAlgParam(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity, draft bool, assistantSnapshot *model.AssistantSnapshot) (pluginList []config.PluginListAlgRequest, err error) {
+	var resp []*model.AssistantTool
+	var status *err_code.Status
+	if draft {
+		// 转换assistantId
+		assistantIdConv := pkgUtil.MustU32(assistantId)
+		resp, status = s.cli.GetAssistantToolList(ctx, assistantIdConv)
+		if status != nil {
+			return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
+		}
+	} else {
+		if assistantSnapshot.AssistantToolConfig != "" {
+			if err := json.Unmarshal([]byte(assistantSnapshot.AssistantToolConfig), &resp); err != nil {
+				return pluginList, errStatus(errs.Code_AssistantConversationErr, toErrStatus("assistant_conversation_err", err.Error()))
+			}
+
+			// 使用创建者的userid、orgid
+			identity.UserId = assistantSnapshot.UserId
+			identity.OrgId = assistantSnapshot.OrgId
+		}
 	}
 
 	// 遍历工具列表，处理每个有效工具
@@ -1240,12 +1311,26 @@ func (s *Service) buildToolPluginListAlgParam(ctx context.Context, sseReq *confi
 	return pluginList, nil
 }
 
-func (s *Service) buildToolPluginListAlgParamNew(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity) (pluginList []config.PluginListAlgRequest, err error) {
-	// 转换assistantId
-	assistantIdConv := pkgUtil.MustU32(assistantId)
-	resp, status := s.cli.GetAssistantToolList(ctx, assistantIdConv)
-	if status != nil {
-		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
+func (s *Service) buildToolPluginListAlgParamNew(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, identity *assistant_service.Identity, draft bool, assistantSnapshot *model.AssistantSnapshot) (pluginList []config.PluginListAlgRequest, err error) {
+	var resp []*model.AssistantTool
+	var status *err_code.Status
+	if draft {
+		// 转换assistantId
+		assistantIdConv := pkgUtil.MustU32(assistantId)
+		resp, status = s.cli.GetAssistantToolList(ctx, assistantIdConv)
+		if status != nil {
+			return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
+		}
+	} else {
+		if assistantSnapshot.AssistantToolConfig != "" {
+			if err := json.Unmarshal([]byte(assistantSnapshot.AssistantToolConfig), &resp); err != nil {
+				return pluginList, errStatus(errs.Code_AssistantConversationErr, toErrStatus("assistant_conversation_err", err.Error()))
+			}
+
+			// 使用创建者的userid、orgid
+			identity.UserId = assistantSnapshot.UserId
+			identity.OrgId = assistantSnapshot.OrgId
+		}
 	}
 
 	// 遍历工具列表，处理每个有效工具
@@ -1388,7 +1473,7 @@ func HttpRequestLlmStream(ctx context.Context, url, userId, xuid string, body io
 		return nil, err
 	}
 
-	log.Infof("HttpRequestLlmStream收到HTTP响应，url: %s, userId: %s, statusCode: %d, responseHeaders: %+v",
+	log.Debugf("HttpRequestLlmStream收到HTTP响应，url: %s, userId: %s, statusCode: %d, responseHeaders: %+v",
 		url, userId, response.StatusCode, response.Header)
 
 	return response, err

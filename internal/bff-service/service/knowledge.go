@@ -29,7 +29,7 @@ func SelectKnowledgeList(ctx *gin.Context, userId, orgId string, req *request.Kn
 	resp, err := knowledgeBase.SelectKnowledgeList(ctx.Request.Context(), &knowledgebase_service.KnowledgeSelectReq{
 		UserId:    userId,
 		OrgId:     orgId,
-		Name:      req.Name,
+		Name:      strings.TrimSpace(req.Name),
 		TagIdList: req.TagIdList,
 		Category:  req.Category,
 	})
@@ -133,6 +133,22 @@ func CreateKnowledge(ctx *gin.Context, userId, orgId string, r *request.CreateKn
 	return &response.CreateKnowledgeResp{KnowledgeId: resp.KnowledgeId}, nil
 }
 
+func CreateKnowledgeOpenapi(ctx *gin.Context, userId, orgId string, r *request.CreateKnowledgeReq) (*response.CreateKnowledgeResp, error) {
+	embModelId, err := getModelIdByUuid(ctx, r.EmbeddingModel.ModelId)
+	if err != nil {
+		return nil, err
+	}
+	r.EmbeddingModel.ModelId = embModelId
+	if r.Category == request.CategoryKnowledge && r.KnowledgeGraph.Switch {
+		llmModelId, err := getModelIdByUuid(ctx, r.KnowledgeGraph.LLMModelId)
+		if err != nil {
+			return nil, err
+		}
+		r.KnowledgeGraph.LLMModelId = llmModelId
+	}
+	return CreateKnowledge(ctx, userId, orgId, r)
+}
+
 // UpdateKnowledge 更新知识库
 func UpdateKnowledge(ctx *gin.Context, userId, orgId string, r *request.UpdateKnowledgeReq) error {
 	_, err := knowledgeBase.UpdateKnowledge(ctx.Request.Context(), &knowledgebase_service.UpdateKnowledgeReq{
@@ -183,6 +199,17 @@ func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHi
 		return nil, err
 	}
 	return buildKnowledgeHitResp(resp), nil
+}
+
+func KnowledgeHitOpenapi(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHitReq) (*response.KnowledgeHitResp, error) {
+	if r.KnowledgeMatchParams.RerankModelId != "" {
+		rerankModelId, err := getModelIdByUuid(ctx, r.KnowledgeMatchParams.RerankModelId)
+		if err != nil {
+			return nil, err
+		}
+		r.KnowledgeMatchParams.RerankModelId = rerankModelId
+	}
+	return KnowledgeHit(ctx, userId, orgId, r)
 }
 
 func GetKnowledgeMetaSelect(ctx *gin.Context, userId, orgId string, r *request.GetKnowledgeMetaSelectReq) (*response.GetKnowledgeMetaSelectResp, error) {

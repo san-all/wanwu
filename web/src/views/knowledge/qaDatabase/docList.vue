@@ -7,6 +7,10 @@
         style="margin-right: 10px; font-size: 20px; cursor: pointer"
       ></i>
       {{ knowledgeName }}
+      <div style="margin-left: 34px; font-weight: normal; color: #6b7280">
+        uuid: {{ docQuery.knowledgeId }}
+        <copyIcon :text="docQuery.knowledgeId" :onlyIcon="true" size="mini" />
+      </div>
     </div>
     <div class="block table-wrap list-common wrap-fullheight">
       <el-container class="konw_container">
@@ -297,7 +301,7 @@
     >
       <mataData
         ref="mataData"
-        @updateMeata="updateMeata"
+        @updateMeta="updateMeta"
         type="create"
         :knowledgeId="docQuery.knowledgeId"
         class="mataData"
@@ -378,15 +382,17 @@ import {
   POWER_TYPE_ADMIN,
   POWER_TYPE_EDIT,
   POWER_TYPE_SYSTEM_ADMIN,
-  QA_STATUS_ALL,
+  ALL,
   QA_STATUS_FAILED,
   QA_STATUS_FINISHED,
   QA_STATUS_PENDING,
   QA_STATUS_PROCESSING,
 } from '@/views/knowledge/constants';
+import CopyIcon from '@/components/copyIcon.vue';
 
 export default {
   components: {
+    CopyIcon,
     Pagination,
     SearchInput,
     mataData,
@@ -408,7 +414,7 @@ export default {
         name: '',
         metaValue: '',
         knowledgeId: this.$route.params.id,
-        status: QA_STATUS_ALL,
+        status: ALL,
       },
       fileList: [],
       listApi: getQaPairList,
@@ -640,7 +646,7 @@ export default {
     showMeta() {
       this.metaVisible = true;
     },
-    updateMeata(data) {
+    updateMeta(data) {
       this.metaData = data;
     },
     handleClose() {

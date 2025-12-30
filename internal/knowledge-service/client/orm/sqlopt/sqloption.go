@@ -240,6 +240,16 @@ func WithStatusList(status []int) SQLOption {
 	})
 }
 
+func WithGraphStatusList(graphStatus []int) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(graphStatus) == 0 {
+			return db
+		} else if len(graphStatus) == 1 {
+			return db.Where("graph_status = ?", graphStatus[0])
+		}
+		return db.Where("graph_status IN ?", graphStatus)
+	})
+}
 func WithStatus(status int) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if status == -1 {
@@ -252,6 +262,15 @@ func WithStatus(status int) SQLOption {
 func WithoutStatus(status int) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("status != ?", status)
+	})
+}
+
+func WithoutDocId(docId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(docId) > 0 {
+			return db.Where("doc_id != ?", docId)
+		}
+		return db
 	})
 }
 

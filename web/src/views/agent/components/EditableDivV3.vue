@@ -49,7 +49,9 @@
       <!-- 问答输入框 -->
       <div
         class="editable-wp flex"
-        :style="{ 'pointer-events': fileLoading ? 'none' : 'auto' }"
+        :style="{
+          'pointer-events': fileLoading || disableClick ? 'none' : 'auto',
+        }"
       >
         <div class="editable-wp-left rl">
           <!-- <i  class="el-icon-upload2 upload-icon" @click="preUpload"></i> -->
@@ -169,6 +171,7 @@ export default {
     },
     isModelDisable: { type: Boolean, default: false },
     type: { type: String },
+    disableClick: { type: Boolean, default: false },
   },
   mixins: [commonMixin, uploadChunk],
   components: { uploadDialog },
@@ -179,7 +182,7 @@ export default {
       isPower: this.$platform === 'YWD_RAG' || this.$platform === 'HW_RAG',
       isLink: false,
       modelParams: null,
-      modleOptions: [],
+      modelOptions: [],
       colorArr: [
         '#dca3c2',
         '#aaa9db',
@@ -222,7 +225,7 @@ export default {
           this.modelParams = null;
           return;
         }
-        this.modleOptions.map(modelItem => {
+        this.modelOptions.map(modelItem => {
           if (
             modelItem.modelId == val.modelId &&
             modelItem.modelVersion == val.modelVersion
@@ -333,34 +336,6 @@ export default {
     },
     linkSearch() {
       this.isActive = !this.isActive;
-    },
-    getModelData(type = '') {
-      getModelList({ modelType: '' })
-        .then(res => {
-          if (res.code === 0) {
-            this.modleOptions = res.data.list || [];
-            if (type === '') {
-              this.modelParams = this.modleOptions[0];
-            }
-            this.modelType =
-              this.modelParams.modelSeries === 'deepseek'
-                ? 'deepseek'
-                : 'bigModel';
-            this.$emit('getModelType', this.modelType);
-          }
-        })
-        .catch(err => {});
-    },
-    visibleChange(val) {
-      if (val) {
-        this.getModelData('refresh');
-      }
-    },
-    modelChange() {
-      this.modelType =
-        this.modelParams.modelSeries === 'deepseek' ? 'deepseek' : 'bigModel';
-      this.$emit('getModelType', this.modelType);
-      this.$emit('modelChange');
     },
     showBigImg(url) {
       console.log(url);

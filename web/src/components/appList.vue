@@ -62,7 +62,7 @@
             <p class="desc">{{ n.desc }}</p>
           </el-tooltip>
         </div>
-        <div class="tags">
+        <div :class="['tags', { 'is-showTool-tags': isExploreShowTool(n) }]">
           <span :class="['smartDate']">{{ n.createdAt }}</span>
           <div v-if="!isShowTool" class="favorite-wrap">
             <el-tooltip
@@ -129,10 +129,7 @@
               >
                 {{$t('common.button.publish')}}
               </el-dropdown-item>-->
-              <el-dropdown-item command="cancelPublish" v-if="n.publishType">
-                {{ $t('common.button.cancelPublish') }}
-              </el-dropdown-item>
-              <el-dropdown-item command="publishSet">
+              <el-dropdown-item command="publishSet" v-if="n.publishType">
                 {{ $t('appSpace.publishSet') }}
               </el-dropdown-item>
               <el-dropdown-item
@@ -143,7 +140,7 @@
               </el-dropdown-item>
               <el-dropdown-item
                 command="transform"
-                v-if="[workflow, chat].includes(n.appType) && !n.publishType"
+                v-if="[workflow, chat].includes(n.appType)"
               >
                 {{
                   $t('common.button.transform') +
@@ -151,6 +148,18 @@
                     ? $t('appSpace.chat')
                     : $t('appSpace.workflow'))
                 }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+        <div class="editor" v-if="isExploreShowTool(n)">
+          <el-dropdown @command="handleClick($event, n)" placement="top">
+            <span class="el-dropdown-link">
+              <i class="el-icon-more icon edit-icon" @click.stop />
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="export">
+                {{ $t('common.button.export') }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -260,11 +269,15 @@ export default {
     handleClose() {
       this.dialogVisible = false;
     },
+    isExploreShowTool(n) {
+      return this.appFrom === 'explore' && [WORKFLOW, CHAT].includes(n.appType);
+    },
     isCanClick(n) {
-      return this.isShowTool
+      return true;
+      /*this.isShowTool
         ? ([WORKFLOW, CHAT].includes(n.appType) && !n.publishType) ||
             ![WORKFLOW, CHAT].includes(n.appType)
-        : true;
+        : true;*/
     },
     // 公用删除方法
     async handleDelete() {
@@ -345,7 +358,11 @@ export default {
       }
     },
     workflowExport(row) {
-      exportWorkflow({ workflow_id: row.appId }, row.appType).then(response => {
+      exportWorkflow(
+        { workflow_id: row.appId },
+        row.appType,
+        this.appFrom !== 'explore',
+      ).then(response => {
         const blob = new Blob([response], { type: response.type });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -446,6 +463,7 @@ export default {
         query: {
           id: row.appId,
           ...(row.publishType !== '' && { publish: true }),
+          publishType: row.publishType,
         },
       });
     },
@@ -496,6 +514,7 @@ export default {
         query: {
           id: row.appId,
           ...(row.publishType !== '' && { publish: true }),
+          publishType: row.publishType,
         },
       });
     },
@@ -539,6 +558,12 @@ export default {
           break;
       }
     },
+    jumpToWorkflowRun(row) {
+      this.$router.push({
+        path: '/explore/workflow',
+        query: { id: row.appId },
+      });
+    },
     commonToChat(row) {
       const type = row.appType;
       switch (type) {
@@ -552,10 +577,10 @@ export default {
           this.$router.push({ path: '/explore/rag', query: { id: row.appId } });
           break;
         case WORKFLOW:
-          this.$router.push({
-            path: '/explore/workflow',
-            query: { id: row.appId },
-          });
+          this.jumpToWorkflowRun(row);
+          break;
+        case CHAT:
+          this.jumpToWorkflowRun(row);
           break;
       }
     },

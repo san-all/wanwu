@@ -1,19 +1,3 @@
-/*
- * Copyright 2025 coze-dev Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package nodes
 
 import (
@@ -72,10 +56,14 @@ func buildHistory(history []request.AssistantConversionHistory, maxHistory int) 
 	// 处理所有历史记录
 	for _, conversionHistory := range history {
 		historyList = append(historyList, schema.UserMessage(conversionHistory.Query))
+		//todo 先不传ToolCall(后续版本考虑传进去)
+		historyList = append(historyList, schema.AssistantMessage(conversionHistory.Response, nil))
 	}
 	if maxHistory <= 0 {
 		return historyList
 	}
+	// 每条记录占用2个位置(问/答)
+	maxHistory = maxHistory * 2
 	// 只返回最后maxHistory条
 	if len(historyList) > maxHistory {
 		return historyList[len(historyList)-maxHistory:]

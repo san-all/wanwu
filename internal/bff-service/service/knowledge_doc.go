@@ -18,17 +18,29 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	AutoSegment        = "0" //自动分段
+	ParentChildSegment = "1" //父子分段
+)
+
+var docAnalyzerMap = map[string]string{
+	"text":  "文字提取",
+	"ocr":   "OCR解析",
+	"model": "模型解析",
+}
+
 // GetDocList 查询知识库所属文档列表
 func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (*response.DocPageResult, error) {
 	resp, err := knowledgeBaseDoc.GetDocList(ctx.Request.Context(), &knowledgebase_doc_service.GetDocListReq{
 		KnowledgeId: r.KnowledgeId,
 		DocName:     strings.TrimSpace(r.DocName),
-		Status:      int32(r.Status),
+		Status:      r.Status,
 		PageSize:    int32(r.PageSize),
 		PageNum:     int32(r.PageNo),
 		UserId:      userId,
 		OrgId:       orgId,
 		MetaValue:   strings.TrimSpace(r.MetaValue),
+		GraphStatus: r.GraphStatus,
 	})
 	if err != nil {
 		return nil, err
@@ -45,6 +57,29 @@ func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (
 			GraphSwitch:     knowledgeInfo.GraphSwitch,
 			ShowGraphReport: knowledgeInfo.ShowGraphReport,
 		},
+	}, nil
+}
+
+// GetDocConfig 查询知识库文档配置
+func GetDocConfig(ctx *gin.Context, userId, orgId string, r *request.DocConfigReq) (*response.DocConfigResult, error) {
+	data, err := knowledgeBaseDoc.GetDocDetail(ctx.Request.Context(), &knowledgebase_doc_service.GetDocDetailReq{
+		DocId:      r.DocId,
+		NeedConfig: true,
+		UserId:     userId,
+		OrgId:      orgId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	configInfo := data.DocConfigInfo
+	docSegment := configInfo.DocSegment
+
+	return &response.DocConfigResult{
+		DocSegment:    buildDocSegment(docSegment),
+		DocPreprocess: configInfo.DocPreprocess,
+		DocAnalyzer:   configInfo.DocAnalyzer,
+		DocImportType: configInfo.DocImportType,
+		ParserModelId: configInfo.OcrModelId,
 	}, nil
 }
 
@@ -101,6 +136,77 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 	})
 	if err != nil {
 		log.Errorf("上传失败(保存上传任务 失败(%v) ", err)
+		return err
+	}
+	return nil
+}
+
+// ImportDocOpenapi 导入文档
+func ImportDocOpenapi(ctx *gin.Context, userId, orgId string, req *request.DocImportReq) error {
+	var err error
+	if req.ParserModelId != "" {
+		req.ParserModelId, err = getModelIdByUuid(ctx, req.ParserModelId)
+		if err != nil {
+			return err
+		}
+	}
+	return ImportDoc(ctx, userId, orgId, req)
+}
+
+// UpdateDocConfig 更新文档配置
+func UpdateDocConfig(ctx *gin.Context, userId, orgId string, req *request.DocConfigUpdateReq) error {
+	segment := req.DocSegment
+	_, err := knowledgeBaseDoc.UpdateDocImportConfig(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocImportConfigReq{
+		KnowledgeId: req.KnowledgeId,
+		DocIdList:   req.DocIdList,
+		ImportDocReq: &knowledgebase_doc_service.ImportDocReq{
+			UserId:        userId,
+			OrgId:         orgId,
+			KnowledgeId:   req.KnowledgeId,
+			DocImportType: int32(req.DocImportType),
+			DocSegment: &knowledgebase_doc_service.DocSegment{
+				SegmentType:    segment.SegmentType,
+				Splitter:       segment.Splitter,
+				MaxSplitter:    int32(segment.MaxSplitter),
+				Overlap:        segment.Overlap,
+				SegmentMethod:  segment.SegmentMethod,
+				SubMaxSplitter: int32(segment.SubMaxSplitter),
+				SubSplitter:    segment.SubSplitter,
+			},
+			DocAnalyzer:   req.DocAnalyzer,
+			OcrModelId:    req.ParserModelId,
+			DocPreprocess: req.DocPreprocess,
+		},
+	})
+	if err != nil {
+		log.Errorf("文档配置更新失败(%v) ", err)
+		return err
+	}
+	return nil
+}
+
+// UpdateDocConfigOpenapi 更新文档配置
+func UpdateDocConfigOpenapi(ctx *gin.Context, userId, orgId string, req *request.DocConfigUpdateReq) error {
+	var err error
+	if req.ParserModelId != "" {
+		req.ParserModelId, err = getModelIdByUuid(ctx, req.ParserModelId)
+		if err != nil {
+			return err
+		}
+	}
+	return UpdateDocConfig(ctx, userId, orgId, req)
+}
+
+// ReImportDoc 重新解析文档
+func ReImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocReImportReq) error {
+	_, err := knowledgeBaseDoc.ReImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ReImportDocReq{
+		KnowledgeId: req.KnowledgeId,
+		DocIdList:   req.DocIdList,
+		UserId:      userId,
+		OrgId:       orgId,
+	})
+	if err != nil {
+		log.Errorf("文档重新解析失败(%v) ", err)
 		return err
 	}
 	return nil
@@ -311,7 +417,17 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 		MetaDataList:        buildMetaDataResultList(docSegmentListResp.MetaDataList),
 		SegmentImportStatus: docSegmentListResp.SegmentImportStatus,
 		SegmentMethod:       docSegmentListResp.SegmentMethod,
+		DocAnalyzerText:     buildDocAnalyzerText(docSegmentListResp.DocAnalyzer),
 	}
+}
+
+func buildDocAnalyzerText(docAnalyzer []string) []string {
+	if len(docAnalyzer) == 0 {
+		return make([]string, 0)
+	}
+	return lo.Map(docAnalyzer, func(item string, index int) string {
+		return docAnalyzerMap[item]
+	})
 }
 
 func buildDocChildSegmentResp(docSegmentListResp *knowledgebase_doc_service.GetDocChildSegmentListResp) *response.DocChildSegmentResp {
@@ -539,4 +655,30 @@ func buildDocInfoList(ctx *gin.Context, req *request.DocImportReq) ([]*knowledge
 		})
 	}
 	return docInfoList, nil
+}
+
+func buildDocSegment(docSegment *knowledgebase_doc_service.DocSegment) *response.DocSegment {
+	if docSegment.SegmentType == AutoSegment {
+		return &response.DocSegment{
+			SegmentType:   docSegment.SegmentType,
+			SegmentMethod: docSegment.SegmentMethod,
+		}
+	}
+	maxSubMaxSplitter := int(docSegment.MaxSplitter)
+	var subMaxSplitter *int
+	var subSplitter []string
+	if docSegment.SegmentMethod == ParentChildSegment {
+		subMaxSplitterValue := int(docSegment.SubMaxSplitter)
+		subMaxSplitter = &subMaxSplitterValue
+		subSplitter = docSegment.SubSplitter
+	}
+	return &response.DocSegment{
+		SegmentType:    docSegment.SegmentType,
+		Splitter:       docSegment.Splitter,
+		MaxSplitter:    &maxSubMaxSplitter,
+		Overlap:        &docSegment.Overlap,
+		SegmentMethod:  docSegment.SegmentMethod,
+		SubMaxSplitter: subMaxSplitter,
+		SubSplitter:    subSplitter,
+	}
 }

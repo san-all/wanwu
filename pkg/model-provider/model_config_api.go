@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	mp_deepseek "github.com/UnicomAI/wanwu/pkg/model-provider/mp-deepseek"
+	mp_qianfan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qianfan"
+
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
 	mp_infini "github.com/UnicomAI/wanwu/pkg/model-provider/mp-infini"
@@ -63,7 +66,7 @@ type IGui interface {
 	Gui(ctx context.Context, req mp_common.IGuiReq, headers ...mp_common.Header) (mp_common.IGuiResp, error)
 }
 
-// ToModelTags ILLM、IEmbedding或IRerank 的 标签列表
+// ToModelTags ILLM、IEmbedding或IRerank 的标签列表
 func ToModelTags(provider, modelType, cfg string) ([]mp_common.Tag, error) {
 	if cfg == "" {
 		return nil, nil
@@ -226,6 +229,40 @@ func ToModelTags(provider, modelType, cfg string) ([]mp_common.Tag, error) {
 		default:
 			return nil, fmt.Errorf("ToModelTags:invalid provider %v model type %v", provider, modelType)
 		}
+	case ProviderQianfan:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_qianfan.LLM{}
+			if err := json.Unmarshal([]byte(cfg), llm); err != nil {
+				return nil, fmt.Errorf("unmarshal model config err: %v", err)
+			}
+			tags = llm.Tags()
+		case ModelTypeRerank:
+			rerank := &mp_qianfan.Rerank{}
+			if err := json.Unmarshal([]byte(cfg), rerank); err != nil {
+				return nil, fmt.Errorf("unmarshal model config err: %v", err)
+			}
+			tags = rerank.Tags()
+		case ModelTypeEmbedding:
+			embedding := &mp_qianfan.Embedding{}
+			if err := json.Unmarshal([]byte(cfg), embedding); err != nil {
+				return nil, fmt.Errorf("unmarshal model config err: %v", err)
+			}
+			tags = embedding.Tags()
+		default:
+			return nil, fmt.Errorf("ToModelTags:invalid provider %v model type %v", provider, modelType)
+		}
+	case ProviderDeepSeek:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_deepseek.LLM{}
+			if err := json.Unmarshal([]byte(cfg), llm); err != nil {
+				return nil, fmt.Errorf("unmarshal model config err: %v", err)
+			}
+			tags = llm.Tags()
+		default:
+			return nil, fmt.Errorf("ToModelTags:invalid provider %v model type %v", provider, modelType)
+		}
 	default:
 		return nil, fmt.Errorf("ToModelTags:invalid provider: %v", provider)
 	}
@@ -312,8 +349,26 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		default:
 			return nil, fmt.Errorf("ToModelConfig:invalid provider %v model type %v", provider, modelType)
 		}
+	case ProviderQianfan:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_qianfan.LLM{}
+		case ModelTypeRerank:
+			ret = &mp_qianfan.Rerank{}
+		case ModelTypeEmbedding:
+			ret = &mp_qianfan.Embedding{}
+		default:
+			return nil, fmt.Errorf("ToModelConfig:invalid provider %v model type %v", provider, modelType)
+		}
+	case ProviderDeepSeek:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_deepseek.LLM{}
+		default:
+			return nil, fmt.Errorf("ToModelConfig:invalid provider %v model type %v", provider, modelType)
+		}
 	default:
-		return nil, fmt.Errorf("ToModelConfig:invalid provider: %v", modelType)
+		return nil, fmt.Errorf("ToModelConfig:invalid provider: %v", provider)
 	}
 
 	if err := json.Unmarshal([]byte(cfg), ret); err != nil {
@@ -325,10 +380,12 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 type ProviderModelConfig struct {
 	ProviderYuanJing         ProviderModelByYuanjing         `json:"providerYuanJing"`
 	ProviderOpenAICompatible ProviderModelByOpenAICompatible `json:"providerOpenAICompatible"`
-	ProviderHuoshan          ProviderModelByHuoshan          `json:"providerHuoshan"`
+	ProviderHuoshan          ProviderModelByHuoShan          `json:"providerHuoShan"`
 	ProviderQwen             ProviderModelByQwen             `json:"providerQwen"`
 	ProviderOllama           ProviderModelByOllama           `json:"providerOllama"`
-	ProviderInfini           ProviderModelByInfini           `json:"providerModelByInfini"`
+	ProviderInfini           ProviderModelByInfini           `json:"providerInfini"`
+	ProviderQianFan          ProviderModelByQianFan          `json:"providerQianFan"`
+	ProviderDeepSeek         ProviderModelByDeepSeek         `json:"providerDeepSeek"`
 }
 
 type ProviderModelByOpenAICompatible struct {
@@ -346,7 +403,7 @@ type ProviderModelByYuanjing struct {
 	PdfParser mp_yuanjing.PdfParser `json:"pdf-parser"`
 }
 
-type ProviderModelByHuoshan struct {
+type ProviderModelByHuoShan struct {
 	Llm       mp_huoshan.LLM       `json:"llm"`
 	Embedding mp_huoshan.Embedding `json:"embedding"`
 }
@@ -366,4 +423,14 @@ type ProviderModelByInfini struct {
 	Llm       mp_infini.LLM       `json:"llm"`
 	Rerank    mp_infini.Rerank    `json:"rerank"`
 	Embedding mp_infini.Embedding `json:"embedding"`
+}
+
+type ProviderModelByQianFan struct {
+	Llm       mp_qianfan.LLM       `json:"llm"`
+	Rerank    mp_qianfan.Rerank    `json:"rerank"`
+	Embedding mp_qianfan.Embedding `json:"embedding"`
+}
+
+type ProviderModelByDeepSeek struct {
+	Llm mp_deepseek.LLM `json:"llm"`
 }

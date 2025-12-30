@@ -243,7 +243,7 @@ export default {
         return;
       }
       this.$nextTick(() => {
-        this.$refs.tagDialog.showDiaglog(id);
+        this.$refs.tagDialog.showDialog(id);
       });
     },
     showCreate() {
@@ -277,8 +277,8 @@ export default {
     editItem(row) {
       this.$emit('editItem', row);
     },
-    reloadData(category) {
-      this.$emit('reloadData', category);
+    reloadData() {
+      this.$emit('reloadData');
     },
     deleteItem(knowledgeId) {
       this.$confirm(

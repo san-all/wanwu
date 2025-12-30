@@ -1,6 +1,7 @@
 package service
 
 import (
+	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
@@ -9,6 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -160,7 +162,6 @@ func buildRagGlobalConfig(kbConfig request.AppKnowledgebaseParams) *rag_service.
 		TermWeight:        kbConfig.TermWeight,
 		TermWeightEnable:  kbConfig.TermWeightEnable,
 		UseGraph:          kbConfig.UseGraph,
-		ChiChat:           kbConfig.ChiChat,
 	}
 }
 
@@ -183,8 +184,12 @@ func DeleteRag(ctx *gin.Context, req request.RagReq) error {
 	return err
 }
 
-func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
-	resp, err := rag.GetRagDetail(ctx.Request.Context(), &rag_service.RagDetailReq{RagId: req.RagID})
+func GetRag(ctx *gin.Context, req request.RagReq, needPublished bool) (*response.RagInfo, error) {
+	resp, err := rag.GetRagDetail(ctx.Request.Context(), &rag_service.RagDetailReq{
+		RagId:   req.RagID,
+		Publish: util.IfElse(needPublished, int32(1), int32(0)),
+		Version: req.Version,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +197,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 	if err != nil {
 		log.Errorf("ragId: %v gets config fail: %v", req.RagID, err.Error())
 	}
+	appInfo, _ := app.GetAppInfo(ctx, &app_service.GetAppInfoReq{AppId: req.RagID, AppType: constant.AppTypeRag})
 	ragInfo := &response.RagInfo{
 		RagID:                 resp.RagId,
 		AppBriefConfig:        appBriefConfigProto2Model(ctx, resp.BriefConfig, constant.AppTypeRag),
@@ -201,6 +207,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 		KnowledgeBaseConfig:   ragKBConfigProto2Model(ctx, resp.KnowledgeBaseConfig),
 		QAKnowledgeBaseConfig: ragKBQAConfigProto2Model(ctx, resp.QAknowledgeBaseConfig),
 		SafetyConfig:          ragSafetyConfigProto2Model(ctx, resp.SensitiveConfig),
+		AppPublishConfig:      request.AppPublishConfig{PublishType: appInfo.GetPublishType()},
 	}
 
 	return ragInfo, nil
@@ -209,7 +216,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 func appModelRerankProto2Model(ctx *gin.Context, resp *rag_service.RagInfo) (request.AppModelConfig, request.AppModelConfig, request.AppModelConfig, error) {
 	var modelConfig, rerankConfig, qaRerankConfig request.AppModelConfig
 	if resp.ModelConfig.ModelId != "" {
-		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
+		modelInfo, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{ModelId: resp.ModelConfig.ModelId})
 		if err != nil {
 			return request.AppModelConfig{}, request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
@@ -219,7 +226,7 @@ func appModelRerankProto2Model(ctx *gin.Context, resp *rag_service.RagInfo) (req
 		}
 	}
 	if resp.RerankConfig.ModelId != "" {
-		rerankInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.RerankConfig.ModelId})
+		rerankInfo, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{ModelId: resp.RerankConfig.ModelId})
 		if err != nil {
 			return request.AppModelConfig{}, request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
@@ -229,7 +236,7 @@ func appModelRerankProto2Model(ctx *gin.Context, resp *rag_service.RagInfo) (req
 		}
 	}
 	if resp.QArerankConfig.ModelId != "" {
-		qaRerankInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.QArerankConfig.ModelId})
+		qaRerankInfo, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{ModelId: resp.QArerankConfig.ModelId})
 		if err != nil {
 			return request.AppModelConfig{}, request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
@@ -318,7 +325,6 @@ func ragKBConfigProto2Model(ctx *gin.Context, kbConfig *rag_service.RagKnowledge
 		TermWeight:        globalConfig.TermWeight,
 		TermWeightEnable:  globalConfig.TermWeightEnable,
 		UseGraph:          globalConfig.UseGraph,
-		ChiChat:           globalConfig.ChiChat,
 	}
 	return request.AppKnowledgebaseConfig{
 		Knowledgebases: knowledgeList,

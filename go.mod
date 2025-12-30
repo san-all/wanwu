@@ -28,13 +28,13 @@ require (
 	github.com/gromitlee/depend/v2 v2.0.0
 	github.com/gromitlee/go-async v1.0.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/hashicorp/go-version v1.8.0
 	github.com/mark3labs/mcp-go v0.43.0
 	github.com/meguminnnnnnnnn/go-openai v0.1.0
 	github.com/minio/minio-go/v7 v7.0.88
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/redis/go-redis/v9 v9.8.0
 	github.com/samber/lo v1.51.0
-	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.20.1
 	github.com/swaggo/swag v1.16.4
 	github.com/wk8/go-ordered-map/v2 v2.1.8

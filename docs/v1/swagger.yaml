@@ -41,9 +41,11 @@ definitions:
     type: object
   mp.AppModelParams:
     properties:
+      providerDeepSeek:
+        $ref: '#/definitions/mp.AppModelParamsDeepSeek'
       providerHuoshan:
-        $ref: '#/definitions/mp.AppModelParamsHuoshan'
-      providerModelByInfini:
+        $ref: '#/definitions/mp.AppModelParamsHuoShan'
+      providerInfini:
         $ref: '#/definitions/mp.AppModelParamsInfini'
       providerOllama:
         $ref: '#/definitions/mp.AppModelParamsOllama'
@@ -51,6 +53,8 @@ definitions:
         allOf:
         - $ref: '#/definitions/mp.AppModelParamsOpenAICompatible'
         description: OpenAI-API-compatible模型配置
+      providerQianFan:
+        $ref: '#/definitions/mp.AppModelParamsQianFan'
       providerQwen:
         $ref: '#/definitions/mp.AppModelParamsQwen'
       providerYuanjing:
@@ -58,49 +62,68 @@ definitions:
         - $ref: '#/definitions/mp.AppModelParamsYuanjing'
         description: YuanJing模型配置
     type: object
-  mp.AppModelParamsHuoshan:
+  mp.AppModelParamsDeepSeek:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_huoshan.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
+        description: 大语言模型配置
+    type: object
+  mp.AppModelParamsHuoShan:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsInfini:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_infini.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsOllama:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_ollama.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsOpenAICompatible:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_openai_compatible.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
+        description: 大语言模型配置
+    type: object
+  mp.AppModelParamsQianFan:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsQwen:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_qwen.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsYuanjing:
     properties:
       llm:
         allOf:
-        - $ref: '#/definitions/mp_yuanjing.LLMParams'
+        - $ref: '#/definitions/mp_common.LLMParams'
         description: 大语言模型配置
     type: object
-  mp.ProviderModelByHuoshan:
+  mp.ProviderModelByDeepSeek:
+    properties:
+      llm:
+        $ref: '#/definitions/mp_deepseek.LLM'
+    type: object
+  mp.ProviderModelByHuoShan:
     properties:
       embedding:
         $ref: '#/definitions/mp_huoshan.Embedding'
@@ -132,6 +155,15 @@ definitions:
       rerank:
         $ref: '#/definitions/mp_openai_compatible.Rerank'
     type: object
+  mp.ProviderModelByQianFan:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_qianfan.Embedding'
+      llm:
+        $ref: '#/definitions/mp_qianfan.LLM'
+      rerank:
+        $ref: '#/definitions/mp_qianfan.Rerank'
+    type: object
   mp.ProviderModelByQwen:
     properties:
       embedding:
@@ -158,23 +190,81 @@ definitions:
     type: object
   mp.ProviderModelConfig:
     properties:
-      providerHuoshan:
-        $ref: '#/definitions/mp.ProviderModelByHuoshan'
-      providerModelByInfini:
+      providerDeepSeek:
+        $ref: '#/definitions/mp.ProviderModelByDeepSeek'
+      providerHuoShan:
+        $ref: '#/definitions/mp.ProviderModelByHuoShan'
+      providerInfini:
         $ref: '#/definitions/mp.ProviderModelByInfini'
       providerOllama:
         $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
         $ref: '#/definitions/mp.ProviderModelByOpenAICompatible'
+      providerQianFan:
+        $ref: '#/definitions/mp.ProviderModelByQianFan'
       providerQwen:
         $ref: '#/definitions/mp.ProviderModelByQwen'
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
     type: object
+  mp_common.LLMParams:
+    properties:
+      frequencyPenalty:
+        description: 频率惩罚
+        type: number
+      frequencyPenaltyEnable:
+        description: 频率惩罚(开关)
+        type: boolean
+      maxTokens:
+        description: 最大标记
+        type: integer
+      maxTokensEnable:
+        description: 最大标记(开关)
+        type: boolean
+      presencePenalty:
+        description: 存在惩罚
+        type: number
+      presencePenaltyEnable:
+        description: 存在惩罚(开关)
+        type: boolean
+      temperature:
+        description: 温度
+        type: number
+      temperatureEnable:
+        description: 温度(开关)
+        type: boolean
+      topP:
+        description: Top P
+        type: number
+      topPEnable:
+        description: Top P(开关)
+        type: boolean
+    type: object
   mp_common.Tag:
     properties:
       text:
         type: string
+    type: object
+  mp_deepseek.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
     type: object
   mp_huoshan.Embedding:
     properties:
@@ -215,39 +305,6 @@ definitions:
         - support
         type: string
     type: object
-  mp_huoshan.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
-    type: object
   mp_infini.Embedding:
     properties:
       apiKey:
@@ -286,39 +343,6 @@ definitions:
         - noSupport
         - support
         type: string
-    type: object
-  mp_infini.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
     type: object
   mp_infini.Rerank:
     properties:
@@ -371,39 +395,6 @@ definitions:
         - support
         type: string
     type: object
-  mp_ollama.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
-    type: object
   mp_openai_compatible.Embedding:
     properties:
       apiKey:
@@ -443,40 +434,58 @@ definitions:
         - support
         type: string
     type: object
-  mp_openai_compatible.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
-    type: object
   mp_openai_compatible.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qianfan.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qianfan.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
+        type: string
+    type: object
+  mp_qianfan.Rerank:
     properties:
       apiKey:
         description: ApiKey
@@ -526,39 +535,6 @@ definitions:
         - noSupport
         - support
         type: string
-    type: object
-  mp_qwen.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
     type: object
   mp_qwen.Rerank:
     properties:
@@ -619,39 +595,6 @@ definitions:
         - noSupport
         - support
         type: string
-    type: object
-  mp_yuanjing.LLMParams:
-    properties:
-      frequencyPenalty:
-        description: 频率惩罚
-        type: number
-      frequencyPenaltyEnable:
-        description: 频率惩罚(开关)
-        type: boolean
-      maxTokens:
-        description: 最大标记
-        type: integer
-      maxTokensEnable:
-        description: 最大标记(开关)
-        type: boolean
-      presencePenalty:
-        description: 存在惩罚
-        type: number
-      presencePenaltyEnable:
-        description: 存在惩罚(开关)
-        type: boolean
-      temperature:
-        description: 温度
-        type: number
-      temperatureEnable:
-        description: 温度(开关)
-        type: boolean
-      topP:
-        description: Top P
-        type: number
-      topPEnable:
-        description: Top P(开关)
-        type: boolean
     type: object
   mp_yuanjing.Ocr:
     properties:
@@ -862,9 +805,6 @@ definitions:
     type: object
   request.AppKnowledgebaseParams:
     properties:
-      chiChat:
-        description: 闲聊开关
-        type: boolean
       keywordPriority:
         description: 关键词权重
         type: number
@@ -918,6 +858,11 @@ definitions:
         type: string
       provider:
         description: 模型供应商
+        type: string
+    type: object
+  request.AppPublishConfig:
+    properties:
+      publishType:
         type: string
     type: object
   request.AppQAKnowledgeBase:
@@ -1130,6 +1075,8 @@ definitions:
   request.AssistantIdRequest:
     properties:
       assistantId:
+        type: string
+      version:
         type: string
     required:
     - assistantId
@@ -1404,6 +1351,33 @@ definitions:
     - question
     - ragId
     type: object
+  request.ChatflowApplicationInfoReq:
+    properties:
+      intelligence_id:
+        type: string
+      intelligence_type:
+        type: integer
+    required:
+    - intelligence_id
+    - intelligence_type
+    type: object
+  request.ChatflowApplicationListReq:
+    properties:
+      workflow_id:
+        type: string
+    required:
+    - workflow_id
+    type: object
+  request.ChatflowConversationDeleteReq:
+    properties:
+      project_id:
+        type: string
+      unique_id:
+        type: string
+    required:
+    - project_id
+    - unique_id
+    type: object
   request.CheckFileListReq:
     properties:
       chunkName:
@@ -1489,6 +1463,18 @@ definitions:
     required:
     - assistantId
     - prompt
+    type: object
+  request.CreateAPIKeyRequest:
+    properties:
+      desc:
+        type: string
+      expiredAt:
+        description: 格式 yyyy-mm-dd
+        type: string
+      name:
+        type: string
+    required:
+    - name
     type: object
   request.CreateDocChildSegmentReq:
     properties:
@@ -1791,13 +1777,18 @@ definitions:
     - name
     - schema
     type: object
-  request.DelApiKeyRequest:
+  request.DelAppKeyRequest:
     properties:
       apiId:
         description: ApiID
         type: string
     required:
     - apiId
+    type: object
+  request.DeleteAPIKeyRequest:
+    properties:
+      keyId:
+        type: string
     type: object
   request.DeleteAppSpaceAppRequest:
     properties:
@@ -1952,6 +1943,47 @@ definitions:
     required:
     - tableId
     type: object
+  request.DocConfigUpdateReq:
+    properties:
+      docAnalyzer:
+        description: 文档解析类型 text / ocr  / model
+        items:
+          type: string
+        type: array
+      docIdList:
+        description: 文档id列表，当更新配置时需要传
+        items:
+          type: string
+        type: array
+      docImportType:
+        description: 文档导入类型，0：文件上传，1：单条url上传，2.文件url上传
+        type: integer
+      docMetaData:
+        description: 元数据
+        items:
+          $ref: '#/definitions/request.DocMetaData'
+        type: array
+      docPreprocess:
+        description: 文本预处理规则 replaceSymbols / deleteLinks
+        items:
+          type: string
+        type: array
+      docSegment:
+        allOf:
+        - $ref: '#/definitions/request.DocSegment'
+        description: 文档分段配置
+      knowledgeId:
+        description: 知识库id
+        type: string
+      parserModelId:
+        description: 模型解析或ocr模型id
+        type: string
+    required:
+    - docAnalyzer
+    - docIdList
+    - docSegment
+    - knowledgeId
+    type: object
   request.DocImportReq:
     properties:
       docAnalyzer:
@@ -2011,6 +2043,32 @@ definitions:
         description: 文档url
         type: string
     type: object
+  request.DocListReq:
+    properties:
+      docName:
+        type: string
+      graphStatus:
+        description: 图谱状态：-1.全部 0.待处理 1.解析中 2.解析成功 3.解析失败
+        items:
+          type: integer
+        type: array
+      knowledgeId:
+        type: string
+      metaValue:
+        type: string
+      pageNo:
+        type: integer
+      pageSize:
+        type: integer
+      status:
+        description: 文档状态：-1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败
+        items:
+          type: integer
+        type: array
+    required:
+    - knowledgeId
+    - pageSize
+    type: object
   request.DocMetaData:
     properties:
       metaId:
@@ -2045,6 +2103,20 @@ definitions:
           $ref: '#/definitions/request.DocMetaData'
         type: array
     required:
+    - knowledgeId
+    type: object
+  request.DocReImportReq:
+    properties:
+      docIdList:
+        description: 文档id列表
+        items:
+          type: string
+        type: array
+      knowledgeId:
+        description: 知识库id
+        type: string
+    required:
+    - docIdList
     - knowledgeId
     type: object
   request.DocSegment:
@@ -2099,7 +2171,7 @@ definitions:
     required:
     - modelId
     type: object
-  request.GenApiKeyRequest:
+  request.GenAppKeyRequest:
     properties:
       appId:
         description: 应用id
@@ -2771,9 +2843,19 @@ definitions:
       appType:
         description: 应用类型
         type: string
+      desc:
+        description: 描述
+        type: string
       publishType:
         description: 发布类型(public:系统公开发布,organization:组织公开发布,private:私密发布)
         type: string
+      version:
+        type: string
+    required:
+    - appId
+    - appType
+    - publishType
+    - version
     type: object
   request.RagBrief:
     properties:
@@ -2832,6 +2914,8 @@ definitions:
   request.RagReq:
     properties:
       ragId:
+        type: string
+      version:
         type: string
     required:
     - ragId
@@ -2941,6 +3025,20 @@ definitions:
     - name
     - roleId
     type: object
+  request.RollbackAppVersionRequest:
+    properties:
+      appId:
+        type: string
+      appType:
+        type: string
+      version:
+        description: 目标回滚版本
+        type: string
+    required:
+    - appId
+    - appType
+    - version
+    type: object
   request.SensitiveTable:
     properties:
       tableId:
@@ -2971,6 +3069,44 @@ definitions:
       appType:
         description: 应用类型
         type: string
+    type: object
+  request.UpdateAPIKeyRequest:
+    properties:
+      desc:
+        type: string
+      expiredAt:
+        type: string
+      keyId:
+        type: string
+      name:
+        type: string
+    type: object
+  request.UpdateAPIKeyStatusRequest:
+    properties:
+      keyId:
+        type: string
+      status:
+        description: 状态 false-禁用 true-启用
+        type: boolean
+    type: object
+  request.UpdateAppVersionRequest:
+    properties:
+      appId:
+        description: 应用 ID
+        type: string
+      appType:
+        description: 应用类型
+        type: string
+      desc:
+        description: 描述
+        type: string
+      publishType:
+        description: 发布类型(public:系统公开发布,organization:组织公开发布,private:私密发布)
+        type: string
+    required:
+    - appId
+    - appType
+    - publishType
     type: object
   request.UpdateCustomPrompt:
     properties:
@@ -3356,24 +3492,39 @@ definitions:
     required:
     - workflow_id
     type: object
+  response.APIKeyDetailResponse:
+    properties:
+      createdAt:
+        description: 创建ApiKey的时间
+        type: string
+      creator:
+        description: 创建者
+        type: string
+      desc:
+        description: 描述
+        type: string
+      expiredAt:
+        description: 过期时间
+        type: string
+      key:
+        description: 生成的ApiKey
+        type: string
+      keyId:
+        description: ID
+        type: string
+      name:
+        description: 名称
+        type: string
+      status:
+        description: 状态
+        type: boolean
+    type: object
   response.AnalysisDocUrlResp:
     properties:
       urlList:
         items:
           $ref: '#/definitions/response.DocUrl'
         type: array
-    type: object
-  response.ApiResponse:
-    properties:
-      apiId:
-        description: ApiID
-        type: string
-      apiKey:
-        description: 生成的ApiKey
-        type: string
-      createdAt:
-        description: 创建ApiKey的时间
-        type: string
     type: object
   response.AppBriefInfo:
     properties:
@@ -3404,6 +3555,18 @@ definitions:
         type: string
       updatedAt:
         description: 应用更新时间(用于历史记录排序)
+        type: string
+    type: object
+  response.AppKeyInfo:
+    properties:
+      apiId:
+        description: ApiID
+        type: string
+      apiKey:
+        description: 生成的ApiKey
+        type: string
+      createdAt:
+        description: 创建ApiKey的时间
         type: string
     type: object
   response.AppUrlInfo:
@@ -3460,6 +3623,17 @@ definitions:
         description: 用户ID
         type: string
     type: object
+  response.AppVersionInfo:
+    properties:
+      createdAt:
+        type: string
+      desc:
+        type: string
+      publishType:
+        type: string
+      version:
+        type: string
+    type: object
   response.Assistant:
     properties:
       assistantId:
@@ -3499,6 +3673,9 @@ definitions:
       prologue:
         description: 开场白
         type: string
+      publishType:
+        description: 发布类型
+        type: string
       recommendQuestion:
         description: 推荐问题
         items:
@@ -3522,6 +3699,8 @@ definitions:
         type: array
       updatedAt:
         description: 更新时间
+        type: string
+      uuid:
         type: string
       visionConfig:
         allOf:
@@ -3824,6 +4003,147 @@ definitions:
       title:
         type: string
     type: object
+  response.CozeConnectorInfo:
+    properties:
+      connector_status:
+        type: integer
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      share_link:
+        type: string
+    type: object
+  response.CozeDraftIntelligenceListData:
+    properties:
+      has_more:
+        type: boolean
+      intelligences:
+        items:
+          $ref: '#/definitions/response.CozeIntelligenceData'
+        type: array
+      next_cursor_id:
+        type: string
+      total:
+        type: integer
+    type: object
+  response.CozeFavoriteInfo:
+    properties:
+      fav_time:
+        type: string
+      is_fav:
+        type: boolean
+    type: object
+  response.CozeGetDraftIntelligenceInfoData:
+    properties:
+      basic_info:
+        $ref: '#/definitions/response.CozeIntelligenceBasicInfo'
+      intelligence_type:
+        type: integer
+      owner_info:
+        $ref: '#/definitions/response.CozeUser'
+      publish_info:
+        $ref: '#/definitions/response.CozeIntelligencePublishInfo'
+    type: object
+  response.CozeIntelligenceBasicInfo:
+    properties:
+      create_time:
+        example: "0"
+        type: string
+      description:
+        type: string
+      enterprise_id:
+        type: string
+      icon_uri:
+        type: string
+      icon_url:
+        type: string
+      id:
+        example: "0"
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: integer
+      owner_id:
+        example: "0"
+        type: string
+      publish_time:
+        example: "0"
+        type: string
+      space_id:
+        example: "0"
+        type: string
+      status:
+        type: integer
+      update_time:
+        example: "0"
+        type: string
+    type: object
+  response.CozeIntelligenceData:
+    properties:
+      basic_info:
+        $ref: '#/definitions/response.CozeIntelligenceBasicInfo'
+      favorite_info:
+        $ref: '#/definitions/response.CozeFavoriteInfo'
+      owner_info:
+        $ref: '#/definitions/response.CozeUser'
+      permission_info:
+        $ref: '#/definitions/response.CozeIntelligencePermissionInfo'
+      publish_info:
+        $ref: '#/definitions/response.CozeIntelligencePublishInfo'
+      type:
+        type: integer
+    type: object
+  response.CozeIntelligencePermissionInfo:
+    properties:
+      can_delete:
+        type: boolean
+      can_view:
+        type: boolean
+      in_collaboration:
+        type: boolean
+    type: object
+  response.CozeIntelligencePublishInfo:
+    properties:
+      connectors:
+        items:
+          $ref: '#/definitions/response.CozeConnectorInfo'
+        type: array
+      has_published:
+        type: boolean
+      publish_time:
+        type: string
+    type: object
+  response.CozeUser:
+    properties:
+      avatar_url:
+        type: string
+      nickname:
+        type: string
+      user_id:
+        example: "0"
+        type: string
+      user_label:
+        $ref: '#/definitions/response.CozeUserLabel'
+      user_unique_name:
+        type: string
+    type: object
+  response.CozeUserLabel:
+    properties:
+      icon_uri:
+        type: string
+      icon_url:
+        type: string
+      jump_link:
+        type: string
+      label_id:
+        type: string
+      label_name:
+        type: string
+    type: object
   response.CozeWorkflowIDData:
     properties:
       workflow_id:
@@ -3885,6 +4205,8 @@ definitions:
       updatedAt:
         type: string
       userId:
+        type: string
+      uuid:
         type: string
     required:
     - model
@@ -4118,6 +4440,29 @@ definitions:
           $ref: '#/definitions/response.ChildSegmentInfo'
         type: array
     type: object
+  response.DocConfigResult:
+    properties:
+      docAnalyzer:
+        description: 文档解析类型
+        items:
+          type: string
+        type: array
+      docImportType:
+        description: 文档导入类型，0：文件上传，1：url上传，2.批量url上传
+        type: integer
+      docPreprocess:
+        description: 文本预处理规则
+        items:
+          type: string
+        type: array
+      docSegment:
+        allOf:
+        - $ref: '#/definitions/response.DocSegment'
+        description: 分段信息配置
+      parserModelId:
+        description: ocr模型id
+        type: string
+    type: object
   response.DocKnowledgeInfo:
     properties:
       graphSwitch:
@@ -4205,12 +4550,47 @@ definitions:
         description: 文档名
         type: string
     type: object
+  response.DocSegment:
+    properties:
+      maxSplitter:
+        description: 可分隔最大值（只有自定义分段必填）
+        type: integer
+      overlap:
+        description: 可重叠值（只有自定义分段必填）
+        type: number
+      segmentMethod:
+        description: 分段方法 0：通用分段；1：父子分段
+        type: string
+      segmentType:
+        description: 分段方式，只有通用分段必填 0：自动分段；1：自定义分段
+        type: string
+      splitter:
+        description: 分隔符（只有自定义分段必填）
+        items:
+          type: string
+        type: array
+      subMaxSplitter:
+        description: 可分隔最大值（只有父子分段必填）
+        type: integer
+      subSplitter:
+        description: 分隔符（只有父子分段必填）
+        items:
+          type: string
+        type: array
+    required:
+    - segmentMethod
+    type: object
   response.DocSegmentResp:
     properties:
       contentList:
         description: 内容
         items:
           $ref: '#/definitions/response.SegmentContent'
+        type: array
+      docAnalyzerText:
+        description: 文档解析类型 文字提取 / OCR解析  / 模型解析
+        items:
+          type: string
         type: array
       fileName:
         description: 名称
@@ -5271,6 +5651,8 @@ definitions:
         type: string
       userId:
         type: string
+      uuid:
+        type: string
     required:
     - model
     - modelType
@@ -5413,6 +5795,10 @@ definitions:
     type: object
   response.RagInfo:
     properties:
+      appPublishConfig:
+        allOf:
+        - $ref: '#/definitions/request.AppPublishConfig'
+        description: 发布配置
       avatar:
         allOf:
         - $ref: '#/definitions/request.Avatar'
@@ -6030,6 +6416,145 @@ info:
   title: AI Agent Productivity Platform API
   version: v0.0.1
 paths:
+  /api/key:
+    delete:
+      consumes:
+      - application/json
+      description: 删除API密钥
+      parameters:
+      - description: 删除API密钥参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteAPIKeyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: "删除API\t密钥"
+      tags:
+      - api.key
+    post:
+      consumes:
+      - application/json
+      description: 创建API密钥
+      parameters:
+      - description: 创建API密钥参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateAPIKeyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.APIKeyDetailResponse'
+              type: object
+      security:
+      - JWT: []
+      summary: 创建API密钥
+      tags:
+      - api.key
+    put:
+      consumes:
+      - application/json
+      description: 更新API密钥
+      parameters:
+      - description: 更新API密钥参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAPIKeyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新API密钥
+      tags:
+      - api.key
+  /api/key/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取API密钥列表
+      parameters:
+      - description: 页面编号，从1开始
+        in: query
+        name: pageNo
+        required: true
+        type: integer
+      - description: 单页数量，从1开始
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.PageResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.APIKeyDetailResponse'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 获取API密钥列表
+      tags:
+      - api.key
+  /api/key/status:
+    put:
+      consumes:
+      - application/json
+      description: 更新API密钥状态
+      parameters:
+      - description: 更新API密钥状态参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAPIKeyStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新API密钥状态
+      tags:
+      - api.key
   /appspace/app:
     delete:
       consumes:
@@ -6058,14 +6583,14 @@ paths:
     delete:
       consumes:
       - application/json
-      description: 删除ApiKey
+      description: 删除AppKey
       parameters:
-      - description: 删除Apikey参数
+      - description: 删除Appkey参数
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/request.DelApiKeyRequest'
+          $ref: '#/definitions/request.DelAppKeyRequest'
       produces:
       - application/json
       responses:
@@ -6073,20 +6598,20 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 删除ApiKey
+      summary: 删除AppKey
       tags:
       - app.key
     post:
       consumes:
       - application/json
-      description: 生成ApiKey
+      description: 生成AppKey
       parameters:
-      - description: 生成ApiKey参数
+      - description: 生成AppKey参数
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/request.GenApiKeyRequest'
+          $ref: '#/definitions/request.GenAppKeyRequest'
       produces:
       - application/json
       responses:
@@ -6097,16 +6622,16 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/response.ApiResponse'
+                  $ref: '#/definitions/response.AppKeyInfo'
               type: object
-      summary: 生成ApiKey
+      summary: 生成AppKey
       tags:
       - app.key
   /appspace/app/key/list:
     get:
       consumes:
       - application/json
-      description: 获取ApiKey
+      description: 获取AppKey
       parameters:
       - description: 应用id
         in: query
@@ -6129,10 +6654,10 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/response.ApiResponse'
+                    $ref: '#/definitions/response.AppKeyInfo'
                   type: array
               type: object
-      summary: 获取ApiKey
+      summary: 获取AppKey
       tags:
       - app.key
   /appspace/app/list:
@@ -6363,7 +6888,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 获取Api根地址
+      description: 获取App根地址
       parameters:
       - description: 应用ID
         in: query
@@ -6389,9 +6914,129 @@ paths:
               type: object
       security:
       - JWT: []
-      summary: 获取Api根地址
+      summary: 获取App根地址
       tags:
       - app.key
+  /appspace/app/version:
+    get:
+      consumes:
+      - application/json
+      description: 根据应用类型和应用ID，查询其最新版本信息
+      parameters:
+      - description: 对应应用 ID
+        in: query
+        name: appId
+        required: true
+        type: string
+      - description: 支持的类型
+        in: query
+        name: appType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.AppVersionInfo'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取应用最新版本信息
+      tags:
+      - common
+    put:
+      consumes:
+      - application/json
+      description: 更新应用最新版本的描述信息和公开范围
+      parameters:
+      - description: 更新应用版本信息请求
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAppVersionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新应用版本信息
+      tags:
+      - common
+  /appspace/app/version/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据应用类型和应用ID，查询其所有历史版本
+      parameters:
+      - description: 对应应用 ID
+        in: query
+        name: appId
+        required: true
+        type: string
+      - description: 支持的类型
+        in: query
+        name: appType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.AppVersionInfo'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 获取应用版本列表
+      tags:
+      - common
+  /appspace/app/version/rollback:
+    post:
+      consumes:
+      - application/json
+      description: 将应用回滚至指定的历史版本
+      parameters:
+      - description: 回滚应用版本请求
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.RollbackAppVersionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 回滚应用到指定版本
+      tags:
+      - common
   /appspace/chatflow:
     post:
       consumes:
@@ -6476,7 +7121,34 @@ paths:
     get:
       consumes:
       - application/json
-      description: 导出工作流的json文件
+      description: 导出对话流的json文件
+      parameters:
+      - description: 工作流ID
+        in: query
+        name: workflow_id
+        required: true
+        type: string
+      - description: 版本
+        in: query
+        name: version
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 导出Chatflow
+      tags:
+      - chatflow
+  /appspace/chatflow/export/draft:
+    get:
+      consumes:
+      - application/json
+      description: 导出对话流草稿的json文件
       parameters:
       - description: 工作流ID
         in: query
@@ -6492,7 +7164,7 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - JWT: []
-      summary: 导出Chatflow
+      summary: 导出Chatflow草稿
       tags:
       - chatflow
   /appspace/chatflow/import:
@@ -6554,6 +7226,9 @@ paths:
         name: ragId
         required: true
         type: string
+      - in: query
+        name: version
+        type: string
       produces:
       - application/json
       responses:
@@ -6568,7 +7243,7 @@ paths:
               type: object
       security:
       - JWT: []
-      summary: 获取RAG信息
+      summary: 获取已发布RAG信息
       tags:
       - rag
     post:
@@ -6671,6 +7346,35 @@ paths:
       summary: 复制RAG
       tags:
       - rag
+  /appspace/rag/draft:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: ragId
+        required: true
+        type: string
+      - in: query
+        name: version
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RagInfo'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取草稿RAG信息
+      tags:
+      - rag
   /appspace/workflow:
     post:
       consumes:
@@ -6762,6 +7466,10 @@ paths:
         name: workflow_id
         required: true
         type: string
+      - description: 版本
+        in: query
+        name: version
+        type: string
       produces:
       - application/octet-stream
       responses:
@@ -6772,6 +7480,29 @@ paths:
       security:
       - JWT: []
       summary: 导出Workflow
+      tags:
+      - workflow
+  /appspace/workflow/export/draft:
+    get:
+      consumes:
+      - application/json
+      description: 导出工作流草稿的json文件
+      parameters:
+      - description: 工作流ID
+        in: query
+        name: workflow_id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 导出Workflow草稿
       tags:
       - workflow
   /appspace/workflow/import:
@@ -6832,12 +7563,14 @@ paths:
     get:
       consumes:
       - application/json
-      description: 查看发布后智能体详情
+      description: 查看已发布智能体详情
       parameters:
-      - description: 智能体id
-        in: query
+      - in: query
         name: assistantId
         required: true
+        type: string
+      - in: query
+        name: version
         type: string
       produces:
       - application/json
@@ -6853,7 +7586,7 @@ paths:
               type: object
       security:
       - JWT: []
-      summary: 查看发布后智能体详情
+      summary: 查看已发布智能体详情
       tags:
       - agent
     post:
@@ -7108,10 +7841,12 @@ paths:
       - application/json
       description: 查看草稿智能体详情
       parameters:
-      - description: 智能体id
-        in: query
+      - in: query
         name: assistantId
         required: true
+        type: string
+      - in: query
+        name: version
         type: string
       produces:
       - application/json
@@ -7131,6 +7866,30 @@ paths:
       tags:
       - agent
   /assistant/stream:
+    post:
+      consumes:
+      - application/json
+      description: 已发布智能体流式问答
+      parameters:
+      - description: 智能体流式问答参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ConversionStreamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 已发布智能体流式问答
+      tags:
+      - agent
+  /assistant/stream/draft:
     post:
       consumes:
       - application/json
@@ -7722,6 +8481,88 @@ paths:
       summary: 邮箱注册验证码发送
       tags:
       - guest
+  /chatflow/application/info:
+    post:
+      consumes:
+      - application/json
+      description: 应用广场对话流关联应用信息
+      parameters:
+      - description: 应用广场对话流关联应用信息参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChatflowApplicationInfoReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeGetDraftIntelligenceInfoData'
+              type: object
+      security:
+      - JWT: []
+      summary: 应用广场对话流关联应用信息
+      tags:
+      - chatflow
+  /chatflow/application/list:
+    post:
+      consumes:
+      - application/json
+      description: 应用广场对话流关联应用
+      parameters:
+      - description: 应用广场对话流关联应用参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChatflowApplicationListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeDraftIntelligenceListData'
+              type: object
+      security:
+      - JWT: []
+      summary: 应用广场对话流关联应用
+      tags:
+      - chatflow
+  /chatflow/conversation/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除对话流会话
+      parameters:
+      - description: 删除对话流会话请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChatflowConversationDeleteReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除对话流会话
+      tags:
+      - chatflow
   /custom/home:
     post:
       consumes:
@@ -8168,9 +9009,7 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/response.CreateKnowledgeResp'
-                  type: array
+                  $ref: '#/definitions/response.CreateKnowledgeResp'
               type: object
       security:
       - JWT: []
@@ -8222,6 +9061,37 @@ paths:
       security:
       - JWT: []
       summary: 删除文档
+      tags:
+      - knowledge.doc
+  /knowledge/doc/config:
+    get:
+      consumes:
+      - application/json
+      description: 获取文档配置信息
+      parameters:
+      - in: query
+        name: docId
+        required: true
+        type: string
+      - in: query
+        name: knowledgeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.DocConfigResult'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取文档配置信息
       tags:
       - knowledge.doc
   /knowledge/doc/export:
@@ -8295,32 +9165,17 @@ paths:
       tags:
       - knowledge.doc
   /knowledge/doc/list:
-    get:
+    post:
       consumes:
       - application/json
       description: 获取知识库文档列表，不展示状态为无效（-1）的文档数据
       parameters:
-      - in: query
-        name: docName
-        type: string
-      - in: query
-        name: knowledgeId
+      - description: 文档列表查询请求参数
+        in: body
+        name: data
         required: true
-        type: string
-      - in: query
-        name: metaValue
-        type: string
-      - in: query
-        name: pageNo
-        type: integer
-      - in: query
-        name: pageSize
-        required: true
-        type: integer
-      - description: 当前状态  -1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败、
-        in: query
-        name: status
-        type: integer
+        schema:
+          $ref: '#/definitions/request.DocListReq'
       produces:
       - application/json
       responses:
@@ -8384,6 +9239,30 @@ paths:
       security:
       - JWT: []
       summary: 批量更新文档元数据
+      tags:
+      - knowledge.doc
+  /knowledge/doc/reimport:
+    post:
+      consumes:
+      - application/json
+      description: 重新解析文档
+      parameters:
+      - description: 重新导入文档请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DocReImportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 重新解析文档
       tags:
       - knowledge.doc
   /knowledge/doc/segment/batch/create:
@@ -8665,6 +9544,30 @@ paths:
       security:
       - JWT: []
       summary: 更新文档切片
+      tags:
+      - knowledge.doc
+  /knowledge/doc/update/config:
+    post:
+      consumes:
+      - application/json
+      description: 更新文档配置
+      parameters:
+      - description: 文更新文档配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DocConfigUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新文档配置
       tags:
       - knowledge.doc
   /knowledge/doc/url/analysis:
@@ -9022,6 +9925,9 @@ paths:
         name: knowledgeId
         required: true
         type: string
+      - in: query
+        name: transfer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -11478,7 +12384,30 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - JWT: []
-      summary: 私域 RAG 问答
+      summary: 已发布 RAG 问答
+      tags:
+      - rag
+  /rag/chat/draft:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: RAG问答请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChatRagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 私域 草稿RAG 问答
       tags:
       - rag
   /role:
@@ -12690,7 +13619,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 工作流运行接口
+      description: 已发布工作流运行接口
       parameters:
       - description: 工作流运行参数
         in: body
@@ -12707,7 +13636,7 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - JWT: []
-      summary: 工作流运行接口
+      summary: 已发布工作流运行接口
       tags:
       - workflow
   /workflow/select:

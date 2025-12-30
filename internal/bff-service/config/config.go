@@ -146,26 +146,40 @@ type PromptEngineeringConfig struct {
 }
 
 type WorkflowServiceConfig struct {
-	Endpoint                      string               `json:"endpoint" mapstructure:"endpoint"`
-	MinioProxyEndpoint            string               `json:"minio_proxy_endpoint" mapstructure:"minio_proxy_endpoint"`
-	MinioProxyPrefix              string               `json:"minio_proxy_prefix" mapstructure:"minio_proxy_prefix"`
-	ListUri                       string               `json:"list_uri" mapstructure:"list_uri"`
-	CreateUri                     string               `json:"create_uri" mapstructure:"create_uri"`
-	DeleteUri                     string               `json:"delete_uri" mapstructure:"delete_uri"`
-	CopyUri                       string               `json:"copy_uri" mapstructure:"copy_uri"`
-	ExportUri                     string               `json:"export_uri" mapstructure:"export_uri"`
-	ImportUri                     string               `json:"import_uri" mapstructure:"import_uri"`
-	ConvertUri                    string               `json:"convert_uri" mapstructure:"convert_uri"`
-	TestRunUri                    string               `json:"test_run_uri" mapstructure:"test_run_uri"`
-	GetProcessUri                 string               `json:"get_process_uri" mapstructure:"get_process_uri"`
-	TestRunWebUri                 string               `json:"test_run_web_uri" mapstructure:"test_run_web_uri"`
-	CreateChatflowConversationUri string               `json:"create_chatflow_conversation_uri" mapstructure:"create_chatflow_conversation_uri"`
-	ChatflowRunUri                string               `json:"chatflow_run_uri" mapstructure:"chatflow_run_uri"`
-	UploadActionUri               string               `json:"upload_action_uri" mapstructure:"upload_action_uri"`
-	UploadCommonUri               string               `json:"upload_common_uri" mapstructure:"upload_common_uri"`
-	UploadFileUri                 string               `json:"upload_file_uri" mapstructure:"upload_file_uri"`
-	SignImgUri                    string               `json:"sign_img_uri" mapstructure:"sign_img_uri"`
-	ModelParams                   []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
+	Endpoint           string `json:"endpoint" mapstructure:"endpoint"`
+	MinioProxyEndpoint string `json:"minio_proxy_endpoint" mapstructure:"minio_proxy_endpoint"`
+	MinioProxyPrefix   string `json:"minio_proxy_prefix" mapstructure:"minio_proxy_prefix"`
+	// general
+	ListUri    string `json:"list_uri" mapstructure:"list_uri"`
+	CreateUri  string `json:"create_uri" mapstructure:"create_uri"`
+	DeleteUri  string `json:"delete_uri" mapstructure:"delete_uri"`
+	CopyUri    string `json:"copy_uri" mapstructure:"copy_uri"`
+	ExportUri  string `json:"export_uri" mapstructure:"export_uri"`
+	ImportUri  string `json:"import_uri" mapstructure:"import_uri"`
+	ConvertUri string `json:"convert_uri" mapstructure:"convert_uri"`
+	// run
+	WorkflowRunByOpenapiUri     string `json:"workflow_run_by_openapi_uri" mapstructure:"workflow_run_by_openapi_uri"`
+	WorkflowRunLatestVersionUri string `json:"workflow_run_latest_version_uri" mapstructure:"workflow_run_latest_version_uri"`
+	GetProcessUri               string `json:"get_process_uri" mapstructure:"get_process_uri"`
+	ChatflowRunByOpenapiUri     string `json:"chatflow_run_by_openapi_uri" mapstructure:"chatflow_run_by_openapi_uri"`
+	// conversation
+	CreateChatflowConversationUri string `json:"create_chatflow_conversation_uri" mapstructure:"create_chatflow_conversation_uri"`
+	GetConversationMessageListUri string `json:"get_conversation_message_list_uri" mapstructure:"get_conversation_message_list_uri"`
+	GetDraftIntelligenceListUri   string `json:"get_draft_intelligence_list_uri" mapstructure:"get_draft_intelligence_list_uri"`
+	GetDraftIntelligenceInfoUri   string `json:"get_draft_intelligence_info_uri" mapstructure:"get_draft_intelligence_info_uri"`
+	DeleteConversationUri         string `json:"delete_conversation_uri" mapstructure:"delete_conversation_uri"`
+	GetProjectConversationDef     string `json:"get_project_conversation_def" mapstructure:"get_project_conversation_def"`
+	// upload
+	UploadActionUri string `json:"upload_action_uri" mapstructure:"upload_action_uri"`
+	UploadCommonUri string `json:"upload_common_uri" mapstructure:"upload_common_uri"`
+	UploadFileUri   string `json:"upload_file_uri" mapstructure:"upload_file_uri"`
+	SignImgUri      string `json:"sign_img_uri" mapstructure:"sign_img_uri"`
+	// version
+	PublishUri           string               `json:"publish_uri" mapstructure:"publish_uri"`
+	VersionListUri       string               `json:"version_list_uri" mapstructure:"version_list_uri"`
+	UpdateVersionDescUri string               `json:"update_version_desc_uri" mapstructure:"update_version_desc_uri"`
+	RollbackUri          string               `json:"rollback_uri" mapstructure:"rollback_uri"`
+	ModelParams          []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
 }
 
 type WorkflowModelParam struct {
@@ -203,7 +217,7 @@ type AgentScopeWorkFlowServiceConfig struct {
 }
 
 type AgentServiceConfig struct {
-	UseNewAgent    int       `json:"use_new_agent" mapstructure:"use_new_agent"`
+	UseOldAgent    int       `json:"use_old_agent" mapstructure:"use_old_agent"`
 	Host           string    `json:"host" mapstructure:"host"`
 	UploadMinioUri UriConfig `json:"upload_minio" mapstructure:"upload_minio"`
 }

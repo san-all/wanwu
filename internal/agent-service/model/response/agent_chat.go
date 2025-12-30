@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/UnicomAI/wanwu/internal/agent-service/model/request"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/cloudwego/eino/schema"
 )
 
@@ -19,6 +20,10 @@ const (
 	toolEndFormat         = "\n\n```工具%s调用结果：\n %s \n```\n\n"
 	toolEndTitle          = `</tool>`
 	endLine               = "\n\n"
+	agentSuccessCode      = 0
+	agentFailCode         = 1
+	finish                = 1
+	notFinish             = 0
 )
 
 type AgentChatRespContext struct {
@@ -30,6 +35,9 @@ type AgentChatRespContext struct {
 	ReplaceContent     strings.Builder // 替换内容，如果出现相同内则则进行替换
 	ReplaceContentStr  string          // 替换内容，如果出现相同内则则进行替换
 	ReplaceContentDone bool            //替换内容准备完成
+
+	ToolParamsStartCount int //工具参数开始的数量
+	ToolParamsEndCount   int //工具参数结束的数量
 }
 
 func NewAgentChatRespContext() *AgentChatRespContext {
@@ -62,7 +70,7 @@ func NewAgentChatRespWithTool(chatMessage *schema.Message, respContext *AgentCha
 	var outputList = make([]string, 0)
 	for _, content := range contentList {
 		var agentChatResp = &AgentChatResp{
-			Code:           0,
+			Code:           agentSuccessCode,
 			Message:        "success",
 			Response:       content,
 			GenFileUrlList: []interface{}{},
@@ -72,17 +80,39 @@ func NewAgentChatRespWithTool(chatMessage *schema.Message, respContext *AgentCha
 			Finish:         buildFinish(chatMessage),
 			Usage:          buildUsage(chatMessage),
 		}
-		var buf bytes.Buffer
-		encoder := json.NewEncoder(&buf)
-		encoder.SetEscapeHTML(false) // 关键：禁用 HTML 转义
-
-		if err := encoder.Encode(agentChatResp); err != nil {
+		respString, err := buildRespString(agentChatResp)
+		if err != nil {
 			return nil, err
 		}
-		outputList = append(outputList, "data:"+buf.String())
+		outputList = append(outputList, respString)
 	}
-
 	return outputList, nil
+}
+
+func AgentChatFailResp() string {
+	var agentChatResp = &AgentChatResp{
+		Code:     agentFailCode,
+		Message:  "智能体处理异常，请稍后重试",
+		Response: "智能体处理异常，请稍后重试",
+		Finish:   finish,
+	}
+	respString, err := buildRespString(agentChatResp)
+	if err != nil {
+		log.Errorf("buildRespString error: %v", err)
+		return ""
+	}
+	return respString
+}
+
+func buildRespString(agentChatResp *AgentChatResp) (string, error) {
+	var buf bytes.Buffer
+	encoder := json.NewEncoder(&buf)
+	encoder.SetEscapeHTML(false) // 关键：禁用 HTML 转义
+
+	if err := encoder.Encode(agentChatResp); err != nil {
+		return "", err
+	}
+	return "data:" + buf.String(), nil
 }
 
 func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRespContext) []string {
@@ -90,33 +120,42 @@ func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRes
 		respContext.ToolStart = true
 		respContext.HasTool = true
 		var retList []string
-		if len(respContext.ToolCountMap) == 0 {
-			retList = append(retList, toolStartTitle)
-		}
+		//if len(respContext.ToolCountMap) == 0 {
+		//	retList = append(retList, toolStartTitle)
+		//}
 
 		for _, tool := range chatMessage.ToolCalls {
+			if len(tool.Function.Arguments) > 0 {
+				retList = append(retList, tool.Function.Arguments)
+				continue
+			}
 			if tool.Type == "function" {
 				if respContext.ToolIndex == -1 {
 					respContext.ToolIndex = *tool.Index
-				} else if *tool.Index != respContext.ToolIndex {
+				} else if *tool.Index != respContext.ToolIndex { //模型触发并发请求工具的bad case
 					respContext.ToolIndex = *tool.Index
-					retList = append(retList, toolParamsEndFormat)
+					if respContext.ToolParamsStartCount > respContext.ToolParamsEndCount {
+						respContext.ToolParamsEndCount = respContext.ToolParamsEndCount + 1
+						retList = append(retList, toolParamsEndFormat)
+					}
 				}
-				toolName := fmt.Sprintf(toolStartTitleFormat, tool.Function.Name)
-				retList = append(retList, toolName)
-				if len(tool.ID) > 0 && respContext.ToolCountMap[tool.ID] == 0 {
+				if len(tool.Function.Name) > 0 {
+					toolName := fmt.Sprintf(toolStartTitleFormat, tool.Function.Name)
+					retList = append(retList, toolName)
+				}
+
+				if isNewTool(tool, respContext) {
+					respContext.ToolParamsStartCount = respContext.ToolParamsStartCount + 1
+					retList = append(retList, toolStartTitle)
 					retList = append(retList, toolParamsStartFormat)
 					respContext.ToolCountMap[tool.ID] = 1
-				}
-			} else {
-				if len(tool.Function.Arguments) > 0 {
-					retList = append(retList, tool.Function.Arguments)
 				}
 			}
 		}
 
 		return retList
 	} else if toolParamsEnd(chatMessage) {
+		respContext.ToolParamsEndCount = respContext.ToolParamsEndCount + 1
 		return []string{toolParamsEndFormat}
 	} else if toolEnd(chatMessage) {
 		respContext.ToolEnd = true
@@ -171,6 +210,10 @@ func buildContentWithTool(chatMessage *schema.Message, respContext *AgentChatRes
 	}
 }
 
+func isNewTool(tool schema.ToolCall, respContext *AgentChatRespContext) bool {
+	return len(tool.ID) > 0 && respContext.ToolCountMap[tool.ID] == 0
+}
+
 func toolStart(chatMessage *schema.Message) bool {
 	//responseMeta := chatMessage.ResponseMeta
 	//if responseMeta == nil {
@@ -194,9 +237,9 @@ func toolEnd(chatMessage *schema.Message) bool {
 
 func buildFinish(chatMessage *schema.Message) int {
 	if chatMessage.ResponseMeta != nil && chatMessage.ResponseMeta.FinishReason == "stop" {
-		return 1
+		return finish
 	}
-	return 0
+	return notFinish
 }
 
 func buildUsage(chatMessage *schema.Message) *AgentChatUsage {

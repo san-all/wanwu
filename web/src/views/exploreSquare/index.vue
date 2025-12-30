@@ -45,6 +45,13 @@
               :appFrom="'explore'"
             />
           </el-tab-pane>
+          <el-tab-pane :label="$t('menu.app.chatflow')" name="chatflow">
+            <AppList
+              :appData="listData"
+              :isShowTool="false"
+              :appFrom="'explore'"
+            />
+          </el-tab-pane>
         </el-tabs>
       </div>
     </div>
@@ -61,7 +68,7 @@ export default {
   components: { SearchInput, CreateTotalDialog, AppList },
   data() {
     return {
-      placeholder: this.$t('explore.hint'),
+      placeholder: this.$t('appSpace.search'),
       asideTitle: this.$t('explore.asideTitle'),
       activeName: 'agent',
       searchValue: '',

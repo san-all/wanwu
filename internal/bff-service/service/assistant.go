@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 
+	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	"github.com/UnicomAI/wanwu/api/proto/common"
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -81,28 +82,37 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 	return nil, err
 }
 
-func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.Assistant, error) {
-	resp, err := assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
-		AssistantId: req.AssistantId,
-	})
+func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest, needPublished bool) (*response.Assistant, error) {
+	var resp *assistant_service.AssistantInfo
+	var err error
+	if needPublished {
+		resp, err = assistant.AssistantSnapshotInfo(ctx.Request.Context(), &assistant_service.AssistantSnapshotInfoReq{
+			AssistantId: req.AssistantId,
+			Version:     req.Version,
+		})
+	} else {
+		resp, err = assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
+			AssistantId: req.AssistantId,
+			Identity: &assistant_service.Identity{ //草稿只能看自己的
+				UserId: userId,
+				OrgId:  orgId,
+			},
+		})
+	}
 	if err != nil {
 		return nil, err
 	}
 	return transAssistantResp2Model(ctx, resp)
 }
 
-func GetAssistantDraftInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.Assistant, error) {
-	resp, err := assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
-		AssistantId: req.AssistantId,
-		Identity: &assistant_service.Identity{ //草稿只能看自己的
-			UserId: userId,
-			OrgId:  orgId,
-		},
+func GetAssistantIdByUuid(ctx *gin.Context, uuid string) (string, error) {
+	resp, err := assistant.GetAssistantIdByUuid(ctx.Request.Context(), &assistant_service.GetAssistantIdByUuidReq{
+		Uuid: uuid,
 	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return transAssistantResp2Model(ctx, resp)
+	return resp.AssistantId, nil
 }
 
 func AssistantCopy(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.AssistantCreateResp, error) {
@@ -256,7 +266,7 @@ func AssistantToolConfig(ctx *gin.Context, userId, orgId string, req request.Ass
 func assistantModelConvert(ctx *gin.Context, modelConfigInfo *common.AppModelConfig) (modelConfig request.AppModelConfig, err error) {
 	if modelConfigInfo != nil && modelConfigInfo.ModelId != "" {
 		log.Debugf("检测到模型配置，模型ID: %s", modelConfigInfo.ModelId)
-		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: modelConfigInfo.ModelId})
+		modelInfo, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{ModelId: modelConfigInfo.ModelId})
 		if err != nil {
 			log.Errorf("获取模型信息失败，模型ID: %s, 错误: %v", modelConfigInfo.ModelId, err)
 		}
@@ -278,7 +288,7 @@ func assistantRerankConvert(ctx *gin.Context, rerankConfigInfo *common.AppModelC
 	var rerankConfig request.AppModelConfig
 	if rerankConfigInfo != nil && rerankConfigInfo.ModelId != "" {
 		log.Debugf("检测到Rerank配置，模型ID: %s", rerankConfigInfo.ModelId)
-		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: rerankConfigInfo.ModelId})
+		modelInfo, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{ModelId: rerankConfigInfo.ModelId})
 		if err != nil {
 			log.Errorf("获取Rerank模型信息失败，模型ID: %s, 错误: %v", rerankConfigInfo.ModelId, err)
 		} else {
@@ -323,8 +333,11 @@ func assistantWorkFlowConvert(ctx *gin.Context, workFlowInfos []*assistant_servi
 				}
 			}
 
-			assistantWorkFlowInfos = append(assistantWorkFlowInfos, workFlowInfo)
-			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
+			// 仅当工作流名称非空时才添加
+			if workFlowInfo.WorkFlowName != "" {
+				assistantWorkFlowInfos = append(assistantWorkFlowInfos, workFlowInfo)
+				log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
+			}
 		}
 		log.Debugf("总共添加 %d 个工作流信息", len(assistantWorkFlowInfos))
 	} else {
@@ -720,6 +733,9 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		return nil, nil
 	}
 
+	// 获取app发布信息，可能没有发布过，不返回错误
+	appInfo, _ := app.GetAppInfo(ctx, &app_service.GetAppInfoReq{AppId: resp.AssistantId, AppType: constant.AppTypeAgent})
+
 	// 转换Model配置
 	modelConfig, err := assistantModelConvert(ctx, resp.ModelConfig)
 	if err != nil {
@@ -776,6 +792,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
+		UUID:                resp.Uuid,
 		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief, constant.AppTypeAgent),
 		Prologue:            resp.Prologue,
 		Instructions:        resp.Instructions,
@@ -791,7 +808,8 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ToolInfos:           assistantToolInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
-		NewAgent:            config.Cfg().Agent.UseNewAgent == 1,
+		NewAgent:            config.Cfg().Agent.UseOldAgent != 1,
+		PublishType:         appInfo.GetPublishType(),
 	}
 
 	log.Debugf("Assistant响应到模型转换完成，结果: %+v", assistantModel)

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      title="新增工具"
+      :title="$t('agent.toolDialog.addTool')"
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose"
@@ -15,11 +15,13 @@
             :class="[{ active: activeValue === item.value }]"
           >
             {{ item.name }}
+            <span>/</span>
+            {{ showToolNum(item.value) }}
           </div>
         </div>
         <el-input
           v-model="toolName"
-          placeholder="搜索工具"
+          :placeholder="$t('agent.toolDialog.searchTool')"
           class="tool-input"
           suffix-icon="el-icon-search"
           @keyup.enter.native="searchTool"
@@ -46,7 +48,12 @@
                       v-show="item.avatar && item.avatar.path"
                     />
                   </div>
-                  <span>{{ item.name }}</span>
+                  <div>
+                    <div>{{ item.name }}</div>
+                    <span class="tag" v-if="tagMap[item.appType]">
+                      {{ tagMap[item.appType] }}
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <el-button
@@ -54,10 +61,10 @@
                     @click="openTool($event, item, type)"
                     v-if="!item.checked"
                   >
-                    添加
+                    {{ $t('agent.toolDialog.add') }}
                   </el-button>
                   <el-button type="text" v-else style="color: #ccc">
-                    已添加
+                    {{ $t('agent.toolDialog.added') }}
                   </el-button>
                 </div>
               </template>
@@ -108,10 +115,10 @@
                           @click="openTool($event, item, type, tool)"
                           v-if="!tool.checked"
                         >
-                          添加
+                          {{ $t('agent.toolDialog.add') }}
                         </el-button>
                         <el-button type="text" v-else style="color: #ccc">
-                          已添加
+                          {{ $t('agent.toolDialog.added') }}
                         </el-button>
                       </div>
                     </div>
@@ -154,7 +161,7 @@ export default {
       toolList: [
         {
           value: 'tool',
-          name: '工具',
+          name: this.$t('agent.toolDialog.tool'),
         },
         {
           value: 'mcp',
@@ -162,7 +169,7 @@ export default {
         },
         {
           value: 'workflow',
-          name: '工作流',
+          name: this.$t('appSpace.workflow'),
         },
       ],
     };
@@ -176,6 +183,12 @@ export default {
         workflow: this.workFlowInfos,
       };
     },
+    tagMap() {
+      return {
+        workflow: this.$t('appSpace.workflow'),
+        chatflow: this.$t('appSpace.chat'),
+      };
+    },
   },
   created() {
     this.getMcpSelect('');
@@ -183,6 +196,15 @@ export default {
     this.getCustomList('');
   },
   methods: {
+    showToolNum(type) {
+      if (type === 'tool') {
+        return this.customList.length > 0 ? this.customList.length : 0;
+      } else if (type === 'mcp') {
+        return this.mcpList.length > 0 ? this.mcpList.length : 0;
+      } else {
+        return this.workFlowList.length > 0 ? this.workFlowList.length : 0;
+      }
+    },
     handleToolChange(id) {
       let toolId = id[0];
       if (this.activeValue === 'tool') {
@@ -246,11 +268,11 @@ export default {
     },
     createText() {
       if (this.activeValue === 'tool') {
-        return '创建自定义工具';
+        return this.$t('agent.toolDialog.createAutoTool');
       } else if (this.activeValue === 'mcp') {
-        return '导入MCP';
+        return this.$t('agent.toolDialog.importMcp');
       } else {
-        return '创建工作流';
+        return this.$t('agent.toolDialog.createWorkflow');
       }
     },
     openTool(e, item, type, action) {
@@ -261,7 +283,7 @@ export default {
         this.addMcpItem(item, action);
       } else {
         if (item.needApiKeyInput && !item.apiKey.length) {
-          this.$message.warning('该内置工具暂未绑定API Key，会导致调用失败!');
+          this.$message.warning(this.$t('agent.toolDialog.errorApiKey'));
         }
         this.addCustomBuiltIn(item, action);
       }
@@ -277,7 +299,7 @@ export default {
         if (res.code === 0) {
           this.$set(action, 'checked', true);
           this.$forceUpdate();
-          this.$message.success('工具添加成功');
+          this.$message.success(this.$t('agent.toolDialog.addSuccess'));
           this.$emit('updateDetail');
         }
       });
@@ -292,7 +314,7 @@ export default {
         if (res.code === 0) {
           this.$set(action, 'checked', true);
           this.$forceUpdate();
-          this.$message.success('工具添加成功');
+          this.$message.success(this.$t('agent.toolDialog.addSuccess'));
           this.$emit('updateDetail');
         }
       });
@@ -308,7 +330,7 @@ export default {
       let res = await addWorkFlowInfo(params);
       if (res.code === 0) {
         n.checked = true;
-        this.$message.success(this.$t('agent.addPluginTips'));
+        this.$message.success(this.$t('agent.addWorkFlowTips'));
         this.$emit('updateDetail');
       }
     },
@@ -460,6 +482,14 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .tag {
+      padding: 0 8px;
+      background: rgba(139, 139, 149, 0.15);
+      color: #4b4a58;
+      font-size: 12px;
+      border-radius: 6px;
+    }
     .tool_box {
       display: flex;
       align-items: center;

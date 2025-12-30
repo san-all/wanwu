@@ -208,3 +208,39 @@ type UploadFileByWorkflowResp struct {
 	Url string `json:"url"`
 	Uri string `json:"uri"`
 }
+
+type CozeListMessageApiResponse struct {
+	Messages []*OpenMessageApi `thrift:"messages,1,optional" form:"data" json:"data,omitempty"`
+	// Is there still data, true yes, false no
+	HasMore *bool `thrift:"has_more,2,optional" form:"has_more" json:"has_more,omitempty"`
+	// The ID of the first piece of data
+	FirstID *int64 `thrift:"first_id,3,optional" form:"first_id" json:"first_id,string,omitempty"`
+	// The id of the last piece of data.
+	LastID *int64 `thrift:"last_id,4,optional" form:"last_id" json:"last_id,string,omitempty"`
+	Code   int64  `thrift:"code,253" form:"code" json:"code" query:"code"`
+	Msg    string `thrift:"msg,254" form:"msg" json:"msg" query:"msg"`
+}
+
+type CozeWorkflowVersionListResp struct {
+	Code int                          `json:"code"`
+	Msg  string                       `json:"msg"`
+	Data *CozeWorkflowVersionListData `json:"data"`
+}
+
+type CozeWorkflowVersionListData struct {
+	WorkflowID  string                 `json:"workflow_id"`
+	VersionList []*CozeWorkflowVersion `json:"version_list"`
+	Total       int32                  `json:"total"`
+}
+
+type CozeWorkflowVersion struct {
+	Version   string `json:"version"`
+	Desc      string `json:"version_description"`
+	CreatedAt int64  `json:"created_at"`
+	CommitId  string `json:"commit_id"`
+}
+
+type CozeCommonResp struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}

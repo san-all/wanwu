@@ -27,7 +27,14 @@ const (
 	AssistantService_AssistantDelete_FullMethodName                     = "/assistant_service.AssistantService/AssistantDelete"
 	AssistantService_GetAssistantListMyAll_FullMethodName               = "/assistant_service.AssistantService/GetAssistantListMyAll"
 	AssistantService_GetAssistantInfo_FullMethodName                    = "/assistant_service.AssistantService/GetAssistantInfo"
+	AssistantService_GetAssistantIdByUuid_FullMethodName                = "/assistant_service.AssistantService/GetAssistantIdByUuid"
 	AssistantService_AssistantCopy_FullMethodName                       = "/assistant_service.AssistantService/AssistantCopy"
+	AssistantService_AssistantSnapshotCreate_FullMethodName             = "/assistant_service.AssistantService/AssistantSnapshotCreate"
+	AssistantService_AssistantSnapshotUpdate_FullMethodName             = "/assistant_service.AssistantService/AssistantSnapshotUpdate"
+	AssistantService_AssistantSnapshotList_FullMethodName               = "/assistant_service.AssistantService/AssistantSnapshotList"
+	AssistantService_AssistantSnapshotRollback_FullMethodName           = "/assistant_service.AssistantService/AssistantSnapshotRollback"
+	AssistantService_AssistantSnapshotInfo_FullMethodName               = "/assistant_service.AssistantService/AssistantSnapshotInfo"
+	AssistantService_AssistantSnapshotLatest_FullMethodName             = "/assistant_service.AssistantService/AssistantSnapshotLatest"
 	AssistantService_AssistantWorkFlowCreate_FullMethodName             = "/assistant_service.AssistantService/AssistantWorkFlowCreate"
 	AssistantService_AssistantWorkFlowDelete_FullMethodName             = "/assistant_service.AssistantService/AssistantWorkFlowDelete"
 	AssistantService_AssistantWorkFlowEnableSwitch_FullMethodName       = "/assistant_service.AssistantService/AssistantWorkFlowEnableSwitch"
@@ -69,7 +76,15 @@ type AssistantServiceClient interface {
 	AssistantDelete(ctx context.Context, in *AssistantDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAssistantListMyAll(ctx context.Context, in *GetAssistantListMyAllReq, opts ...grpc.CallOption) (*AppBriefList, error)
 	GetAssistantInfo(ctx context.Context, in *GetAssistantInfoReq, opts ...grpc.CallOption) (*AssistantInfo, error)
+	GetAssistantIdByUuid(ctx context.Context, in *GetAssistantIdByUuidReq, opts ...grpc.CallOption) (*GetAssistantIdByUuidResp, error)
 	AssistantCopy(ctx context.Context, in *AssistantCopyReq, opts ...grpc.CallOption) (*AssistantCreateResp, error)
+	// --- assistant snapshot ---
+	AssistantSnapshotCreate(ctx context.Context, in *AssistantSnapshotReq, opts ...grpc.CallOption) (*AssistantSnapshotResp, error)
+	AssistantSnapshotUpdate(ctx context.Context, in *AssistantSnapshotUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantSnapshotList(ctx context.Context, in *AssistantSnapshotListReq, opts ...grpc.CallOption) (*AssistantSnapshotListResp, error)
+	AssistantSnapshotRollback(ctx context.Context, in *AssistantSnapshotRollbackReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantSnapshotInfo(ctx context.Context, in *AssistantSnapshotInfoReq, opts ...grpc.CallOption) (*AssistantInfo, error)
+	AssistantSnapshotLatest(ctx context.Context, in *AssistantSnapshotInfoReq, opts ...grpc.CallOption) (*AssistantSnapshot, error)
 	// --- workFlow ---
 	AssistantWorkFlowCreate(ctx context.Context, in *AssistantWorkFlowCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(ctx context.Context, in *AssistantWorkFlowDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -182,10 +197,80 @@ func (c *assistantServiceClient) GetAssistantInfo(ctx context.Context, in *GetAs
 	return out, nil
 }
 
+func (c *assistantServiceClient) GetAssistantIdByUuid(ctx context.Context, in *GetAssistantIdByUuidReq, opts ...grpc.CallOption) (*GetAssistantIdByUuidResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAssistantIdByUuidResp)
+	err := c.cc.Invoke(ctx, AssistantService_GetAssistantIdByUuid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *assistantServiceClient) AssistantCopy(ctx context.Context, in *AssistantCopyReq, opts ...grpc.CallOption) (*AssistantCreateResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AssistantCreateResp)
 	err := c.cc.Invoke(ctx, AssistantService_AssistantCopy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotCreate(ctx context.Context, in *AssistantSnapshotReq, opts ...grpc.CallOption) (*AssistantSnapshotResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssistantSnapshotResp)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotCreate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotUpdate(ctx context.Context, in *AssistantSnapshotUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotList(ctx context.Context, in *AssistantSnapshotListReq, opts ...grpc.CallOption) (*AssistantSnapshotListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssistantSnapshotListResp)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotRollback(ctx context.Context, in *AssistantSnapshotRollbackReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotRollback_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotInfo(ctx context.Context, in *AssistantSnapshotInfoReq, opts ...grpc.CallOption) (*AssistantInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssistantInfo)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantSnapshotLatest(ctx context.Context, in *AssistantSnapshotInfoReq, opts ...grpc.CallOption) (*AssistantSnapshot, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssistantSnapshot)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantSnapshotLatest_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +577,15 @@ type AssistantServiceServer interface {
 	AssistantDelete(context.Context, *AssistantDeleteReq) (*emptypb.Empty, error)
 	GetAssistantListMyAll(context.Context, *GetAssistantListMyAllReq) (*AppBriefList, error)
 	GetAssistantInfo(context.Context, *GetAssistantInfoReq) (*AssistantInfo, error)
+	GetAssistantIdByUuid(context.Context, *GetAssistantIdByUuidReq) (*GetAssistantIdByUuidResp, error)
 	AssistantCopy(context.Context, *AssistantCopyReq) (*AssistantCreateResp, error)
+	// --- assistant snapshot ---
+	AssistantSnapshotCreate(context.Context, *AssistantSnapshotReq) (*AssistantSnapshotResp, error)
+	AssistantSnapshotUpdate(context.Context, *AssistantSnapshotUpdateReq) (*emptypb.Empty, error)
+	AssistantSnapshotList(context.Context, *AssistantSnapshotListReq) (*AssistantSnapshotListResp, error)
+	AssistantSnapshotRollback(context.Context, *AssistantSnapshotRollbackReq) (*emptypb.Empty, error)
+	AssistantSnapshotInfo(context.Context, *AssistantSnapshotInfoReq) (*AssistantInfo, error)
+	AssistantSnapshotLatest(context.Context, *AssistantSnapshotInfoReq) (*AssistantSnapshot, error)
 	// --- workFlow ---
 	AssistantWorkFlowCreate(context.Context, *AssistantWorkFlowCreateReq) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(context.Context, *AssistantWorkFlowDeleteReq) (*emptypb.Empty, error)
@@ -556,8 +649,29 @@ func (UnimplementedAssistantServiceServer) GetAssistantListMyAll(context.Context
 func (UnimplementedAssistantServiceServer) GetAssistantInfo(context.Context, *GetAssistantInfoReq) (*AssistantInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAssistantInfo not implemented")
 }
+func (UnimplementedAssistantServiceServer) GetAssistantIdByUuid(context.Context, *GetAssistantIdByUuidReq) (*GetAssistantIdByUuidResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAssistantIdByUuid not implemented")
+}
 func (UnimplementedAssistantServiceServer) AssistantCopy(context.Context, *AssistantCopyReq) (*AssistantCreateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssistantCopy not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotCreate(context.Context, *AssistantSnapshotReq) (*AssistantSnapshotResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotCreate not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotUpdate(context.Context, *AssistantSnapshotUpdateReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotUpdate not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotList(context.Context, *AssistantSnapshotListReq) (*AssistantSnapshotListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotList not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotRollback(context.Context, *AssistantSnapshotRollbackReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotRollback not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotInfo(context.Context, *AssistantSnapshotInfoReq) (*AssistantInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotInfo not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantSnapshotLatest(context.Context, *AssistantSnapshotInfoReq) (*AssistantSnapshot, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantSnapshotLatest not implemented")
 }
 func (UnimplementedAssistantServiceServer) AssistantWorkFlowCreate(context.Context, *AssistantWorkFlowCreateReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssistantWorkFlowCreate not implemented")
@@ -787,6 +901,24 @@ func _AssistantService_GetAssistantInfo_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssistantService_GetAssistantIdByUuid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAssistantIdByUuidReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).GetAssistantIdByUuid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_GetAssistantIdByUuid_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).GetAssistantIdByUuid(ctx, req.(*GetAssistantIdByUuidReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AssistantService_AssistantCopy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssistantCopyReq)
 	if err := dec(in); err != nil {
@@ -801,6 +933,114 @@ func _AssistantService_AssistantCopy_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AssistantServiceServer).AssistantCopy(ctx, req.(*AssistantCopyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotCreate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotCreate(ctx, req.(*AssistantSnapshotReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotUpdate(ctx, req.(*AssistantSnapshotUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotList(ctx, req.(*AssistantSnapshotListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotRollback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotRollbackReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotRollback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotRollback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotRollback(ctx, req.(*AssistantSnapshotRollbackReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotInfo(ctx, req.(*AssistantSnapshotInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantSnapshotLatest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantSnapshotInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantSnapshotLatest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantSnapshotLatest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantSnapshotLatest(ctx, req.(*AssistantSnapshotInfoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1313,8 +1553,36 @@ var AssistantService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AssistantService_GetAssistantInfo_Handler,
 		},
 		{
+			MethodName: "GetAssistantIdByUuid",
+			Handler:    _AssistantService_GetAssistantIdByUuid_Handler,
+		},
+		{
 			MethodName: "AssistantCopy",
 			Handler:    _AssistantService_AssistantCopy_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotCreate",
+			Handler:    _AssistantService_AssistantSnapshotCreate_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotUpdate",
+			Handler:    _AssistantService_AssistantSnapshotUpdate_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotList",
+			Handler:    _AssistantService_AssistantSnapshotList_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotRollback",
+			Handler:    _AssistantService_AssistantSnapshotRollback_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotInfo",
+			Handler:    _AssistantService_AssistantSnapshotInfo_Handler,
+		},
+		{
+			MethodName: "AssistantSnapshotLatest",
+			Handler:    _AssistantService_AssistantSnapshotLatest_Handler,
 		},
 		{
 			MethodName: "AssistantWorkFlowCreate",
