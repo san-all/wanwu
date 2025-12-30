@@ -6,6 +6,7 @@ import (
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/model-service/client/model"
+	"github.com/UnicomAI/wanwu/pkg/db"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -20,12 +21,12 @@ func (s *Service) ImportModel(ctx context.Context, req *model_service.ModelInfo)
 		ModelIconPath:  req.ModelIconPath,
 		IsActive:       req.IsActive,
 		PublishDate:    req.PublishDate,
-		ProviderConfig: req.ProviderConfig,
+		ProviderConfig: db.LongText(req.ProviderConfig),
 		PublicModel: model.PublicModel{
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
 		},
-		ModelDesc: req.ModelDesc,
+		ModelDesc: db.LongText(req.ModelDesc),
 	}); err != nil {
 		return nil, errStatus(errs.Code_ModelImportedModel, err)
 	}
@@ -41,8 +42,8 @@ func (s *Service) UpdateModel(ctx context.Context, req *model_service.ModelInfo)
 		DisplayName:    req.DisplayName,
 		ModelIconPath:  req.ModelIconPath,
 		PublishDate:    req.PublishDate,
-		ProviderConfig: req.ProviderConfig,
-		ModelDesc:      req.ModelDesc,
+		ProviderConfig: db.LongText(req.ProviderConfig),
+		ModelDesc:      db.LongText(req.ModelDesc),
 		PublicModel: model.PublicModel{
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
@@ -78,6 +79,33 @@ func (s *Service) ChangeModelStatus(ctx context.Context, req *model_service.Mode
 		return nil, errStatus(errs.Code_ModelChangeModelStatus, err)
 	}
 	return nil, nil
+}
+
+func (s *Service) GetModelById(ctx context.Context, req *model_service.GetModelByIdReq) (*model_service.ModelInfo, error) {
+	modelInfo, err := s.cli.GetModelById(ctx, util.MustU32(req.ModelId))
+	if err != nil {
+		return nil, errStatus(errs.Code_ModelGetModelById, err)
+	}
+	return toModelInfo(modelInfo), nil
+}
+
+func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
+	return &model_service.ModelInfo{
+		ModelId:        util.Int2Str(modelInfo.ID),
+		Provider:       modelInfo.Provider,
+		ModelType:      modelInfo.ModelType,
+		Model:          modelInfo.Model,
+		DisplayName:    modelInfo.DisplayName,
+		ModelIconPath:  modelInfo.ModelIconPath,
+		IsActive:       modelInfo.IsActive,
+		PublishDate:    modelInfo.PublishDate,
+		ProviderConfig: string(modelInfo.ProviderConfig),
+		UserId:         modelInfo.UserID,
+		OrgId:          modelInfo.OrgID,
+		CreatedAt:      modelInfo.CreatedAt,
+		UpdatedAt:      modelInfo.UpdatedAt,
+		ModelDesc:      string(modelInfo.ModelDesc),
+	}
 }
 
 func (s *Service) GetModelByIds(ctx context.Context, req *model_service.GetModelByIdsReq) (*model_service.ModelInfos, error) {

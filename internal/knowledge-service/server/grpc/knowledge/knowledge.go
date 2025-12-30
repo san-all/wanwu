@@ -8,11 +8,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
+	db2 "github.com/UnicomAI/wanwu/pkg/db"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	rag_service "github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -387,7 +390,7 @@ func buildExportRecordListResp(knowledge *model.KnowledgeBase, list []*model.Kno
 			retList = append(retList, &knowledgebase_service.ExportRecordInfo{
 				ExportRecordId: item.ExportId,
 				Status:         int32(item.Status),
-				ErrorMsg:       item.ErrorMsg,
+				ErrorMsg:       string(item.ErrorMsg),
 				FilePath:       item.ExportFilePath,
 				UserId:         item.UserId,
 				ExportTime:     wanwu_util.Time2Str(item.CreatedAt),
@@ -793,8 +796,8 @@ func buildKnowledgeBaseModel(req *knowledgebase_service.CreateKnowledgeReq) (*mo
 		Description:          req.Description,
 		OrgId:                req.OrgId,
 		UserId:               req.UserId,
-		EmbeddingModel:       string(embeddingModelInfo),
-		KnowledgeGraph:       string(knowledgeGraph),
+		EmbeddingModel:       db2.LongText(embeddingModelInfo),
+		KnowledgeGraph:       db2.LongText(knowledgeGraph),
 		KnowledgeGraphSwitch: buildKnowledgeGraphSwitch(req.KnowledgeGraph.Switch),
 		CreatedAt:            time.Now().UnixMilli(),
 		UpdatedAt:            time.Now().UnixMilli(),
